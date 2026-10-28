@@ -17,6 +17,12 @@ const usuariosSemilla = [
     password: "Cliente123",
     rol: "cliente",
   },
+  {
+    nombre: "Cliente de prueba 2",
+    email: "cliente2@tienda.com",
+    password: "Cliente123",
+    rol: "cliente",
+  },
 ];
 
 // [nombre, descripcion, precio (COP), stock, categoria]
@@ -63,7 +69,8 @@ async function sembrarProductos() {
   console.log(`Productos: creados ${productosSemilla.length} de ejemplo`);
 }
 
-async function main() {
+// Exportado para que reset.ts lo reutilice. No cierra el pool.
+export async function sembrar() {
   await sembrarUsuarios();
   await sembrarProductos();
 }
@@ -81,9 +88,12 @@ async function sembrarUsuarios() {
   }
 }
 
-main()
-  .catch((err) => {
-    console.error("Error ejecutando el seed:", err);
-    process.exitCode = 1;
-  })
-  .finally(() => pool.end());
+// Solo se ejecuta al correrlo directamente (npm run seed), no al importarlo.
+if (require.main === module) {
+  sembrar()
+    .catch((err) => {
+      console.error("Error ejecutando el seed:", err);
+      process.exitCode = 1;
+    })
+    .finally(() => pool.end());
+}
