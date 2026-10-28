@@ -1,6 +1,5 @@
 // Validaciones de datos de productos, separadas del controlador.
-
-export type Resultado<T> = { ok: true; datos: T } | { ok: false; mensaje: string };
+import { ENTERO_MAXIMO, leerQuery, validarPaginacion, type Resultado } from "./comunes";
 
 export interface ProductoEntrada {
   nombre: string;
@@ -20,17 +19,6 @@ export interface FiltrosListado {
 }
 
 const PRECIO_MAXIMO = 9999999999.99; // NUMERIC(12,2)
-const ENTERO_MAXIMO = 2147483647; // INT de PostgreSQL
-const LIMITE_POR_DEFECTO = 12;
-const LIMITE_MAXIMO = 50;
-
-function esEnteroPositivo(texto: string): boolean {
-  return /^\d+$/.test(texto) && Number(texto) >= 1 && Number(texto) <= ENTERO_MAXIMO;
-}
-
-export function validarId(valor: unknown): number | null {
-  return typeof valor === "string" && esEnteroPositivo(valor) ? Number(valor) : null;
-}
 
 // Campo de texto opcional: undefined, null o "" se guardan como null.
 function textoOpcional(valor: unknown, campo: string, maximo: number): Resultado<string | null> {
@@ -106,26 +94,11 @@ export function validarProducto(body: unknown): Resultado<ProductoEntrada> {
 
 // Lee los filtros de la query. "activo" solo se acepta en el listado de admin.
 export function validarFiltrosListado(query: Record<string, unknown>, permitirActivo: boolean): Resultado<FiltrosListado> {
-  const leer = (campo: string): string | undefined => {
-    const valor = query[campo];
-    return typeof valor === "string" && valor.trim() !== "" ? valor.trim() : undefined;
-  };
-
-  const paginaTexto = leer("pagina");
-  if (paginaTexto !== undefined && !esEnteroPositivo(paginaTexto)) {
-    return { ok: false, mensaje: "El parámetro pagina debe ser un entero positivo" };
-  }
-
-  const limiteTexto = leer("limite");
-  if (limiteTexto !== undefined && !/^\d+$/.test(limiteTexto)) {
-    return { ok: false, mensaje: "El parámetro limite debe ser un entero positivo" };
-  }
-  let limite = limiteTexto === undefined ? LIMITE_POR_DEFECTO : Number(limiteTexto);
-  if (limite < 1) return { ok: false, mensaje: "El parámetro limite debe ser un entero positivo" };
-  limite = Math.min(limite, LIMITE_MAXIMO);
+  const paginacion = validarPaginacion(query);
+  if (!paginacion.ok) return paginacion;
 
   let activo: boolean | null = null;
-  const activoTexto = leer("activo");
+  const activoTexto = leerQuery(query, "activo");
   if (permitirActivo && activoTexto !== undefined) {
     if (activoTexto !== "true" && activoTexto !== "false") {
       return { ok: false, mensaje: "El parámetro activo debe ser true o false" };
@@ -136,11 +109,10 @@ export function validarFiltrosListado(query: Record<string, unknown>, permitirAc
   return {
     ok: true,
     datos: {
-      buscar: leer("buscar") ?? null,
-      categoria: leer("categoria") ?? null,
+      buscar: leerQuery(query, "buscar") ?? null,
+      categoria: leerQuery(query, "categoria") ?? null,
       activo,
-      pagina: paginaTexto === undefined ? 1 : Number(paginaTexto),
-      limite,
+      ...paginacion.datos,
     },
   };
 }

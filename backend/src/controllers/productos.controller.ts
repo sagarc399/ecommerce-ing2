@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { pool } from "../config/db";
-import { validarFiltrosListado, validarId, validarProducto } from "../validators/producto.validator";
+import { validarId } from "../validators/comunes";
+import { validarFiltrosListado, validarProducto } from "../validators/producto.validator";
 
 const COLUMNAS = "id, nombre, descripcion, precio, stock, imagen_url, categoria, activo, creado_en, actualizado_en";
 

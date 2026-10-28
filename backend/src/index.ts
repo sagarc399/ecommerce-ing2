@@ -4,6 +4,7 @@ import { env } from "./config/env";
 import { pool } from "./config/db";
 import authRoutes from "./routes/auth.routes";
 import productosRoutes, { adminProductosRouter } from "./routes/productos.routes";
+import ordenesRoutes, { adminOrdenesRouter } from "./routes/ordenes.routes";
 import { errorHandler, rutaNoEncontrada } from "./middleware/errorHandler";
 
 const app = express();
@@ -19,6 +20,8 @@ app.get("/api/health", async (_req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/productos", productosRoutes);
 app.use("/api/admin/productos", adminProductosRouter);
+app.use("/api/ordenes", ordenesRoutes);
+app.use("/api/admin/ordenes", adminOrdenesRouter);
 
 app.use(rutaNoEncontrada);
 app.use(errorHandler);
