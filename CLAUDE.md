@@ -27,8 +27,8 @@ Tienda web con: inicio de sesión (JWT), CRUD de productos (solo admin), carrito
 ## Fases
 1. Base de datos en Docker ✅
 2. Backend: auth (registro/login) + seed de admin ✅
-3. Backend: CRUD de productos ← SIGUIENTE (esperando confirmación)
-4. Backend: órdenes + pago simulado (transacción)
+3. Backend: CRUD de productos ✅
+4. Backend: órdenes + pago simulado (transacción) ← SIGUIENTE (esperando confirmación)
 5. Frontend: login, catálogo, carrito
 6. Frontend: checkout, mis pedidos, panel admin
 7. Pruebas y evidencias
