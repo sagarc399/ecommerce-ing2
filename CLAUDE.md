@@ -4,8 +4,8 @@
 Tienda web con: inicio de sesión (JWT), CRUD de productos (solo admin), carrito de compras, checkout con pago SIMULADO y vista "Mis pedidos". Se basa en una arquitectura de referencia: Cliente → API Gateway/Auth (JWT + roles) → servicio con validaciones → PostgreSQL con transacciones ACID.
 
 ## Stack (no cambiar)
-- Base de datos: PostgreSQL 16 en Docker (docker-compose.yml en la raíz)
-- Backend: Node.js + Express + TypeScript, librería `pg` (sin ORM), bcrypt, jsonwebtoken, dotenv, cors
+- Base de datos: PostgreSQL 16 en Docker (docker-compose.yml en la raíz), expuesto en el puerto 5434 del host (5432 y 5433 los ocupan PostgreSQL nativos de Windows)
+- Backend: Node.js + Express + TypeScript, librería `pg` (sin ORM), bcryptjs, jsonwebtoken, dotenv, cors
 - Frontend: React + Vite + TypeScript + Tailwind CSS v3
 
 ## Estructura
@@ -25,9 +25,9 @@ Tienda web con: inicio de sesión (JWT), CRUD de productos (solo admin), carrito
 - Secretos solo en .env, nunca valores por defecto en el código.
 
 ## Fases
-1. Base de datos en Docker ← ACTUAL
-2. Backend: auth (registro/login) + seed de admin
-3. Backend: CRUD de productos
+1. Base de datos en Docker ✅
+2. Backend: auth (registro/login) + seed de admin ✅
+3. Backend: CRUD de productos ← SIGUIENTE (esperando confirmación)
 4. Backend: órdenes + pago simulado (transacción)
 5. Frontend: login, catálogo, carrito
 6. Frontend: checkout, mis pedidos, panel admin
