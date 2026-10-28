@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import * as authApi from '../api/auth'
 import { alExpirarSesion, ErrorApi, guardarToken, obtenerToken } from '../api/cliente'
 import type { Usuario } from '../types'
@@ -10,7 +10,9 @@ interface ValorAuth {
   cargando: boolean // true mientras se valida la sesión guardada al recargar
   login: (email: string, password: string) => Promise<Usuario>
   registro: (nombre: string, email: string, password: string) => Promise<Usuario>
-  logout: () => void
+  logout: (opciones?: { voluntario?: boolean }) => void
+  // true si el usuario cerró sesión con el botón "Salir" (no por token expirado).
+  salidaVoluntaria: boolean
 }
 
 const AuthContext = createContext<ValorAuth | null>(null)
@@ -21,17 +23,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [usuario, setUsuario] = useState<Usuario | null>(null)
   const [cargando, setCargando] = useState<boolean>(() => obtenerToken() !== null)
 
-  const logout = useCallback(() => {
+  const [salidaVoluntaria, setSalidaVoluntaria] = useState(false)
+  const { pathname } = useLocation()
+
+  // La marca de "salió con el botón" solo aplica a la página donde estaba: al cambiar de ruta se borra,
+  // para que luego, sin sesión, /checkout vuelva a pedir login.
+  useEffect(() => {
+    setSalidaVoluntaria(false)
+  }, [pathname])
+
+  const logout = useCallback((opciones?: { voluntario?: boolean }) => {
     guardarToken(null)
     setToken(null)
     setUsuario(null)
+    setSalidaVoluntaria(opciones?.voluntario === true)
   }, [])
 
-  // Si el backend responde 401 a una petición con token: se cierra la sesión y se va a /login.
+  // Si el backend responde 401 a una petición con token: se cierra la sesión y se va a /login,
+  // con ?redirigir= para volver a la página actual después de iniciar sesión.
   useEffect(() => {
     alExpirarSesion(() => {
       logout()
-      navigate('/login', { state: { mensaje: 'Tu sesión expiró. Inicia sesión de nuevo.' } })
+      const redirigir = encodeURIComponent(window.location.pathname + window.location.search)
+      navigate(`/login?redirigir=${redirigir}`, { state: { mensaje: 'Tu sesión expiró. Inicia sesión de nuevo.' } })
     })
     return () => alExpirarSesion(null)
   }, [logout, navigate])
@@ -64,6 +78,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     guardarToken(respuesta.token)
     setToken(respuesta.token)
     setUsuario(respuesta.usuario)
+    setSalidaVoluntaria(false)
     return respuesta.usuario
   }, [])
 
@@ -76,8 +91,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   )
 
   const valor = useMemo(
-    () => ({ usuario, token, cargando, login, registro, logout }),
-    [usuario, token, cargando, login, registro, logout]
+    () => ({ usuario, token, cargando, login, registro, logout, salidaVoluntaria }),
+    [usuario, token, cargando, login, registro, logout, salidaVoluntaria]
   )
 
   return <AuthContext.Provider value={valor}>{children}</AuthContext.Provider>

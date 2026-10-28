@@ -30,5 +30,5 @@ Tienda web con: inicio de sesión (JWT), CRUD de productos (solo admin), carrito
 3. Backend: CRUD de productos ✅
 4. Backend: órdenes + pago simulado (transacción) ✅
 5. Frontend: login, catálogo, carrito ✅
-6. Frontend: checkout, mis pedidos, panel admin ← SIGUIENTE (esperando confirmación)
-7. Pruebas y evidencias
+6. Frontend: checkout, mis pedidos, panel admin ✅
+7. Pruebas y evidencias ← SIGUIENTE (esperando confirmación)

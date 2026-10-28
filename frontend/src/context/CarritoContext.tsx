@@ -11,6 +11,7 @@ interface ValorCarrito {
   agregar: (producto: Producto, cantidad: number) => void
   cambiarCantidad: (productoId: number, cantidad: number) => void
   quitar: (productoId: number) => void
+  ajustarADisponible: (productoId: number, disponible: number) => void
   vaciar: () => void
   cantidadEnCarrito: (productoId: number) => number
 }
@@ -77,6 +78,19 @@ export function CarritoProvider({ children }: { children: ReactNode }) {
     setItems((actuales) => actuales.filter((i) => i.producto_id !== productoId))
   }, [])
 
+  // Tras un 409 del checkout: actualiza el stock conocido y deja la cantidad en lo disponible (0 → se quita).
+  const ajustarADisponible = useCallback((productoId: number, disponible: number) => {
+    setItems((actuales) =>
+      disponible <= 0
+        ? actuales.filter((i) => i.producto_id !== productoId)
+        : actuales.map((i) =>
+            i.producto_id === productoId
+              ? { ...i, stock: disponible, cantidad: Math.min(i.cantidad, cantidadMaxima(disponible)) }
+              : i
+          )
+    )
+  }, [])
+
   const vaciar = useCallback(() => setItems([]), [])
 
   const cantidadEnCarrito = useCallback(
@@ -92,10 +106,11 @@ export function CarritoProvider({ children }: { children: ReactNode }) {
       agregar,
       cambiarCantidad,
       quitar,
+      ajustarADisponible,
       vaciar,
       cantidadEnCarrito,
     }),
-    [items, agregar, cambiarCantidad, quitar, vaciar, cantidadEnCarrito]
+    [items, agregar, cambiarCantidad, quitar, ajustarADisponible, vaciar, cantidadEnCarrito]
   )
 
   return <CarritoContext.Provider value={valor}>{children}</CarritoContext.Provider>

@@ -30,6 +30,44 @@ export interface ItemCarrito {
   cantidad: number
 }
 
+export type EstadoOrden = 'PAGADA' | 'RECHAZADA'
+
+export interface ItemOrden {
+  producto_id: number
+  nombre: string
+  cantidad: number
+  precio_unitario: number
+  subtotal: number
+}
+
+export interface PagoOrden {
+  estado: 'APROBADO' | 'RECHAZADO'
+  ultimos4: string
+  referencia: string
+  monto: number
+}
+
+export interface Orden {
+  id: number
+  usuario_id: number
+  total: number
+  estado: EstadoOrden
+  creado_en: string
+  comprador: { id: number; nombre: string; email: string }
+  items: ItemOrden[]
+  pago: PagoOrden | null
+}
+
+// Datos que el admin envía al crear o editar un producto (POST y PUT usan el mismo cuerpo).
+export interface ProductoEntrada {
+  nombre: string
+  descripcion: string
+  precio: number
+  stock: number
+  imagen_url: string
+  categoria: string
+}
+
 export interface RespuestaPaginada<T> {
   datos: T[]
   total: number

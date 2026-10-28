@@ -1,11 +1,11 @@
 import { useState, type FormEvent } from 'react'
-import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { mensajeDeError } from '../api/cliente'
 import MensajeError from '../components/MensajeError'
 import { useAuth } from '../context/AuthContext'
+import { rutaInternaSegura } from '../utils/formato'
 
 interface EstadoNavegacion {
-  desde?: string
   mensaje?: string
 }
 
@@ -13,13 +13,16 @@ export default function Login() {
   const { usuario, login } = useAuth()
   const navigate = useNavigate()
   const estado = (useLocation().state ?? {}) as EstadoNavegacion
+  // /login?redirigir=/checkout → después de iniciar sesión vuelve a /checkout.
+  const redirigir = rutaInternaSegura(useSearchParams()[0].get('redirigir'))
+  const destino = redirigir ?? '/'
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [enviando, setEnviando] = useState(false)
 
-  if (usuario) return <Navigate to="/" replace />
+  if (usuario) return <Navigate to={destino} replace />
 
   async function enviar(e: FormEvent) {
     e.preventDefault()
@@ -27,7 +30,7 @@ export default function Login() {
     setEnviando(true)
     try {
       await login(email.trim(), password)
-      navigate(estado.desde ?? '/', { replace: true })
+      navigate(destino, { replace: true })
     } catch (err) {
       setError(mensajeDeError(err))
     } finally {
@@ -87,7 +90,10 @@ export default function Login() {
 
       <p className="mt-4 text-center text-sm text-slate-600">
         ¿No tienes cuenta?{' '}
-        <Link to="/registro" className="font-medium text-indigo-700 hover:underline">
+        <Link
+          to={redirigir ? `/registro?redirigir=${encodeURIComponent(redirigir)}` : '/registro'}
+          className="font-medium text-indigo-700 hover:underline"
+        >
           Regístrate
         </Link>
       </p>

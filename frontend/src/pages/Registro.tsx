@@ -1,14 +1,17 @@
 import { useState, type FormEvent } from 'react'
-import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import { mensajeDeError } from '../api/cliente'
 import MensajeError from '../components/MensajeError'
 import { useAuth } from '../context/AuthContext'
+import { rutaInternaSegura } from '../utils/formato'
 
 const PASSWORD_MINIMO = 8
 
 export default function Registro() {
   const { usuario, registro } = useAuth()
   const navigate = useNavigate()
+  const redirigir = rutaInternaSegura(useSearchParams()[0].get('redirigir'))
+  const destino = redirigir ?? '/'
 
   const [nombre, setNombre] = useState('')
   const [email, setEmail] = useState('')
@@ -16,7 +19,7 @@ export default function Registro() {
   const [error, setError] = useState<string | null>(null)
   const [enviando, setEnviando] = useState(false)
 
-  if (usuario) return <Navigate to="/" replace />
+  if (usuario) return <Navigate to={destino} replace />
 
   async function enviar(e: FormEvent) {
     e.preventDefault()
@@ -35,7 +38,7 @@ export default function Registro() {
     setEnviando(true)
     try {
       await registro(nombre.trim(), email.trim(), password)
-      navigate('/', { replace: true })
+      navigate(destino, { replace: true })
     } catch (err) {
       setError(mensajeDeError(err))
     } finally {
@@ -96,7 +99,10 @@ export default function Registro() {
 
       <p className="mt-4 text-center text-sm text-slate-600">
         ¿Ya tienes cuenta?{' '}
-        <Link to="/login" className="font-medium text-indigo-700 hover:underline">
+        <Link
+          to={redirigir ? `/login?redirigir=${encodeURIComponent(redirigir)}` : '/login'}
+          className="font-medium text-indigo-700 hover:underline"
+        >
           Inicia sesión
         </Link>
       </p>

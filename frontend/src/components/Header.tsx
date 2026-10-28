@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useCarrito } from '../context/CarritoContext'
 
@@ -7,8 +7,12 @@ export default function Header() {
   const { totalUnidades } = useCarrito()
   const navigate = useNavigate()
 
+  const claseEnlace = ({ isActive }: { isActive: boolean }) =>
+    `whitespace-nowrap rounded-md px-2 py-1.5 font-medium ${isActive ? 'bg-indigo-50 text-indigo-700' : 'text-slate-700 hover:bg-slate-100'}`
+
+  // voluntario: si está en una ruta protegida, RutaProtegida lo manda al catálogo y no a /login.
   function cerrarSesion() {
-    logout()
+    logout({ voluntario: true })
     navigate('/')
   }
 
@@ -34,7 +38,16 @@ export default function Header() {
 
           {usuario ? (
             <>
-              <span className="max-w-[9rem] truncate text-slate-600" title={usuario.email}>
+              {usuario.rol === 'admin' ? (
+                <NavLink to="/admin" className={claseEnlace}>
+                  Panel admin
+                </NavLink>
+              ) : (
+                <NavLink to="/pedidos" className={claseEnlace}>
+                  Mis pedidos
+                </NavLink>
+              )}
+              <span className="hidden max-w-[9rem] truncate text-slate-600 md:inline" title={usuario.email}>
                 {usuario.nombre}
                 {usuario.rol === 'admin' && <span className="ml-1 rounded bg-amber-100 px-1.5 py-0.5 text-xs text-amber-800">admin</span>}
               </span>

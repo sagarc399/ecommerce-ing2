@@ -7,11 +7,13 @@ const CLAVE_TOKEN = 'token'
 
 export class ErrorApi extends Error {
   status: number
+  datos: unknown // cuerpo completo de la respuesta (p. ej. producto_id y disponible en un 409)
 
-  constructor(status: number, mensaje: string) {
+  constructor(status: number, mensaje: string, datos: unknown = null) {
     super(mensaje)
     this.name = 'ErrorApi'
     this.status = status
+    this.datos = datos
   }
 }
 
@@ -74,7 +76,7 @@ export async function apiFetch<T>(ruta: string, opciones: OpcionesFetch = {}): P
       datos && typeof datos === 'object' && 'mensaje' in datos && typeof datos.mensaje === 'string'
         ? datos.mensaje
         : `Error inesperado (HTTP ${respuesta.status})`
-    throw new ErrorApi(respuesta.status, mensaje)
+    throw new ErrorApi(respuesta.status, mensaje, datos)
   }
 
   return datos as T

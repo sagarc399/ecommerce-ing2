@@ -77,10 +77,12 @@ export default function Carrito() {
             <span>{formatearPrecio(total)}</span>
           </div>
           <p className="mt-2 text-xs text-slate-400">El total final se confirma con los precios vigentes al momento de pagar.</p>
-          <button type="button" disabled className="mt-4 w-full cursor-not-allowed rounded-md bg-slate-300 px-4 py-2.5 font-medium text-white">
+          <Link
+            to="/checkout"
+            className="mt-4 block w-full rounded-md bg-indigo-600 px-4 py-2.5 text-center font-medium text-white hover:bg-indigo-700"
+          >
             Proceder al pago
-          </button>
-          <p className="mt-1 text-center text-xs text-slate-500">Disponible en la siguiente fase</p>
+          </Link>
         </aside>
       </div>
     </div>
