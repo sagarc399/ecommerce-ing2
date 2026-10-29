@@ -2,7 +2,10 @@
 import type { MensajeChat } from "../chat/proveedor";
 import type { Resultado } from "./comunes";
 
-const MAXIMO_CARACTERES = 500;
+// El límite de 500 es para lo que escribe el usuario. Las respuestas del asistente (que vuelven en el
+// historial) las genera el propio backend y pueden ser algo más largas: si se les aplicara 500, una
+// respuesta larga rompería la conversación en el turno siguiente.
+const MAXIMO_POR_ROL = { usuario: 500, asistente: 2000 } as const;
 const MAXIMO_MENSAJES_RECIBIDOS = 50;
 const MENSAJES_AL_MODELO = 10;
 
@@ -22,8 +25,9 @@ export function validarChat(body: unknown): Resultado<MensajeChat[]> {
     if (rol !== "usuario" && rol !== "asistente") {
       return { ok: false, mensaje: `mensajes[${i}].rol debe ser "usuario" o "asistente"` };
     }
-    if (typeof texto !== "string" || texto.trim().length < 1 || texto.trim().length > MAXIMO_CARACTERES) {
-      return { ok: false, mensaje: `mensajes[${i}].texto debe tener entre 1 y ${MAXIMO_CARACTERES} caracteres` };
+    const maximo = MAXIMO_POR_ROL[rol];
+    if (typeof texto !== "string" || texto.trim().length < 1 || texto.trim().length > maximo) {
+      return { ok: false, mensaje: `mensajes[${i}].texto debe tener entre 1 y ${maximo} caracteres` };
     }
     limpios.push({ rol, texto: texto.trim() });
   }

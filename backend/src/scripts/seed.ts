@@ -25,26 +25,23 @@ const usuariosSemilla = [
   },
 ];
 
-// [nombre, descripcion, precio (COP), stock, categoria]
-const productosSemilla: [string, string, number, number, string][] = [
-  ["Audífonos Bluetooth", "Audífonos inalámbricos con cancelación de ruido y 30 horas de batería.", 189900, 25, "Tecnología"],
-  ["Teclado mecánico", "Teclado mecánico retroiluminado con switches rojos, distribución en español.", 249900, 15, "Tecnología"],
-  ["Mouse inalámbrico", "Mouse ergonómico inalámbrico de 1600 DPI con receptor USB.", 45000, 40, "Tecnología"],
-  ["Monitor 24 pulgadas", "Monitor Full HD IPS de 24 pulgadas a 75 Hz. Última unidad disponible.", 1250000, 1, "Tecnología"],
-  ["Cafetera de goteo", "Cafetera eléctrica de goteo para 12 tazas con jarra de vidrio.", 159900, 12, "Hogar"],
-  ["Juego de sábanas", "Juego de sábanas doble en algodón de 200 hilos.", 129900, 20, "Hogar"],
-  ["Lámpara de escritorio LED", "Lámpara LED con brazo flexible y tres niveles de intensidad.", 89900, 0, "Hogar"],
-  ["Balón de fútbol", "Balón de fútbol número 5 cosido a máquina.", 79900, 30, "Deportes"],
-  ["Mat de yoga", "Mat antideslizante de 6 mm con correa para transportar.", 65000, 18, "Deportes"],
-  ["Mancuernas 5 kg", "Par de mancuernas de 5 kg recubiertas en neopreno.", 149900, 10, "Deportes"],
-  ["Camiseta deportiva", "Camiseta de secado rápido para entrenamiento, talla M.", 49900, 50, "Ropa"],
-  ["Chaqueta impermeable", "Chaqueta rompevientos impermeable con capucha.", 289900, 8, "Ropa"],
+// [nombre, descripcion, precio (COP), stock, categoria, imagen]
+// Las imágenes están en frontend/public/productos/ y el frontend las sirve en /productos/<archivo>:
+// así la demo no depende de internet para mostrar el catálogo.
+const productosSemilla: [string, string, number, number, string, string][] = [
+  ["Audífonos Bluetooth", "Audífonos inalámbricos con cancelación de ruido y 30 horas de batería.", 189900, 25, "Tecnología", "audifonos-bluetooth.jpg"],
+  ["Teclado mecánico", "Teclado mecánico retroiluminado con switches rojos, distribución en español.", 249900, 15, "Tecnología", "teclado-mecanico.jpg"],
+  ["Mouse inalámbrico", "Mouse ergonómico inalámbrico de 1600 DPI con receptor USB.", 45000, 40, "Tecnología", "mouse-inalambrico.jpg"],
+  ["Monitor 24 pulgadas", "Monitor Full HD IPS de 24 pulgadas a 75 Hz. Última unidad disponible.", 1250000, 1, "Tecnología", "monitor-24.jpg"],
+  ["Cafetera de goteo", "Cafetera eléctrica de goteo para 12 tazas con jarra de vidrio.", 159900, 12, "Hogar", "cafetera-goteo.jpg"],
+  ["Juego de sábanas", "Juego de sábanas doble en algodón de 200 hilos.", 129900, 20, "Hogar", "juego-sabanas.jpg"],
+  ["Lámpara de escritorio LED", "Lámpara LED con brazo flexible y tres niveles de intensidad.", 89900, 0, "Hogar", "lampara-escritorio-led.jpg"],
+  ["Balón de fútbol", "Balón de fútbol número 5 cosido a máquina.", 79900, 30, "Deportes", "balon-futbol.jpg"],
+  ["Mat de yoga", "Mat antideslizante de 6 mm con correa para transportar.", 65000, 18, "Deportes", "mat-yoga.jpg"],
+  ["Mancuernas 5 kg", "Par de mancuernas de 5 kg recubiertas en neopreno.", 149900, 10, "Deportes", "mancuernas-5kg.jpg"],
+  ["Camiseta deportiva", "Camiseta de secado rápido para entrenamiento, talla M.", 49900, 50, "Ropa", "camiseta-deportiva.jpg"],
+  ["Chaqueta impermeable", "Chaqueta rompevientos impermeable con capucha.", 289900, 8, "Ropa", "chaqueta-impermeable.jpg"],
 ];
-
-// "Lámpara de escritorio LED" → "LamparadeescritorioLED"
-function semillaImagen(nombre: string): string {
-  return nombre.normalize("NFD").replace(/[^A-Za-z0-9]/g, "");
-}
 
 async function sembrarProductos() {
   const { rows } = await pool.query("SELECT COUNT(*)::int AS total FROM productos");
@@ -54,8 +51,8 @@ async function sembrarProductos() {
   }
 
   const valores: unknown[] = [];
-  const filas = productosSemilla.map(([nombre, descripcion, precio, stock, categoria]) => {
-    const imagen = `https://picsum.photos/seed/${semillaImagen(nombre)}/600/400`;
+  const filas = productosSemilla.map(([nombre, descripcion, precio, stock, categoria, archivo]) => {
+    const imagen = `/productos/${archivo}`;
     valores.push(nombre, descripcion, precio, stock, imagen, categoria);
     const n = valores.length;
     return `($${n - 5}, $${n - 4}, $${n - 3}, $${n - 2}, $${n - 1}, $${n})`;

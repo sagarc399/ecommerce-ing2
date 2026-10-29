@@ -35,7 +35,12 @@ export function formularioDesdeProducto(p: Producto): FormularioProducto {
   }
 }
 
-export function esUrlHttp(texto: string): boolean {
+// Imágenes del seed servidas por el propio frontend desde public/productos/ (igual que en el backend).
+const RUTA_IMAGEN_LOCAL = /^\/productos\/[a-z0-9-]+\.(jpg|jpeg|png|webp)$/
+
+// URL http/https o imagen local /productos/<archivo>.
+export function esImagenValida(texto: string): boolean {
+  if (RUTA_IMAGEN_LOCAL.test(texto)) return true
   try {
     const url = new URL(texto)
     return url.protocol === 'http:' || url.protocol === 'https:'
@@ -69,7 +74,9 @@ export function validarProducto(f: FormularioProducto): ErroresProducto {
 
   const imagen = f.imagen_url.trim()
   if (imagen.length > 500) errores.imagen_url = 'La URL no puede superar 500 caracteres'
-  else if (imagen && !esUrlHttp(imagen)) errores.imagen_url = 'Debe ser una URL válida que empiece por http:// o https://'
+  else if (imagen && !esImagenValida(imagen)) {
+    errores.imagen_url = 'Debe ser una URL que empiece por http:// o https://, o una imagen local /productos/<archivo>'
+  }
 
   if (f.categoria.trim().length > 80) errores.categoria = 'La categoría no puede superar 80 caracteres'
 

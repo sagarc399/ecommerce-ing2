@@ -4,7 +4,7 @@ import { actualizarProducto, crearProducto, listarCategorias } from '../api/prod
 import type { Producto } from '../types'
 import {
   aProductoEntrada,
-  esUrlHttp,
+  esImagenValida,
   FORMULARIO_PRODUCTO_VACIO,
   formularioDesdeProducto,
   validarProducto,
@@ -67,7 +67,7 @@ export default function FormularioProducto({ producto, onGuardado, onCancelar }:
       errores[clave] ? 'border-red-400 focus:ring-red-200' : 'border-slate-300 focus:border-indigo-500 focus:ring-indigo-200'
     }`
   const errorDe = (clave: keyof Formulario) => (errores[clave] ? <p className="mt-1 text-xs text-red-600">{errores[clave]}</p> : null)
-  const urlVistaPrevia = esUrlHttp(form.imagen_url.trim()) ? form.imagen_url.trim() : null
+  const urlVistaPrevia = esImagenValida(form.imagen_url.trim()) ? form.imagen_url.trim() : null
 
   return (
     <form onSubmit={guardar} noValidate className="space-y-4">

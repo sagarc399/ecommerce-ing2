@@ -1,0 +1,15 @@
+{
+  "name": "ecommerce-ing2",
+  "private": true,
+  "description": "Tienda USCO - Electiva Ingeniería de Software II. Scripts para arrancar backend y frontend juntos.",
+  "scripts": {
+    "instalar": "npm install && npm --prefix backend install && npm --prefix frontend install",
+    "dev": "concurrently --names api,web --prefix-colors blue.bold,magenta.bold --kill-others-on-fail \"npm --prefix backend run dev\" \"npm --prefix frontend run dev\"",
+    "db:reset": "npm --prefix backend run db:reset",
+    "verificar": "node scripts/verificar.mjs",
+    "prueba:concurrencia": "npm --prefix backend run prueba:concurrencia"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.6"
+  }
+}

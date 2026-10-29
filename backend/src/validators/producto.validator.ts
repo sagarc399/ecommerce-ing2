@@ -19,6 +19,8 @@ export interface FiltrosListado {
 }
 
 const PRECIO_MAXIMO = 9999999999.99; // NUMERIC(12,2)
+// Imágenes servidas por el frontend desde public/productos/ (las del seed), p. ej. /productos/monitor-24.jpg
+const RUTA_IMAGEN_LOCAL = /^\/productos\/[a-z0-9-]+\.(jpg|jpeg|png|webp)$/;
 
 // Campo de texto opcional: undefined, null o "" se guardan como null.
 function textoOpcional(valor: unknown, campo: string, maximo: number): Resultado<string | null> {
@@ -64,7 +66,7 @@ export function validarProducto(body: unknown): Resultado<ProductoEntrada> {
 
   const imagen = textoOpcional(imagen_url, "imagen_url", 500);
   if (!imagen.ok) return imagen;
-  if (imagen.datos !== null) {
+  if (imagen.datos !== null && !RUTA_IMAGEN_LOCAL.test(imagen.datos)) {
     let url: URL | null = null;
     try {
       url = new URL(imagen.datos);
@@ -72,7 +74,10 @@ export function validarProducto(body: unknown): Resultado<ProductoEntrada> {
       url = null;
     }
     if (!url || (url.protocol !== "http:" && url.protocol !== "https:")) {
-      return { ok: false, mensaje: "El campo imagen_url debe ser una URL válida que empiece por http:// o https://" };
+      return {
+        ok: false,
+        mensaje: "El campo imagen_url debe ser una URL que empiece por http:// o https://, o una imagen local /productos/<archivo>",
+      };
     }
   }
 
