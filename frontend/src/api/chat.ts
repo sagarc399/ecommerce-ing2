@@ -9,7 +9,7 @@ export interface MensajeChatApi {
 
 export interface RespuestaChat {
   respuesta: string
-  proveedor: 'gemini' | 'reglas'
+  proveedor: 'groq' | 'gemini' | 'reglas'
 }
 
 export function enviarMensaje(mensajes: MensajeChatApi[]) {

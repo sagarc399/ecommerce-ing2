@@ -8,9 +8,20 @@ export interface MensajeChat {
   texto: string;
 }
 
-export type NombreProveedor = "gemini" | "reglas";
+export type NombreProveedor = "groq" | "gemini" | "reglas";
 
 export interface ProveedorChat {
   nombre: NombreProveedor;
   responder(mensajes: MensajeChat[]): Promise<string>;
+}
+
+// Error HTTP de un proveedor externo (401 key inválida, 429 límite, 5xx caída...).
+export class ErrorHttpProveedor extends Error {
+  readonly status: number;
+
+  constructor(status: number, mensaje: string) {
+    super(mensaje);
+    this.name = "ErrorHttpProveedor";
+    this.status = status;
+  }
 }

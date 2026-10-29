@@ -46,4 +46,6 @@ export const chatEnv = {
   CHAT_PROVEEDOR: leerOpcional("CHAT_PROVEEDOR"),
   GEMINI_API_KEY: leerOpcional("GEMINI_API_KEY"),
   GEMINI_MODEL: leerOpcional("GEMINI_MODEL"),
+  GROQ_API_KEY: leerOpcional("GROQ_API_KEY"),
+  GROQ_MODEL: leerOpcional("GROQ_MODEL"),
 };

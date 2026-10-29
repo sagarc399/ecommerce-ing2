@@ -1,4 +1,4 @@
-import { ApiError, GoogleGenAI } from "@google/genai";
+import { ApiError, GoogleGenAI, ThinkingLevel } from "@google/genai";
 import type { MensajeChat, ProveedorChat } from "./proveedor";
 import { PROMPT_SISTEMA } from "./prompt-sistema";
 
@@ -56,7 +56,10 @@ export class ProveedorGemini implements ProveedorChat {
       config: {
         systemInstruction: PROMPT_SISTEMA,
         temperature: 0.4,
-        maxOutputTokens: 400,
+        maxOutputTokens: 300,
+        // Razonamiento al mínimo: las respuestas son cortas y no lo necesitan. En los modelos 3.x se usa
+        // thinkingLevel; thinkingBudget: 0 lo rechazan con 400.
+        thinkingConfig: { thinkingLevel: ThinkingLevel.MINIMAL },
         // El corte es del lado del cliente: no se usa httpOptions.timeout porque Google rechaza
         // (400) plazos menores a 10 s.
         abortSignal: AbortSignal.timeout(restante),
