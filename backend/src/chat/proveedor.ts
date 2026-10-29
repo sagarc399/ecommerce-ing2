@@ -1,5 +1,5 @@
 // Patrón Strategy: cada proveedor sabe responder una conversación; chat.service elige cuál usar.
-// En la v2 (consultas a productos y pedidos) se agregará aquí el contexto/herramientas que reciba el proveedor.
+import type { UsuarioToken } from "../middleware/auth";
 
 export type RolChat = "usuario" | "asistente";
 
@@ -8,11 +8,16 @@ export interface MensajeChat {
   texto: string;
 }
 
+// Datos de la petición que el proveedor puede usar (v2): el usuario sale SIEMPRE del token JWT.
+export interface ContextoChat {
+  usuario: UsuarioToken | null; // null = visitante sin sesión
+}
+
 export type NombreProveedor = "groq" | "gemini" | "reglas";
 
 export interface ProveedorChat {
   nombre: NombreProveedor;
-  responder(mensajes: MensajeChat[]): Promise<string>;
+  responder(mensajes: MensajeChat[], contexto: ContextoChat): Promise<string>;
 }
 
 // Error HTTP de un proveedor externo (401 key inválida, 429 límite, 5xx caída...).

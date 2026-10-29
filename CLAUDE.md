@@ -34,4 +34,4 @@ Tienda web con: inicio de sesión (JWT), CRUD de productos (solo admin), carrito
 6. Frontend: checkout, mis pedidos, panel admin ✅
 7. Chatbot v1: botón flotante, Groq (o Gemini) con respaldo por reglas, sin acceso a la BD ✅
 8. Preparación de la demo (arranque desde cero, guion, evidencias) ✅
-9. (Futura) Chatbot v2: con acceso a la BD (consultar productos y pedidos)
+9. Chatbot v2: herramientas de solo lectura (productos, categorías y pedidos del usuario del token) ✅ (en la rama chatbot-v2, sin merge a master)

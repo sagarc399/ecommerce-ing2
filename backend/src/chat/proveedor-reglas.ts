@@ -27,7 +27,7 @@ const REGLAS: Regla[] = [
   {
     claves: ["precio", "cuesta", "cuestan", "vale", "valor", "stock", "disponible", "existencia", "agotado", "quedan", "descuento", "oferta"],
     respuesta:
-      "En esta versión no tengo acceso al catálogo, así que no puedo darte precios ni existencias. Usa el buscador de la página principal: ahí verás el precio actual y si el producto está disponible o agotado.",
+      "En este momento no puedo consultar el catálogo, así que no puedo darte precios ni existencias. Usa el buscador de la página principal: ahí verás el precio actual y si el producto está disponible o agotado.",
   },
   {
     claves: ["pago", "pagar", "tarjeta", "cvv", "checkout", "vencimiento"],

@@ -11,7 +11,7 @@ function formatearProducto(fila: Record<string, unknown>) {
 }
 
 // Escapa los comodines de LIKE para que el texto buscado se tome literal.
-function escaparLike(texto: string): string {
+export function escaparLike(texto: string): string {
   return texto.replace(/[\\%_]/g, (c) => `\\${c}`);
 }
 

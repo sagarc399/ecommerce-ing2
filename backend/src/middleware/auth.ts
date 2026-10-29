@@ -28,16 +28,35 @@ export function verificarToken(req: Request, res: Response, next: NextFunction) 
     return res.status(401).json({ mensaje: "Token no proporcionado" });
   }
 
+  const usuario = leerUsuarioDelToken(token);
+  if (!usuario) {
+    return res.status(401).json({ mensaje: "Token inválido o expirado" });
+  }
+  req.usuario = usuario;
+  next();
+}
+
+// Devuelve { id, rol } si el token es válido y no ha expirado; si no, null.
+function leerUsuarioDelToken(token: string): UsuarioToken | null {
   try {
     const payload = jwt.verify(token, env.JWT_SECRET);
     if (typeof payload === "string" || typeof payload.id !== "number" || typeof payload.rol !== "string") {
-      return res.status(401).json({ mensaje: "Token inválido o expirado" });
+      return null;
     }
-    req.usuario = { id: payload.id, rol: payload.rol as Rol };
-    next();
+    return { id: payload.id, rol: payload.rol as Rol };
   } catch {
-    return res.status(401).json({ mensaje: "Token inválido o expirado" });
+    return null;
   }
+}
+
+// Autenticación opcional (chat): si hay un token válido guarda req.usuario; si no hay o es inválido,
+// sigue como anónimo sin responder 401.
+export function autenticacionOpcional(req: Request, _res: Response, next: NextFunction) {
+  const encabezado = req.headers.authorization;
+  const token = encabezado?.startsWith("Bearer ") ? encabezado.slice("Bearer ".length).trim() : "";
+  const usuario = token ? leerUsuarioDelToken(token) : null;
+  if (usuario) req.usuario = usuario;
+  next();
 }
 
 export function requiereRol(...roles: Rol[]) {

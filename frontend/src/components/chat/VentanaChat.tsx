@@ -13,7 +13,7 @@ export interface MensajeVista {
 
 export const MAXIMO_CARACTERES = 500
 
-const SUGERENCIAS = ['¿Cómo compro?', '¿Cómo funciona el pago?', '¿Dónde veo mis pedidos?']
+const SUGERENCIAS = ['¿Qué productos de Tecnología hay?', '¿Cuánto cuesta el monitor?', '¿Cómo va mi último pedido?']
 
 interface Props {
   mensajes: MensajeVista[]

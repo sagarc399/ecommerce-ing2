@@ -5,7 +5,7 @@ import { validarId } from "../validators/comunes";
 import { validarFiltrosOrdenes, validarOrden } from "../validators/orden.validator";
 
 // Orden con sus items (nombre del producto y subtotal) y su pago. Nunca incluye datos sensibles de la tarjeta.
-const SELECT_ORDEN = `
+export const SELECT_ORDEN = `
   SELECT o.id, o.usuario_id, o.total, o.estado, o.creado_en,
     json_build_object('id', u.id, 'nombre', u.nombre, 'email', u.email) AS comprador,
     COALESCE((
@@ -25,7 +25,7 @@ const SELECT_ORDEN = `
   JOIN usuarios u ON u.id = o.usuario_id`;
 
 // NUMERIC llega como string en las columnas normales (dentro del JSON ya llega como número).
-function formatearOrden(fila: Record<string, unknown>) {
+export function formatearOrden(fila: Record<string, unknown>) {
   return { ...fila, total: Number(fila.total) };
 }
 

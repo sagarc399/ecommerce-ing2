@@ -1,6 +1,6 @@
 import { ApiError } from "@google/genai";
 import { chatEnv } from "../config/env";
-import { ErrorHttpProveedor, type MensajeChat, type NombreProveedor, type ProveedorChat } from "./proveedor";
+import { ErrorHttpProveedor, type ContextoChat, type MensajeChat, type NombreProveedor, type ProveedorChat } from "./proveedor";
 import { ProveedorGemini } from "./proveedor-gemini";
 import { ProveedorGroq } from "./proveedor-groq";
 import { ProveedorReglas } from "./proveedor-reglas";
@@ -55,14 +55,16 @@ function motivoDeFallo(err: unknown): string {
 // Un solo respaldo: si el proveedor principal falla (timeout, 429, 5xx, key inválida, red, respuesta vacía),
 // responde el de reglas. No se encadenan proveedores externos.
 export async function responderChat(
-  mensajes: MensajeChat[]
+  mensajes: MensajeChat[],
+  contexto: ContextoChat
 ): Promise<{ respuesta: string; proveedor: NombreProveedor }> {
   if (principal !== respaldo) {
     try {
-      return { respuesta: await principal.responder(mensajes), proveedor: principal.nombre };
+      return { respuesta: await principal.responder(mensajes, contexto), proveedor: principal.nombre };
     } catch (err) {
       console.warn(`Chat: ${principal.nombre} falló (${motivoDeFallo(err)}); se responde con reglas`);
     }
   }
+  // Las reglas no consultan la BD, así que no necesitan el contexto del usuario.
   return { respuesta: await respaldo.responder(mensajes), proveedor: respaldo.nombre };
 }
