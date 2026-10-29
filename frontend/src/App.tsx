@@ -1,4 +1,5 @@
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom'
+import Chatbot from './components/chat/Chatbot'
 import Header from './components/Header'
 import RutaProtegida from './components/RutaProtegida'
 import AdminLayout from './pages/admin/AdminLayout'
@@ -16,7 +17,9 @@ import Registro from './pages/Registro'
 
 function Layout() {
   return (
-    <div className="flex min-h-screen flex-col">
+    // pb-24 (96 px) debajo del pie: al final del scroll el botón flotante del chat (56 px + 16/24 px de margen)
+    // queda sobre espacio vacío y no tapa ningún elemento.
+    <div className="flex min-h-screen flex-col pb-24">
       <Header />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:py-8">
         <Outlet />
@@ -24,6 +27,7 @@ function Layout() {
       <footer className="border-t border-slate-200 py-4 text-center text-xs text-slate-400">
         Tienda USCO · Electiva Ingeniería de Software II
       </footer>
+      <Chatbot />
     </div>
   )
 }

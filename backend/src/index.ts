@@ -5,6 +5,7 @@ import { pool } from "./config/db";
 import authRoutes from "./routes/auth.routes";
 import productosRoutes, { adminProductosRouter } from "./routes/productos.routes";
 import ordenesRoutes, { adminOrdenesRouter } from "./routes/ordenes.routes";
+import chatRoutes from "./routes/chat.routes";
 import { errorHandler, rutaNoEncontrada } from "./middleware/errorHandler";
 
 const app = express();
@@ -22,6 +23,7 @@ app.use("/api/productos", productosRoutes);
 app.use("/api/admin/productos", adminProductosRouter);
 app.use("/api/ordenes", ordenesRoutes);
 app.use("/api/admin/ordenes", adminOrdenesRouter);
+app.use("/api/chat", chatRoutes);
 
 app.use(rutaNoEncontrada);
 app.use(errorHandler);

@@ -5,7 +5,7 @@ Tienda web con: inicio de sesión (JWT), CRUD de productos (solo admin), carrito
 
 ## Stack (no cambiar)
 - Base de datos: PostgreSQL 16 en Docker (docker-compose.yml en la raíz), expuesto en el puerto 5434 del host (5432 y 5433 los ocupan PostgreSQL nativos de Windows)
-- Backend: Node.js + Express + TypeScript, librería `pg` (sin ORM), bcryptjs, jsonwebtoken, dotenv, cors
+- Backend: Node.js + Express + TypeScript, librería `pg` (sin ORM), bcryptjs, jsonwebtoken, dotenv, cors, @google/genai (chatbot), express-rate-limit
 - Frontend: React + Vite + TypeScript + Tailwind CSS v3
 
 ## Estructura
@@ -31,4 +31,6 @@ Tienda web con: inicio de sesión (JWT), CRUD de productos (solo admin), carrito
 4. Backend: órdenes + pago simulado (transacción) ✅
 5. Frontend: login, catálogo, carrito ✅
 6. Frontend: checkout, mis pedidos, panel admin ✅
-7. Pruebas y evidencias ← SIGUIENTE (esperando confirmación)
+7. Chatbot v1: botón flotante, Gemini con respaldo por reglas, sin acceso a la BD ✅
+8. Preparación de la demo (arranque desde cero, guion, evidencias) ← SIGUIENTE (esperando confirmación)
+9. (Futura) Chatbot v2: con acceso a la BD (consultar productos y pedidos)

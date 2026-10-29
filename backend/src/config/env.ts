@@ -33,3 +33,17 @@ export const env = {
   JWT_EXPIRES_IN: requerirVariable("JWT_EXPIRES_IN"),
   CORS_ORIGIN: requerirVariable("CORS_ORIGIN"),
 };
+
+// Variable opcional: undefined si no está o está vacía (sin valores por defecto).
+function leerOpcional(nombre: string): string | undefined {
+  const valor = process.env[nombre]?.trim();
+  return valor ? valor : undefined;
+}
+
+// Configuración del chatbot. Es opcional: si falta, el chat usa respuestas por reglas
+// y la tienda arranca igual.
+export const chatEnv = {
+  CHAT_PROVEEDOR: leerOpcional("CHAT_PROVEEDOR"),
+  GEMINI_API_KEY: leerOpcional("GEMINI_API_KEY"),
+  GEMINI_MODEL: leerOpcional("GEMINI_MODEL"),
+};
