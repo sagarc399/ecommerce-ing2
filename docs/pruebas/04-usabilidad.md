@@ -4,6 +4,8 @@ Se documenta el estado **antes** de cualquier corrección: no se modificó la in
 
 ## Metodología
 
+**Desviación declarada frente al enunciado.** El enunciado pide una **prueba cruzada**: el equipo "A" prueba la interfaz del equipo "B" mientras el autor observa en silencio, y después aplican el SUS. Como el proyecto lo desarrolló un solo integrante y no hubo otro equipo, esa prueba se **reemplazó por una simulación con perfiles generados con IA, autorizada por el docente**. Las tareas, sus tiempos de máquina, el KLM, la accesibilidad y la inspección heurística sí se midieron sobre la aplicación real; lo simulado son los participantes, sus tiempos, sus observaciones y sus respuestas al SUS.
+
 > **Los participantes son perfiles simulados con IA, con autorización del docente, debido a que el proyecto fue desarrollado por un solo integrante. Los tiempos base, la accesibilidad y la inspección heurística se obtuvieron sobre la aplicación real.**
 
 | Componente | Origen | Herramienta | Archivos |

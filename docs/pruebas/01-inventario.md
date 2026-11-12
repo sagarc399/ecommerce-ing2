@@ -16,6 +16,20 @@ Estado medido: rama `pruebas-no-funcionales`, creada desde `master` (commit `47f
 
 **Importante para interpretar los resultados:** el backend corre en modo desarrollo (`tsx watch`, sin compilar), con un solo proceso de Node, en la misma máquina que PostgreSQL, k6 y ZAP. Son valores de un portátil, útiles para comparar el antes y el después, no para estimar la capacidad de un servidor de producción.
 
+## Herramientas de evaluación (paso 1.2 de la metodología)
+
+Instalación validada: cada herramienta produjo sus reportes en esta máquina con la versión indicada (la versión sale de los propios reportes o del `package.json` instalado).
+
+| Herramienta | Versión | Instalación | Evidencia de que funciona |
+|---|---|---|---|
+| k6 (rendimiento) | 2.3.0 | Imagen Docker `grafana/k6` | `pruebas/rendimiento/resultados/` (salida y JSON por escenario) |
+| OWASP ZAP (seguridad) | 2.17.0 | Imagen Docker `zaproxy/zap-stable` | `pruebas/seguridad/reportes/*.json` (campo `@version`) |
+| Playwright (tareas de usabilidad) | 1.65.0 | `npm install` en `pruebas/usabilidad` + `npx playwright install chromium` | `pruebas/usabilidad/resultados/medicion*.json` |
+| axe-core / @axe-core/playwright (accesibilidad) | 4.14.0 / 4.14.0 | Ídem | `pruebas/usabilidad/resultados/accesibilidad*.json` |
+| npm audit (dependencias) | npm 11.17.0 | Incluido en Node.js | `pruebas/seguridad/manuales/npm-audit.txt` |
+| Node.js (scripts manuales y SUS) | v24.19.0 | Instalador oficial | `pruebas/seguridad/manuales/`, `pruebas/usabilidad/*.csv` |
+| Docker / PostgreSQL (SUT) | 28.5.1 / 16.15 | Docker Desktop, `docker compose up -d` | `npm run verificar` → LISTO PARA LA DEMO |
+
 ## Datos de demostración (`npm run db:demo`)
 
 Requisito 1.1 de la práctica: despliegue local con al menos 50 registros. `npm run db:demo` parte de cero (igual que `db:reset`, con las mismas credenciales de prueba) y carga datos coherentes y deterministas. Es el estado en que se entrega y se presenta la aplicación.

@@ -14,7 +14,7 @@ Escrito el 12 de noviembre de 2026 al cerrar una sesión muy larga, para una ses
   - seguridad con **OWASP ZAP**;
   - **matriz de calidad unificada**;
   - **corrección de al menos un problema crítico por dimensión**, con medición antes y después.
-  - Requisitos completos de la práctica (fases 1 a 3 y contexto de la entrega): **`docs/practica-requisitos.md`**.
+  - Enunciado **textual** del docente, con notas de interpretación y la auditoría de cobertura en una sección aparte: **`docs/practica-requisitos.md`**. No editar el texto del docente.
 - **Entregable final:** un **informe técnico en PDF, sin enfoque de venta**, que el usuario arma **fuera del repositorio**. Claude Code **no** lo redacta; el repo aporta las evidencias (`docs/pruebas/00` a `06`, scripts y resultados).
 - **Usabilidad simulada:** el docente **autorizó simular con IA a los participantes** de usabilidad. El informe **DEBE declararlo** con esta frase (ya está en `docs/pruebas/04-usabilidad.md`): *"Los participantes son perfiles simulados con IA, con autorización del docente, debido a que el proyecto fue desarrollado por un solo integrante. Los tiempos base, la accesibilidad y la inspección heurística se obtuvieron sobre la aplicación real."*
 

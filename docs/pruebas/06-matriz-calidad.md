@@ -46,6 +46,53 @@ Umbrales de referencia: lecturas p95 < 500 ms; escrituras p95 < 1500 ms; errores
 
 **En una frase:** Tienda USCO pasó de "Requiere mejora" a "Aceptable" en las tres dimensiones, con los tres problemas críticos corregidos y medidos, y con una hoja de ruta concreta para lo que falta.
 
+## Trazabilidad de todos los hallazgos (paso 3.2 de la metodología)
+
+Cada hallazgo de `02`, `03` y `04` (y la observación de la regresión) tiene destino: **9 corregidos** con su commit y **20 en la hoja de ruta** con su esfuerzo. **Ningún hallazgo queda sin destino.** Las severidades de usabilidad son de Nielsen (0 a 4).
+
+| ID | Hallazgo | Severidad | Destino |
+|---|---|---|---|
+| REN-01 | Autobloqueo del pool con 10 checkouts simultáneos | Crítica | **Corregido**, `a76c206` (código y medición k6) |
+| REN-02 | Órdenes confirmadas sin respuesta al cliente | Alta | **Corregido**, `a76c206` (código y medición k6) |
+| REN-03 | Pago simulado de 500 ms con el bloqueo de filas | Media | Hoja de ruta, esfuerzo Alto |
+| REN-04 | Login lento con 30 VUs (`bcryptjs`) | Media | Hoja de ruta, esfuerzo Bajo |
+| REN-05 | Medición en modo desarrollo en un portátil | Informativa | Hoja de ruta, esfuerzo Medio |
+| SEG-01 | Denegación de servicio con 10 checkouts (mismo defecto que REN-01) | Alta en `03`; Crítica junto con REN-01 en `00` | **Corregido**, `a76c206` (mismo cambio que REN-01) |
+| SEG-02 | Login sin límite de intentos | Alta | **Corregido**, `a76c206` (código y prueba de fuerza bruta) |
+| SEG-03 | Token en `localStorage` y sin revocación | Media | Hoja de ruta, esfuerzo Alto |
+| SEG-04 | Faltan cabeceras de seguridad | Media | **Corregido**, `a76c206` (código; ZAP del después en `fff72eb`) |
+| SEG-05 | `X-Powered-By: Express` | Baja | **Corregido**, `a76c206` (código; ZAP del después en `fff72eb`) |
+| SEG-06 | Enumeración de usuarios por tiempo | Baja | Hoja de ruta, esfuerzo Bajo |
+| SEG-07 | 500 con byte nulo o cuerpo grande | Baja | Hoja de ruta, esfuerzo Bajo |
+| SEG-08 | Política de contraseñas débil | Baja | Hoja de ruta, esfuerzo Bajo |
+| SEG-09 | BD en `0.0.0.0:5434` con contraseña `postgres` | Media | **Corregido**, `8391d27` |
+| SEG-10 | Sin registro de eventos de seguridad | Baja | Hoja de ruta, esfuerzo Medio |
+| USA-01 | "Mis pedidos" sin productos ni paginación | 2 | Hoja de ruta, esfuerzo Medio |
+| USA-02 | Contraste insuficiente (43 elementos) | 3 | **Corregido**, `60e7393` (axe 43 → 0 graves) |
+| USA-03 | Tras un rechazo hay que reescribir la tarjeta | 2 | **Corregido**, `df10b04` (aplicado como compromiso usabilidad-seguridad, no como mejora) |
+| USA-04 | En el celular la notificación de rechazo tapa el resumen | 1 | Hoja de ruta, esfuerzo Bajo |
+| USA-05 | Vaciar carrito y Quitar sin confirmación | 2 | Hoja de ruta, esfuerzo Bajo |
+| USA-06 | Agregar al carrito casi sin confirmación | 2 | Hoja de ruta, esfuerzo Bajo |
+| USA-07 | Imágenes que no corresponden al producto | 2 | Hoja de ruta, esfuerzo Bajo |
+| USA-08 | Sin recuperación de contraseña | 3 | Hoja de ruta, esfuerzo Alto |
+| USA-09 | Registro sin confirmar ni mostrar la contraseña | 2 | Hoja de ruta, esfuerzo Bajo |
+| USA-10 | En el celular no se ve quién inició sesión | 1 | Hoja de ruta, esfuerzo Bajo |
+| USA-11 | "Limpiar filtros" solo sin resultados | 1 | Hoja de ruta, esfuerzo Bajo |
+| USA-12 | Landmarks y enlaces duplicados | 1 | Hoja de ruta, esfuerzo Bajo |
+| USA-13 | "Respuesta automática" sin explicación | 1 | Hoja de ruta, esfuerzo Bajo |
+| OBS-01 | En el IDOR del chatbot, el modelo pide "iniciar sesión" a un usuario con sesión | Informativa | Hoja de ruta, esfuerzo Bajo |
+
+Nota sobre SEG-01: `03-seguridad.md` lo clasifica como Alta desde el punto de vista de seguridad (denegación de servicio), mientras que `00-estado.md` lo agrupa con REN-01 como Crítica. Es el mismo defecto y la misma corrección.
+
+## Brechas frente al enunciado
+
+Lo que la auditoría de cobertura encontró sin cubrir del todo y que **requiere ejecutar pruebas nuevas** (no se ejecutaron):
+
+| Paso | Brecha | Qué haría falta |
+|---|---|---|
+| 2.3.1 | No hubo una sesión de navegación manual con el navegador configurado contra el proxy de ZAP, y el spider tradicional solo mapeó 6 URL de la SPA | Navegar la app (cliente y admin) con el navegador a través del proxy de ZAP, o correr el *AJAX spider*, y guardar el árbol de sitios |
+| 2.2.1–2.2.3 y Módulo 2 | La prueba cruzada con otro equipo se reemplazó por perfiles simulados (desviación declarada y autorizada) | Solo si el docente lo pide: una sesión con un evaluador externo real y su SUS |
+
 ## Hoja de ruta (lo que no se corrigió)
 
 Esfuerzo estimado para un desarrollador que ya conoce el proyecto: **Bajo** (menos de medio día), **Medio** (1 o 2 días) y **Alto** (3 días o más, o un servicio externo).

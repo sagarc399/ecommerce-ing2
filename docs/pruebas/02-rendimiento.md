@@ -12,6 +12,18 @@ Se documenta el estado **antes** de cualquier corrección: ningún hallazgo se c
 - Las métricas se filtran por etiqueta, así que los 25 logins de preparación de los checkouts no cuentan.
 - `POST /api/chat` se excluyó (ver [01-inventario.md](01-inventario.md#exclusiones)).
 
+### Plan por escenario (paso 2.1.2)
+
+Todos los escenarios usan la misma rampa (`stages` en `pruebas/rendimiento/comun.js`): **30 s** subiendo hasta el máximo de VUs, **60 s** sostenido en el máximo y **15 s** bajando a 0, con `sleep(1)` entre iteraciones de cada VU (duración total 105 s).
+
+| Escenario | Endpoint | Stages (duración → VUs objetivo) | Thresholds | Datos |
+|---|---|---|---|---|
+| A. Catálogo | `GET /api/productos` con búsqueda, categoría y página al azar | 30 s → 50, 60 s → 50, 15 s → 0 | p95 < 500 ms; errores < 1 % | 63 productos (`db:poblar`) |
+| B. Login | `POST /api/auth/login` (25 clientes de carga) | 30 s → 30, 60 s → 30, 15 s → 0 | p95 < 1500 ms; errores < 1 % | carga01…carga25 |
+| C1. Checkout distribuido | `POST /api/ordenes`, cada VU con su cliente compra uno de los 3 productos de carga al azar | 30 s → 20, 60 s → 20, 15 s → 0 | p95 < 1500 ms; errores < 1 % | 3 productos con stock 100000 |
+| C2. Checkout con contención | `POST /api/ordenes`, todos los VUs compran el mismo producto | 30 s → 20, 60 s → 20, 15 s → 0 | p95 < 1500 ms; errores < 1 % | 1 producto con stock 100000 |
+| C1 y C2 adicionales (antes) | Igual que C1 y C2 | 30 s → 8, 60 s → 8, 15 s → 0 (`VUS=8`) | Iguales | Iguales |
+
 ## Resultados
 
 | Escenario | VUs máx | Peticiones | req/s | p50 | p90 | p95 | Máx | Errores | Thresholds |

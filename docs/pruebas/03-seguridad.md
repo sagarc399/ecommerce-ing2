@@ -30,6 +30,20 @@ Notas del escaneo:
 - `vite preview` no es un servidor de producción: las cabeceras que falten en un despliegue real dependen del servidor que se use.
 - **0 alertas altas no significa que no haya vulnerabilidades.** ZAP no detectó REN-01 ni SEG-02, que son los hallazgos más graves; salieron de la prueba de carga y de las pruebas manuales.
 
+### Mapeo de rutas: spider y proxy (paso 2.3.1)
+
+- **Spider de ZAP:** sí se usó. El escaneo baseline ejecuta el spider tradicional de ZAP sobre el frontend (`zap-baseline.py`, 1 minuto) y mapeó 6 URL: `/`, `/robots.txt`, `/sitemap.xml`, `/favicon.svg` y los dos *assets* (JS y CSS) (`pruebas/seguridad/reportes/baseline-frontend.json`). Encuentra tan pocas porque la app es una SPA: las rutas (`/carrito`, `/checkout`, `/admin`…) las dibuja React en el navegador y el spider tradicional no ejecuta JavaScript.
+- **Rutas del backend:** se mapearon importando la especificación OpenAPI (`docs/openapi.yaml`, 17 endpoints) en `zap-api-scan.py`, con el token de cliente y de admin inyectado por una regla *replacer*. Es el equivalente al mapeo por proxy para una API REST.
+- **Pendiente (requiere ejecutar una prueba nueva):** el enunciado pide "interceptar el tráfico de su propia aplicación web mientras navegan por ella". No se hizo una sesión de navegación manual con el navegador configurado contra el proxy de ZAP, ni se usó el *AJAX spider*, que sí ejecuta JavaScript. Ver `06-matriz-calidad.md`, "Brechas frente al enunciado".
+
+### Análisis pedido por el enunciado (Módulo 3, punto 3)
+
+| Fallo común que pide revisar el enunciado | ¿Se encontró? | Evidencia |
+|---|---|---|
+| **Falta de validación de entradas** | Parcial: la validación existe, pero dos entradas dan 500 en lugar de 400 (SEG-07) | Prueba manual 3 (JSON malformado → 400; cuerpo de 2 MB y byte nulo → 500), prueba 4 (14 cargas de inyección SQL sin efecto), prueba 5 (XSS almacenado no se ejecuta), prueba 6 (asignación masiva de `rol` ignorada), `imagen_url` rechaza `javascript:`; ZAP: 500 con `buscar=%00` |
+| **Contraseñas en texto plano** | No | Revisión de código: el registro y el seed guardan `bcrypt.hash(password, 10)` en la columna `password_hash` (`backend/src/controllers/auth.controller.ts:30`, `backend/src/scripts/seed.ts:77`) y el login compara con `bcrypt.compare` (`auth.controller.ts:63`); ninguna ruta devuelve `password_hash` (la inyección `UNION SELECT … password_hash` no lo filtró: `manuales/pruebas-api.txt`, líneas 31 y 32). La tarjeta tampoco se guarda: solo los últimos 4 dígitos |
+| **Errores mal gestionados que revelen información del servidor** | No | Prueba manual 3: ninguna respuesta filtra stack, rutas ni mensajes de PostgreSQL (los 500 de SEG-07 son genéricos); `X-Powered-By: Express` sí revelaba la tecnología (SEG-05, corregido) |
+
 ## Pruebas manuales
 
 Evidencia completa en `pruebas/seguridad/manuales/pruebas-api.txt` y `npm-audit.txt`.
