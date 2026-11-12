@@ -16,7 +16,24 @@ Estado medido: rama `pruebas-no-funcionales`, creada desde `master` (commit `47f
 
 **Importante para interpretar los resultados:** el backend corre en modo desarrollo (`tsx watch`, sin compilar), con un solo proceso de Node, en la misma máquina que PostgreSQL, k6 y ZAP. Son valores de un portátil, útiles para comparar el antes y el después, no para estimar la capacidad de un servidor de producción.
 
-## Datos de prueba (`npm run db:poblar`)
+## Datos de demostración (`npm run db:demo`)
+
+Requisito 1.1 de la práctica: despliegue local con al menos 50 registros. `npm run db:demo` parte de cero (igual que `db:reset`, con las mismas credenciales de prueba) y carga datos coherentes y deterministas. Es el estado en que se entrega y se presenta la aplicación.
+
+| Tabla | Registros | Detalle |
+|---|---|---|
+| usuarios | 15 | admin, cliente, cliente2 y 12 clientes con nombres reales (`nombre.apellido@correo.com`, clave `Cliente123`) |
+| productos | 60 | 12 del seed (sin tocar: monitor con stock 1, lámpara agotada) y 48 del catálogo de prueba en 4 categorías |
+| ordenes | 40 | 34 PAGADA y 6 RECHAZADA, repartidas en los últimos 60 días entre los 14 clientes |
+| orden_items | 85 | Solo productos del catálogo de prueba |
+| pagos | 40 | Solo los últimos 4 dígitos (1111 aprobadas, 0000 rechazadas) |
+| **Total** | **240** | |
+
+Comprobaciones que imprime el script (todas en 0): stock negativo, órdenes cuyo estado no coincide con el del pago, órdenes cuyo total no es la suma de sus ítems, órdenes sin ítems e ítems en productos del seed. Además, el stock de los 48 productos cuadra con su stock inicial menos las 73 unidades de las órdenes pagadas, y dos corridas seguidas dejan exactamente los mismos datos.
+
+## Datos de prueba de carga (`npm run db:poblar`)
+
+Para k6 (no para la demo): agrega a lo que haya en la BD los 48 productos, 3 productos de carga con stock 100000, 25 clientes `carga01…carga25` y 80 órdenes. Después de `db:reset` deja:
 
 | Tabla | Registros | Detalle |
 |---|---|---|

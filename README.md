@@ -118,6 +118,7 @@ Vencimiento: cualquier fecha futura en formato MM/AA (ej. 12/28). CVV: cualquier
 | `npm run instalar` | `npm install` en la raíz, `backend/` y `frontend/` |
 | `npm run dev` | Levanta backend y frontend juntos (prefijos de color `[api]` y `[web]`) |
 | `npm run db:reset` | Vacía las tablas, reinicia los ids y carga los datos de prueba. Se niega a correr con `NODE_ENV=production` |
+| `npm run db:demo` | Igual que `db:reset` y además carga datos de demostración coherentes: 48 productos más, 12 clientes y 40 órdenes con su historial (240 registros) |
 | `npm run verificar` | Chequeo previo: Docker, contenedor, tablas, `.env`, puertos e internet/Groq |
 | `npm run prueba:concurrencia` | Dos clientes compran a la vez la última unidad del monitor: debe dar 201 + 409 y stock final 0 |
 

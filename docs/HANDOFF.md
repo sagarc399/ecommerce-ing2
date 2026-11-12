@@ -41,7 +41,7 @@ Escrito el 12 de noviembre de 2026 al cerrar una sesión muy larga, para una ses
 |---|---|
 | `master` | App completa hasta la Fase 9 (`47f7afa`, chatbot v2 ya unido) |
 | `chatbot-v2` | Igual a `master` (ya se unió); se puede borrar con permiso |
-| `pruebas-no-funcionales` | **Rama de trabajo.** Todo lo de pruebas y correcciones. Commits: `f349fd0` rendimiento y seguridad, `eabd850` usabilidad, `a76c206` correcciones en progreso, más el traspaso. **No unir a master todavía.** |
+| `pruebas-no-funcionales` | **Rama de trabajo.** Todo lo de pruebas y correcciones. Commits: `f349fd0` rendimiento y seguridad (estado inicial), `eabd850` usabilidad (estado inicial), `a76c206` REN-01/02, SEG-02 y SEG-04/05 (código), `195b45f` traspaso, `536a6e7` requisitos de la práctica, `fff72eb` ZAP de SEG-04/05, `8391d27` SEG-09, `60e7393` USA-02, `df10b04` USA-03, `c52b290` regresión, `f0c2ac4` documentos 05 y 06 y regresión con registro, `CIERRE_HASH` cierre (db:demo y revisión de secretos). **Plan de correcciones completo. No unir a master sin permiso.** |
 
 **Puertos:** BD PostgreSQL **5434** (contenedor `ecommerce_db`), API **3000**, web **5173**, `vite preview` **4173** (solo para ZAP baseline).
 
@@ -53,6 +53,7 @@ Escrito el 12 de noviembre de 2026 al cerrar una sesión muy larga, para una ses
 | `npm run dev` | Backend + frontend con `concurrently` (prefijos `[api]` y `[web]`) |
 | `npm run verificar` | `scripts/verificar.mjs`: Docker, contenedor, tablas, `.env`, puertos, Groq → "LISTO PARA LA DEMO" |
 | `npm run db:reset` | Vacía las tablas y deja los datos de demo (3 usuarios, 12 productos, 0 órdenes) |
+| `npm run db:demo` | **Estado de demo con ≥50 registros** (requisito 1.1): hace lo mismo que `db:reset` y agrega 48 productos, 12 clientes con nombres reales (`nombre.apellido@correo.com`, clave `Cliente123`) y 40 órdenes históricas (34 PAGADA, 6 RECHAZADA) con ítems y pagos: 15 usuarios, 60 productos, 40 órdenes, 85 ítems, 40 pagos (240 registros). Stock coherente; no toca los 12 productos del seed (el guion y `prueba:concurrencia` siguen funcionando). Determinista |
 | `npm run db:poblar` | Datos de prueba: 63 productos (12 + 48 + 3 de carga con stock 100000), 28 usuarios (carga01…carga25, clave `Cliente123`), 80 órdenes históricas |
 | `npm run prueba:concurrencia` | Dos clientes compran el último monitor a la vez → debe decir PRUEBA SUPERADA |
 
@@ -77,7 +78,7 @@ Escrito el 12 de noviembre de 2026 al cerrar una sesión muy larga, para una ses
    cd pruebas/rendimiento/resultados && node -e "const fs=require('fs');for(const f of fs.readdirSync('.').filter(f=>f.endsWith('.json'))){const j=JSON.parse(fs.readFileSync(f,'utf8'));if('setup_data' in j){delete j.setup_data;fs.writeFileSync(f,JSON.stringify(j,null,4)+'\n')}}"
    ```
 8. **No modificar archivos del backend mientras corre k6**: `tsx watch` reinicia el servidor y arruina la medición.
-9. `db:reset` deja los datos de demo; `db:poblar` carga los datos de prueba. Las mediciones de k6 usan `db:poblar`; Playwright, axe y la demo usan `db:reset`. Al final de cada fase va `db:reset`.
+9. `db:reset` deja lo mínimo (3 usuarios, 12 productos, 0 órdenes); `db:demo` deja la demo con historial (≥50 registros); `db:poblar` carga los datos de prueba de carga. Las mediciones de k6 usan `db:poblar`; Playwright y axe usan `db:reset` (sus mediciones del antes se hicieron así); la demo y el estado final usan `db:demo`. **Al terminar, dejar la BD en `db:demo`.**
 10. **curl de Git Bash envía las tildes en latin1**: usa URLs ya codificadas (`Tecnolog%C3%ADa`) o `--data-binary @archivo.json` con el cuerpo en UTF-8.
 11. **Playwright:** `getByRole` compara el nombre por subcadena: usa `exact: true` (`"Activar"` coincide con `"Desactivar"`). Cada tarjeta del catálogo tiene **dos enlaces con el mismo nombre** (imagen y título): usa `.first()`.
 12. **La verificación de seguridad de Bash a veces falla temporalmente** ("no verdict"): reintenta el mismo comando una vez.
@@ -165,9 +166,9 @@ Escrito el 12 de noviembre de 2026 al cerrar una sesión muy larga, para una ses
 | USA-03 | **Hecho y medido** | `Checkout.tsx`: tras un 402 se conservan número, titular y vencimiento (solo estado de React), se borra el CVV, foco al CVV y "Por seguridad, vuelve a ingresar el CVV."; con otro resultado se borra todo. (Antes del cambio la app ya conservaba titular y vencimiento y borraba número y CVV.) `node pruebas/usabilidad/verificar-usa03.mjs`: 12/12 OK (almacenamiento solo `carrito` y `token`; 409 borra todo). T5 con `SOLO=T5 SUFIJO=_antes\|_despues node pruebas/usabilidad/medir.mjs` (`tareas.mjs` detecta el número conservado y hace clic + Ctrl+A = 2K): máquina 2,014 → 2,012 s; **KLM 36,91 → 37,47 s** (52K → 54K). Con OTRA tarjeta no mejora (+0,56 s); con la MISMA tarjeta el tramo de reintento baja de 11,87 a 4,19 s (−65 %), calculado con KLM porque el pago simulado no permite automatizarlo. Explicación y tablas en `00-estado.md` → llevar a `05-correcciones.md` ("USA-03: equilibrio usabilidad-seguridad"). **Decisión del usuario sobre cómo documentarlo:** USA-03 va como **análisis de compromiso usabilidad-seguridad, NO como mejora**: en el simulador el rechazo solo ocurre con tarjetas terminadas en 0000, así que se reintenta con otra tarjeta (+0,56 s en KLM); en pasarelas reales con rechazos transitorios se reintenta con la misma (el tramo baja de 11,87 a 4,19 s). **La corrección crítica de usabilidad es USA-02** (axe 43 → 0 graves) |
 | Regresión | **Hecha** (dos veces; la segunda tras un reinicio de Docker) | Build del backend y del frontend ok; `node pruebas/regresion/chatbot.mjs` 4/4 OK con Groq (precio $1.250.000, sin sesión pide login, pedido propio visible, IDOR sin fuga); `node pruebas/regresion/flujo.mjs` 8/8 OK (registro → carrito → compra aprobada → rechazo USA-03 y reintento → mis pedidos → salir → admin crea producto, sin errores JS); `npm run verificar` LISTO. Observación (no regresión, para la hoja de ruta): en el IDOR el modelo le dice a cliente2 "inicia sesión" en vez de "no encontré ese pedido entre los tuyos"; el filtro por `usuario_id` está en el SQL. Detalle en `00-estado.md` |
 | Documentación 05 y 06 | **Hecha** | `05-correcciones.md` (causa raíz, cambio, ANTES/DESPUÉS y efecto en el negocio; sección "USA-03: equilibrio usabilidad-seguridad", como análisis de compromiso y no como mejora (ver fila USA-03); la corrección crítica de usabilidad es USA-02; aclarar que el SUS no se repite y que la mejora se mide con axe y KLM), `06-matriz-calidad.md` (filas rendimiento, seguridad y usabilidad con accesibilidad; columnas: indicadores, estado inicial, estado después, hallazgos abiertos y calificación Óptimo / Aceptable / Requiere mejora; diagnóstico de una frase por dimensión), hoja de ruta con esfuerzo y motivo, y actualizar `00-estado.md` |
-| Cierre | Pendiente | `npm run db:reset` (ya quedó en `db:reset` tras la regresión); quitar `setup_data` de los JSON de k6; revisar keys y tokens; commit "Correcciones de rendimiento, seguridad y usabilidad con nueva medición". No unir a master |
+| Cierre | **Hecho** (`CIERRE_HASH`) | Nuevo `npm run db:demo` (requisito de ≥50 registros con datos coherentes); los 10 JSON de k6 ya no tenían `setup_data`; revisión de secretos sin hallazgos; commit "Correcciones de rendimiento, seguridad y usabilidad con nueva medición"; BD en estado de demo. Sin unir a master |
 
-**Al cerrar esta sesión:** no hay comandos corriendo ni cambios a medias. `ecommerce_db` estaba detenido (`Exited`) y la app no estaba corriendo.
+**Al cerrar esta sesión (12 de noviembre, segunda sesión):** plan de correcciones completo y con commit; BD en `db:demo`; `ecommerce_db` arriba en `127.0.0.1:5434`; `npm run dev` corriendo en segundo plano (si no responde, relanzarlo); `CHAT_PROVEEDOR=groq`.
 
 ## H. Decisiones ya tomadas (no volver a discutirlas)
 
@@ -181,14 +182,8 @@ Escrito el 12 de noviembre de 2026 al cerrar una sesión muy larga, para una ses
 
 ## I. Qué sigue (en orden)
 
-1. Terminar SEG-04/05: ZAP de API con token de cliente y tabla ANTES/DESPUÉS.
-2. SEG-09.
-3. USA-02 y axe-core.
-4. USA-03 y T5 con Playwright y KLM.
-5. Regresión completa y `npm run verificar`.
-6. Documentación: `05-correcciones.md`, `06-matriz-calidad.md`, hoja de ruta y `00-estado.md`.
-7. Cierre: `db:reset`, revisión de secretos y commit.
-8. Después, el **documento formal final con enfoque de venta**. Los datos de portada (nombre del estudiante, código, docente, fecha y demás) están **pendientes del usuario**: pídeselos.
+1. ~~SEG-04/05~~, ~~SEG-09~~, ~~USA-02~~, ~~USA-03~~, ~~regresión~~, ~~documentos 05 y 06~~ y ~~cierre~~: **hechos** (ver la sección G).
+2. Siguiente:  el **documento formal final con enfoque de venta**. Los datos de portada (nombre del estudiante, código, docente, fecha y demás) están **pendientes del usuario**: pídeselos.
 
 ## J. Primeros pasos de la siguiente sesión
 

@@ -12,7 +12,7 @@ Transcripción de los requisitos de la práctica (el documento original del doce
 
 | Punto | Requisito | Dónde se cubre |
 |---|---|---|
-| 1.1 | Despliegue local con **al menos 50 registros de prueba** | `npm run db:poblar` (63 productos, 28 usuarios, 80 órdenes); `docs/pruebas/01-inventario.md` |
+| 1.1 | Despliegue local con **al menos 50 registros de prueba** | `npm run db:demo` (estado de demo: 15 usuarios, 60 productos, 40 órdenes, 85 ítems y 40 pagos, 240 registros coherentes) y `npm run db:poblar` (pruebas de carga: 28 usuarios, 63 productos, 80 órdenes); `docs/pruebas/01-inventario.md` |
 | 1.2 | **Inventario de rutas y flujos**: flujo principal y endpoints críticos | `docs/pruebas/01-inventario.md` (17 endpoints con criticidad) |
 
 ## Fase 2. Pruebas no funcionales

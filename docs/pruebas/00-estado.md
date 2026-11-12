@@ -78,7 +78,9 @@ Para repetir las mediciones después de corregir, usa las mismas condiciones: ba
 | 12 | USA-12 | Landmarks y enlaces duplicados (axe-core A11Y-02) | 1 |
 | 13 | USA-13 | "Respuesta automática" sin explicación | 1 |
 
-## Progreso de correcciones (sesión del 12 de noviembre, interrumpida por contexto)
+## Progreso de correcciones (completo)
+
+Commits en `pruebas-no-funcionales`: `f349fd0` rendimiento y seguridad (estado inicial), `eabd850` usabilidad (estado inicial), `a76c206` REN-01/02, SEG-02 y SEG-04/05 (código), `195b45f` traspaso, `536a6e7` requisitos de la práctica, `fff72eb` ZAP de SEG-04/05, `8391d27` SEG-09, `60e7393` USA-02, `df10b04` USA-03, `c52b290` regresión, `f0c2ac4` documentos 05 y 06 y regresión con registro, `CIERRE_HASH` cierre (db:demo y revisión de secretos).
 
 Todo en la rama `pruebas-no-funcionales`. Las mediciones del "después" usaron los mismos scripts y parámetros que el "antes": k6 con 20 VUs para checkout y 30 para login, datos de `npm run db:poblar` y backend con `npm run dev`.
 
@@ -245,7 +247,7 @@ Observación (no es regresión: `backend/src/chat` no cambia desde la Fase 9): e
 3. **Usabilidad:** completo (USA-02 y USA-03, ver arriba).
 4. **Regresión:** completa (ver arriba).
 5. **Documentación:** completa. `05-correcciones.md` (causa raíz, cambio, ANTES/DESPUÉS y efecto en el negocio; USA-03 como análisis de compromiso) y `06-matriz-calidad.md` (matriz unificada, calificación Requiere mejora → Aceptable en las tres dimensiones, diagnóstico por dimensión y hoja de ruta con esfuerzo y motivo).
-6. **Cierre:** `npm run db:reset` (la BD ya quedó en `db:reset` tras la regresión; repetirlo por seguridad), revisar `.env`, keys y tokens (incluidos los JSON de k6, que guardan tokens en `setup_data`), y el commit "Correcciones de rendimiento, seguridad y usabilidad con nueva medición". No unir a master.
+6. **Cierre:** completo (`CIERRE_HASH`). Se creó `npm run db:demo` para el requisito de ≥50 registros (ver `01-inventario.md`), los JSON de k6 están sin `setup_data`, la revisión de secretos no encontró nada y la BD quedó en estado de demo. Sin unir a master.
 
 ## Lo que falta
 

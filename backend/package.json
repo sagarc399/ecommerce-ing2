@@ -10,7 +10,8 @@
     "seed": "tsx src/scripts/seed.ts",
     "prueba:concurrencia": "tsx src/scripts/prueba-concurrencia.ts",
     "db:reset": "tsx src/scripts/reset.ts",
-    "db:poblar": "tsx src/scripts/poblar.ts"
+    "db:poblar": "tsx src/scripts/poblar.ts",
+    "db:demo": "tsx src/scripts/demo.ts"
   },
   "keywords": [],
   "author": "",
