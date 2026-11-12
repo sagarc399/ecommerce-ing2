@@ -5,7 +5,7 @@ Transcripción de los requisitos de la práctica (el documento original del doce
 ## Contexto de la entrega
 
 - La materia es de **venta e integración de tecnologías**.
-- El entregable es un **documento formal que presenta y "vende" el software** con su calidad medida.
+- El entregable es un **informe técnico en PDF** (sin enfoque de venta) con la calidad medida del software; el usuario lo arma fuera del repositorio con las evidencias de `docs/pruebas/`.
 - El docente **autorizó simular con IA a los participantes de usabilidad**; esto **debe declararse** en el informe.
 
 ## Fase 1. Preparación

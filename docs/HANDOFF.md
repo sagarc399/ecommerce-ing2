@@ -15,7 +15,7 @@ Escrito el 12 de noviembre de 2026 al cerrar una sesión muy larga, para una ses
   - **matriz de calidad unificada**;
   - **corrección de al menos un problema crítico por dimensión**, con medición antes y después.
   - Requisitos completos de la práctica (fases 1 a 3 y contexto de la entrega): **`docs/practica-requisitos.md`**.
-- **Entregable final:** un **documento formal con enfoque de VENTA del software** (la materia es de venta e integración de tecnologías): debe mostrar el producto, su calidad medida y su valor para un cliente.
+- **Entregable final:** un **informe técnico en PDF, sin enfoque de venta**, que el usuario arma **fuera del repositorio**. Claude Code **no** lo redacta; el repo aporta las evidencias (`docs/pruebas/00` a `06`, scripts y resultados).
 - **Usabilidad simulada:** el docente **autorizó simular con IA a los participantes** de usabilidad. El informe **DEBE declararlo** con esta frase (ya está en `docs/pruebas/04-usabilidad.md`): *"Los participantes son perfiles simulados con IA, con autorización del docente, debido a que el proyecto fue desarrollado por un solo integrante. Los tiempos base, la accesibilidad y la inspección heurística se obtuvieron sobre la aplicación real."*
 
 ## B. Cómo se trabaja
@@ -183,7 +183,7 @@ Escrito el 12 de noviembre de 2026 al cerrar una sesión muy larga, para una ses
 ## I. Qué sigue (en orden)
 
 1. ~~SEG-04/05~~, ~~SEG-09~~, ~~USA-02~~, ~~USA-03~~, ~~regresión~~, ~~documentos 05 y 06~~ y ~~cierre~~: **hechos** (ver la sección G).
-2. Siguiente:  el **documento formal final con enfoque de venta**. Los datos de portada (nombre del estudiante, código, docente, fecha y demás) están **pendientes del usuario**: pídeselos.
+2. No hay tareas pendientes en el repo. El informe técnico en PDF lo arma el usuario fuera del repositorio.
 
 ## J. Primeros pasos de la siguiente sesión
 

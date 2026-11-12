@@ -80,6 +80,8 @@ Para repetir las mediciones después de corregir, usa las mismas condiciones: ba
 
 ## Progreso de correcciones (completo)
 
+**Entregable:** un informe técnico en PDF, sin enfoque de venta, que el usuario arma fuera del repositorio. No queda ninguna tarea pendiente en el repo.
+
 Commits en `pruebas-no-funcionales`: `f349fd0` rendimiento y seguridad (estado inicial), `eabd850` usabilidad (estado inicial), `a76c206` REN-01/02, SEG-02 y SEG-04/05 (código), `195b45f` traspaso, `536a6e7` requisitos de la práctica, `fff72eb` ZAP de SEG-04/05, `8391d27` SEG-09, `60e7393` USA-02, `df10b04` USA-03, `c52b290` regresión, `f0c2ac4` documentos 05 y 06 y regresión con registro, `20f305d` cierre (db:demo y revisión de secretos) y un último commit que solo anota este hash.
 
 Todo en la rama `pruebas-no-funcionales`. Las mediciones del "después" usaron los mismos scripts y parámetros que el "antes": k6 con 20 VUs para checkout y 30 para login, datos de `npm run db:poblar` y backend con `npm run dev`.
