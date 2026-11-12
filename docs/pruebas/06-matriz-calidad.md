@@ -62,7 +62,7 @@ Hay **32 hallazgos válidos** en `02`, `03` y `04` (incluidos SEG-13 del paso 2.
 | SEG-01 | Denegación de servicio con 10 checkouts (mismo defecto que REN-01) | Alta | **Corregido**, `a76c206` (mismo cambio que REN-01) |
 | SEG-02 | Login sin límite de intentos | Alta | **Corregido**, `a76c206` (código y prueba de fuerza bruta) |
 | SEG-03 | Token en `localStorage` y sin revocación | Media | Hoja de ruta, esfuerzo Alto |
-| SEG-04 | Faltan cabeceras de seguridad | Media | **Corregido en la API** (`a76c206`, ZAP del después en `fff72eb`) **y en el frontend** (`HASH_SEG04`, baseline del después sobre :4173) |
+| SEG-04 | Faltan cabeceras de seguridad | Media | **Corregido en la API** (`a76c206`, ZAP del después en `fff72eb`) **y en el frontend** (`507ae43`, baseline del después sobre :4173) |
 | SEG-05 | `X-Powered-By: Express` | Baja | **Corregido**, `a76c206` (código; ZAP del después en `fff72eb`) |
 | SEG-06 | Enumeración de usuarios por tiempo | Baja | Hoja de ruta, esfuerzo Bajo |
 | SEG-07 | 500 con byte nulo o cuerpo grande | Baja | Hoja de ruta, esfuerzo Bajo |

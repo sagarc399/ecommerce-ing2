@@ -85,7 +85,7 @@ Para repetir las mediciones después de corregir, usa las mismas condiciones: ba
 
 ## Progreso de correcciones (completo)
 
-**Paso 2.3.1 (proxy y spider):** hecho el 12 de noviembre: ZAP como proxy con el flujo de Playwright (cliente y admin) y el AJAX spider; frontend de 6 URL (build) a 15 comparables (desarrollo, sin archivos internos de Vite) y 12 endpoints del API. Agregó SEG-13 (Informativa) y dos descartados (SEG-11 y SEG-12), y mostró que SEG-04 seguía abierto en el frontend. **SEG-04 en el frontend** se corrigió después en `frontend/vite.config.ts` (`HASH_SEG04`): el ZAP baseline sobre :4173 pasa de Media 2 / Baja 1 a Media 1 / Baja 4, sin las 3 alertas de SEG-04 y con dos hallazgos nuevos (SEG-14 y SEG-15). Total: **32 hallazgos válidos y 2 descartados** (ver `06-matriz-calidad.md`, "Trazabilidad").
+**Paso 2.3.1 (proxy y spider):** hecho el 12 de noviembre: ZAP como proxy con el flujo de Playwright (cliente y admin) y el AJAX spider; frontend de 6 URL (build) a 15 comparables (desarrollo, sin archivos internos de Vite) y 12 endpoints del API. Agregó SEG-13 (Informativa) y dos descartados (SEG-11 y SEG-12), y mostró que SEG-04 seguía abierto en el frontend. **SEG-04 en el frontend** se corrigió después en `frontend/vite.config.ts` (`507ae43`): el ZAP baseline sobre :4173 pasa de Media 2 / Baja 1 a Media 1 / Baja 4, sin las 3 alertas de SEG-04 y con dos hallazgos nuevos (SEG-14 y SEG-15). Total: **32 hallazgos válidos y 2 descartados** (ver `06-matriz-calidad.md`, "Trazabilidad").
 
 **Entregable:** un informe técnico en PDF, sin enfoque de venta, que el usuario arma fuera del repositorio. No queda ninguna tarea pendiente en el repo.
 
