@@ -1,0 +1,44 @@
+
+
+  █ THRESHOLDS 
+
+    http_req_duration{name:catalogo}
+    ✓ 'p(95)<500' p(95)=8.31ms
+
+    http_req_failed{name:catalogo}
+    ✓ 'rate<0.01' rate=0.00%
+
+    http_reqs{name:catalogo}
+    ✓ 'count>0' count=4126
+
+
+  █ TOTAL RESULTS 
+
+    checks_total.......: 8252    77.942621/s
+    checks_succeeded...: 100.00% 8252 out of 8252
+    checks_failed......: 0.00%   0 out of 8252
+
+    ✓ HTTP 200
+    ✓ trae datos y total
+
+    HTTP
+    http_req_duration..............: min=4.58ms avg=6.58ms med=6.34ms p(90)=7.65ms p(95)=8.31ms p(99)=10.67ms max=29.7ms
+      { expected_response:true }...: min=4.58ms avg=6.58ms med=6.34ms p(90)=7.65ms p(95)=8.31ms p(99)=10.67ms max=29.7ms
+      { name:catalogo }............: min=4.58ms avg=6.58ms med=6.34ms p(90)=7.65ms p(95)=8.31ms p(99)=10.67ms max=29.7ms
+    http_req_failed................: 0.00%  0 out of 4126
+      { name:catalogo }............: 0.00%  0 out of 4126
+    http_reqs......................: 4126   38.971311/s
+      { name:catalogo }............: 4126   38.971311/s
+
+    EXECUTION
+    iteration_duration.............: min=1s     avg=1s     med=1s     p(90)=1s     p(95)=1s     p(99)=1.01s   max=1.03s 
+    iterations.....................: 4126   38.971311/s
+    vus............................: 3      min=2         max=50
+    vus_max........................: 50     min=50        max=50
+
+    NETWORK
+    data_received..................: 3.7 MB 35 kB/s
+    data_sent......................: 531 kB 5.0 kB/s
+
+
+

@@ -1,0 +1,28 @@
+=== Estado del backend tras c1 (2026-11-05 12:40:14) ===
+--- GET /api/health (timeout 5 s):
+HTTP 000 en 5.008545 s
+--- GET /api/productos/categorias (timeout 5 s):
+HTTP 000 en 5.006320 s
+--- GET / de Express sin BD (ruta inexistente, timeout 5 s):
+{"mensaje":"Ruta no encontrada"} ? HTTP 404 en 0.017394 s
+--- Conexiones del backend en PostgreSQL:
+ state | wait_event_type | wait_event | ultima_consulta | count 
+-------+-----------------+------------+-----------------+-------
+ idle  | Client          | ClientRead | COMMIT          |    10
+(1 row)
+
+--- Bloqueos sobre productos:
+0 bloqueos no concedidos
+--- Órdenes creadas por el escenario c1 (producto de carga):
+ ordenes | unidades 
+---------+----------
+      76 |       76
+(1 row)
+
+--- estado tras c2 a 20 VUs:
+GET /api/health ? HTTP 000 en 5.014565 s
+ state | ultima_consulta | count 
+-------+-----------------+-------
+ idle  | COMMIT          |    10
+(1 row)
+
