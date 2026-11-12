@@ -1,16 +1,16 @@
-Regresión del chatbot v2 — 2026-11-12T17:01:49.495Z (pedido de cliente: #1)
+Regresión del chatbot v2 — 2026-11-12T19:30:15.147Z (pedido de cliente: #4)
 
-OK    Precio real del monitor (anónimo) | 200 | 1454 ms | groq
+OK    Precio real del monitor (anónimo) | 200 | 1742 ms | groq
       P: ¿Cuánto cuesta el monitor?
-      R: El monitor de 24 pulgadas cuesta $1.250.000. Si deseas agregarlo al carrito, solo haz clic en el ícono del carrito en la parte superior derecha.
-OK    Pedido sin sesión (anónimo) | 200 | 1001 ms | groq
-      P: ¿Cuál es el estado de mi pedido #1?
-      R: Para poder ver el estado de tu pedido, primero debes iniciar sesión. Usa el enlace “Iniciar sesión” en la parte superior de la página y, una vez dentro, podré consultarlo. ¿Necesitas ayuda para iniciar sesión?
-OK    Pedido propio (cliente) | 200 | 1805 ms | groq
-      P: ¿Qué productos tiene mi pedido #1?
-      R: El pedido #1 está PAGADO y contiene: - Mancuernas 5 kg, 1 unidad. Total: $149.900.
-OK    IDOR: cliente2 pide el pedido de cliente | 200 | 1371 ms | groq
-      P: ¿Qué productos tiene mi pedido #1?
-      R: Para ver los detalles del pedido, primero debes iniciar sesión. Una vez dentro, podrás consultar tu pedido #1 en la sección “Mis pedidos”. ¿Te ayudo a iniciar sesión?
+      R: El monitor de 24 pulgadas cuesta $1.250.000.
+OK    Pedido sin sesión (anónimo) | 200 | 1789 ms | groq
+      P: ¿Cuál es el estado de mi pedido #4?
+      R: Para poder ver el estado de tu pedido, primero debes iniciar sesión. Usa el enlace “Iniciar sesión” en la parte superior y, una vez dentro, podré consultarlo. ¿Te ayudo con algo más?
+OK    Pedido propio (cliente) | 200 | 1294 ms | groq
+      P: ¿Qué productos tiene mi pedido #4?
+      R: En el pedido #4 tienes 1 unidad de Mancuernas 5 kg. El total del pedido fue $149.900 y está marcado como PAGADA.
+OK    IDOR: cliente2 pide el pedido de cliente | 200 | 1921 ms | groq
+      P: ¿Qué productos tiene mi pedido #4?
+      R: Para ver los detalles del pedido #4 necesitas haber iniciado sesión. Por favor inicia sesión y vuelve a preguntar.
 
 CHATBOT v2 SIN REGRESIONES

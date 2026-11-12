@@ -1,5 +1,5 @@
 // Regresión del flujo completo en el navegador (Chromium 1366×768), todo por la interfaz:
-// login → carrito → compra aprobada → rechazo (USA-03) y reintento → mis pedidos → salir → admin crea producto.
+// registro → carrito → compra aprobada → rechazo (USA-03) y reintento → mis pedidos → salir → admin crea producto.
 // Uso (desde la raíz, con npm run dev y datos de db:reset): node pruebas/regresion/flujo.mjs
 // Escribe pruebas/regresion/resultados/flujo.txt.
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -46,10 +46,16 @@ async function pagar(numero) {
 
 await page.goto(`${APP}/`);
 
-await paso("1. Login como cliente", async () => {
-  await iniciarSesion("cliente@tienda.com", "Cliente123");
-  await page.getByRole("link", { name: "Mis pedidos" }).waitFor();
-  return "aparece 'Mis pedidos' en el encabezado";
+const nombreCliente = "Cliente Regresión";
+await paso("1. Registro de un cliente nuevo", async () => {
+  await page.getByRole("link", { name: "Registrarse" }).click();
+  await page.locator("#nombre").fill(nombreCliente);
+  await page.locator("#email").fill(`regresion${Date.now() % 1000000}@correo.com`);
+  await page.locator("#password").fill("Segura2026");
+  await page.getByRole("button", { name: "Registrarme" }).click();
+  await page.waitForURL(`${APP}/`);
+  await page.locator("header").getByText(nombreCliente).waitFor();
+  return "sesión iniciada y su nombre en el encabezado";
 });
 
 await paso("2. Agregar al carrito desde el catálogo", async () => {
