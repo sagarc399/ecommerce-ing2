@@ -1,3 +1,5 @@
+Antes de cualquier tarea, lee docs/HANDOFF.md
+
 # Proyecto: Ecommerce - Electiva Ingeniería de Software II (USCO)
 
 ## Qué es
