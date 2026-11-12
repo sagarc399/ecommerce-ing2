@@ -50,3 +50,17 @@
 [Informational] Non-Storable Content (plugin 10049, CWE 524, 5 instancias, confianza 2)
      ejemplo: GET :3000/api/auth/me ; GET :3000/api/health
      evidencia: authorization:
+
+## API con token de cliente — DESPUÉS → High: 0 | Medium: 0 | Low: 1 | Informational: 3
+[Low] A Server Error response code was returned by the server (plugin 100000, CWE 388, 1 instancias, confianza 3)
+     ejemplo: GET :3000/api/productos?buscar=%00&categoria=Hogar&pagina=1&limite=12
+     evidencia: 500
+[Informational] A Client Error response code was returned by the server (plugin 100000, CWE 388, 52 instancias, confianza 3)
+     ejemplo: DELETE :3000/api/productos/1 ; DELETE :3000/api/productos/1/
+     evidencia: 403
+[Informational] Authentication Request Identified (plugin 10111, CWE -1, 2 instancias, confianza 1)
+     ejemplo: POST :3000/api/auth/registro ; POST :3000/api/auth/login
+     evidencia: password
+[Informational] Non-Storable Content (plugin 10049, CWE 524, 5 instancias, confianza 2)
+     ejemplo: GET :3000/api/health ; GET :3000/api/productos?buscar=monitor&categoria=Hogar&pagina=1&limite=12
+     evidencia: authorization:

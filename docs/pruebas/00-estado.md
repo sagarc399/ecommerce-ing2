@@ -133,14 +133,30 @@ La mejora de tiempos **no** se debe al límite, que no abarata bcrypt: es variab
 | Referrer-Policy | ausente | `no-referrer` |
 | X-Powered-By | `Express` | ausente |
 
-### Incompleto
+**SEG-04/05: ZAP de API con token de cliente** (`pruebas/seguridad/reportes/api-cliente_despues.*`, `resumen-zap.txt`). Mismo escaneo y parámetros que el antes (OpenAPI, regla *replacer* con Bearer, `maxScanDurationInMins=15`, `threadPerHost=2`, `CHAT_PROVEEDOR=reglas` durante el escaneo). Comando: `SUFIJO=_despues bash pruebas/seguridad/ejecutar-zap.sh cliente` (el script ahora acepta qué escaneos correr y un sufijo, para no pisar los reportes del antes). Se corrió el 12 de noviembre: 120 reglas PASS, 0 FAIL, 1 WARN.
 
-- **SEG-04/05:** falta repetir el **escaneo de API de ZAP con token de cliente** (mismo comando, `bash pruebas/seguridad/ejecutar-zap.sh`, con `CHAT_PROVEEDOR=reglas` durante el escaneo y `groq` al final) y armar la tabla ANTES/DESPUÉS por severidad. Antes: Alta 0, Media 0, Baja 3, Informativa 3. El script ejecuta los 3 escaneos; si solo interesa el de cliente, se puede comentar el resto.
+| Severidad | Antes | Después |
+|---|---|---|
+| Alta | 0 | 0 |
+| Media | 0 | 0 |
+| Baja | 3 | **1** |
+| Informativa | 3 | 3 |
+
+| Alerta | Antes | Después |
+|---|---|---|
+| Server Leaks Information via "X-Powered-By" (Baja, SEG-05) | 5 instancias | **desaparece** |
+| X-Content-Type-Options Header Missing (Baja, SEG-04) | 5 instancias | **desaparece** |
+| A Server Error response code (Baja, `buscar=%00` → 500) | 1 | 1 (es SEG-07, hoja de ruta) |
+| Client Error response code (Informativa) | 51 | 52 (403/404 esperados) |
+| Authentication Request Identified (Informativa) | 2 | 2 |
+| Non-Storable Content (Informativa) | 5 | 5 |
+
+Las informativas son esperadas (errores 4xx correctos, el login identificado y respuestas no cacheables). Los escaneos baseline del frontend y de admin no se repitieron: el cambio fue en la API y el escaneo de cliente es el pedido en el plan. SEG-04/05 quedan **cerrados**.
 
 ### Falta del plan, sección por sección
 
 1. **Rendimiento:** completo.
-2. **Seguridad:** el ZAP de SEG-04/05 (arriba); **SEG-09** completo: puerto `127.0.0.1:5434:5432` en `docker-compose.yml`, `ALTER USER postgres` con contraseña aleatoria sin borrar el volumen, actualizarla en `backend/.env` (valor de ejemplo en `.env.example`), recrear el contenedor y verificar que no escucha en `0.0.0.0` y que la app funciona.
+2. **Seguridad:** **SEG-09** completo: puerto `127.0.0.1:5434:5432` en `docker-compose.yml`, `ALTER USER postgres` con contraseña aleatoria sin borrar el volumen, actualizarla en `backend/.env` (valor de ejemplo en `.env.example`), recrear el contenedor y verificar que no escucha en `0.0.0.0` y que la app funciona.
 3. **Usabilidad:**
    - **USA-02:** cambiar `text-slate-400` por un tono que cumpla 4,5:1 (probar `slate-500`) en toda la app, incluidos el chat y el admin, y repetir `node pruebas/usabilidad/accesibilidad.mjs`. Antes: 43 graves y 3 moderadas.
    - **USA-03:** en `frontend/src/pages/Checkout.tsx`, tras un 402 conservar el número, el titular y el vencimiento en memoria, borrar solo el CVV, poner el foco en el CVV y mostrar "Por seguridad, vuelve a ingresar el CVV"; con cualquier otro resultado, borrar todo. Verificar con el script de la prueba 11 de la Fase 6 y volver a medir T5 con Playwright y KLM. **Ojo:** T5 pide reintentar con *otra* tarjeta, así que con el número conservado el usuario debe borrarlo antes de escribir el nuevo (selección + Ctrl+A en el KLM). Hay que medirlo y explicar el compromiso en "USA-03: equilibrio entre usabilidad y seguridad". No repetir el SUS.
