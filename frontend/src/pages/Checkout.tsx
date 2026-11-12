@@ -302,7 +302,7 @@ export default function Checkout() {
             </span>
             <span>{formatearPrecio(total)}</span>
           </div>
-          <p className="mt-2 text-xs text-slate-400">El total final lo calcula el servidor con los precios vigentes.</p>
+          <p className="mt-2 text-xs text-slate-600">El total final lo calcula el servidor con los precios vigentes.</p>
         </aside>
       </div>
     </div>

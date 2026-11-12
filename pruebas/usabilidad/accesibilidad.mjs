@@ -1,5 +1,6 @@
 // Accesibilidad real con axe-core (WCAG 2.0/2.1/2.2 A y AA + buenas prácticas) en 8 pantallas a 1366×768.
 // Uso: node pruebas/usabilidad/accesibilidad.mjs → resultados/accesibilidad.json y accesibilidad.csv
+// SUFIJO=_despues node ... escribe accesibilidad_despues.json/.csv (no pisa el ANTES).
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -8,6 +9,7 @@ import { chromium } from "playwright";
 import { APP, prepararSesion, tokenDe } from "./tareas.mjs";
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
+const SUFIJO = process.env.SUFIJO ?? "";
 mkdirSync(join(AQUI, "resultados"), { recursive: true });
 
 const CARRITO = [{ producto_id: 3, nombre: "Mouse inalámbrico", precio: 45000, imagen_url: "/productos/mouse-inalambrico.jpg", stock: 40, cantidad: 2 }];
@@ -58,5 +60,5 @@ for (const [nombre, ruta, token, abrirChat] of PAGINAS) {
 }
 
 await navegador.close();
-writeFileSync(join(AQUI, "resultados", "accesibilidad.json"), JSON.stringify(resultado, null, 2));
-writeFileSync(join(AQUI, "accesibilidad.csv"), `${filasCsv.join("\n")}\n`);
+writeFileSync(join(AQUI, "resultados", `accesibilidad${SUFIJO}.json`), JSON.stringify(resultado, null, 2));
+writeFileSync(join(AQUI, `accesibilidad${SUFIJO}.csv`), `${filasCsv.join("\n")}\n`);

@@ -1,0 +1,4 @@
+pagina,impacto,regla,descripcion,nodos,ejemplo
+"Admin productos","moderate","landmark-unique","Landmarks should have a unique role or role/label/title (i.e. accessible name) combination","1",".sm\:gap-4"
+"Chat abierto","moderate","landmark-no-duplicate-banner","Document should not have more than one banner landmark","1",".sticky"
+"Chat abierto","moderate","landmark-unique","Landmarks should have a unique role or role/label/title (i.e. accessible name) combination","1",".sticky"

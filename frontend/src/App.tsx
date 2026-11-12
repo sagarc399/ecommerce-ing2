@@ -24,7 +24,7 @@ function Layout() {
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:py-8">
         <Outlet />
       </main>
-      <footer className="border-t border-slate-200 py-4 text-center text-xs text-slate-400">
+      <footer className="border-t border-slate-200 py-4 text-center text-xs text-slate-600">
         Tienda USCO · Electiva Ingeniería de Software II
       </footer>
       <Chatbot />

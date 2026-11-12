@@ -89,7 +89,7 @@ export default function AdminOrdenes() {
                     </td>
                     <td className="px-3 py-2">
                       <p>{o.comprador.nombre}</p>
-                      <p className="text-xs text-slate-400">{o.comprador.email}</p>
+                      <p className="text-xs text-slate-600">{o.comprador.email}</p>
                     </td>
                     <td className="whitespace-nowrap px-3 py-2">{formatearFecha(o.creado_en)}</td>
                     <td className="px-3 py-2 text-right font-medium">{formatearPrecio(o.total)}</td>

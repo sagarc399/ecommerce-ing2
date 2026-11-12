@@ -1,0 +1,12 @@
+pagina,impacto,regla,descripcion,nodos,ejemplo
+"Catálogo","serious","color-contrast","Elements must meet minimum color contrast ratio thresholds","1","footer"
+"Detalle de producto","serious","color-contrast","Elements must meet minimum color contrast ratio thresholds","2",".mt-2.text-slate-400.text-xs"
+"Carrito","serious","color-contrast","Elements must meet minimum color contrast ratio thresholds","3",".hover\:text-red-600.shrink-0.text-slate-400"
+"Checkout","serious","color-contrast","Elements must meet minimum color contrast ratio thresholds","2",".mt-2"
+"Login","serious","color-contrast","Elements must meet minimum color contrast ratio thresholds","1","footer"
+"Mis pedidos","serious","color-contrast","Elements must meet minimum color contrast ratio thresholds","21","a[href=""/pedidos/20""] > .min-w-0 > .text-slate-400.text-xs"
+"Admin productos","serious","color-contrast","Elements must meet minimum color contrast ratio thresholds","11","tr:nth-child(1) > td:nth-child(1) > .gap-3.items-center.flex > div > .text-slate-400"
+"Admin productos","moderate","landmark-unique","Landmarks should have a unique role or role/label/title (i.e. accessible name) combination","1",".sm\:gap-4"
+"Chat abierto","serious","color-contrast","Elements must meet minimum color contrast ratio thresholds","2","footer"
+"Chat abierto","moderate","landmark-no-duplicate-banner","Document should not have more than one banner landmark","1",".sticky"
+"Chat abierto","moderate","landmark-unique","Landmarks should have a unique role or role/label/title (i.e. accessible name) combination","1",".sticky"

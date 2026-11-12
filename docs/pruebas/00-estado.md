@@ -168,12 +168,38 @@ Cambios: `docker-compose.yml` publica `"127.0.0.1:5434:5432"`; `ALTER USER postg
 
 Riesgo residual: otro contenedor del mismo equipo aún llega al puerto por `host.docker.internal` (pasarela interna de Docker Desktop), pero la clave por defecto ya no sirve. Verificación de la app: `/api/health` ok, catálogo y login 200, `npm run verificar` → LISTO PARA LA DEMO, `npm run prueba:concurrencia` → PRUEBA SUPERADA. SEG-09 queda **cerrado**.
 
+**USA-02: contraste insuficiente** (`pruebas/usabilidad/resultados/accesibilidad_antes.json` y `accesibilidad_despues.json`, más sus `.csv`; el `accesibilidad.json` original se conserva)
+
+Cambio: `text-slate-400` (`#94a3b8`) → `text-slate-600` (`#475569`) en el texto secundario de 9 archivos (pie de página, notas del carrito y del checkout, enlaces "Quitar" y "Vaciar carrito", fecha en "Mis pedidos", correo e id en el admin, paginación y los dos textos del chat) y → `text-slate-500` (`#64748b`) en 3 íconos (lupa del catálogo, imagen de reemplazo y botón cerrar del modal), que como elementos no textuales piden 3:1 (WCAG 1.4.11). Para el texto no se usó `slate-500` porque queda justo en el límite: 4,55:1 sobre `#f8fafc` y 4,34:1 sobre `slate-100`.
+
+| Color | Blanco | `#f8fafc` (fondo) | `slate-100` | `slate-200` |
+|---|---|---|---|---|
+| `slate-400` (antes) | 2,56 | 2,45 | 2,34 | 2,08 |
+| `slate-500` (íconos) | 4,76 | 4,55 | 4,34 | 3,86 |
+| `slate-600` (texto) | **7,58** | **7,24** | **6,92** | **6,15** |
+
+Método: los mismos datos del ANTES original (`npm run db:reset` + 20 pedidos de `cliente@tienda.com`, que es lo que dejaron las corridas de `medir.mjs`), recreados con `node pruebas/usabilidad/preparar-pedidos.mjs` para no volver a correr `medir.mjs` (que sobrescribiría la medición KLM del antes). El ANTES se repitió en esta sesión con `SUFIJO=_antes node pruebas/usabilidad/accesibilidad.mjs` y dio lo mismo que el original (43 graves, 3 moderadas); el DESPUÉS, con `SUFIJO=_despues`.
+
+| Pantalla | Graves antes | Graves después | Moderadas antes | Moderadas después |
+|---|---|---|---|---|
+| Catálogo | 1 | 0 | 0 | 0 |
+| Detalle de producto | 2 | 0 | 0 | 0 |
+| Carrito | 3 | 0 | 0 | 0 |
+| Checkout | 2 | 0 | 0 | 0 |
+| Login | 1 | 0 | 0 | 0 |
+| Mis pedidos | 21 | 0 | 0 | 0 |
+| Admin productos | 11 | 0 | 1 | 1 |
+| Chat abierto | 2 | 0 | 2 | 2 |
+| **Total** | **43** | **0** | **3** | **3** |
+
+Críticas y menores: 0 antes y 0 después. Las 3 moderadas que quedan son de landmarks (`landmark-unique` y `landmark-no-duplicate-banner`), es decir USA-12, que está en la hoja de ruta. `color-contrast` ya no aparece en ninguna pantalla. `npm run build` del frontend compila. USA-02 queda **cerrado**.
+
 ### Falta del plan, sección por sección
 
 1. **Rendimiento:** completo.
-2. **Seguridad:** completo (SEG-09 cerrado, ver abajo).
+2. **Seguridad:** completo (SEG-04/05 y SEG-09 cerrados, ver arriba).
 3. **Usabilidad:**
-   - **USA-02:** cambiar `text-slate-400` por un tono que cumpla 4,5:1 (probar `slate-500`) en toda la app, incluidos el chat y el admin, y repetir `node pruebas/usabilidad/accesibilidad.mjs`. Antes: 43 graves y 3 moderadas.
+   - **USA-02:** completo (ver arriba).
    - **USA-03:** en `frontend/src/pages/Checkout.tsx`, tras un 402 conservar el número, el titular y el vencimiento en memoria, borrar solo el CVV, poner el foco en el CVV y mostrar "Por seguridad, vuelve a ingresar el CVV"; con cualquier otro resultado, borrar todo. Verificar con el script de la prueba 11 de la Fase 6 y volver a medir T5 con Playwright y KLM. **Ojo:** T5 pide reintentar con *otra* tarjeta, así que con el número conservado el usuario debe borrarlo antes de escribir el nuevo (selección + Ctrl+A en el KLM). Hay que medirlo y explicar el compromiso en "USA-03: equilibrio entre usabilidad y seguridad". No repetir el SUS.
 4. **Regresión:** `npm run build` del frontend; pruebas del chatbot v2 (precio real, pedido sin sesión, IDOR con cliente2), espaciadas por la cuota de Groq; flujo completo en el navegador. Antes, reiniciar el backend para borrar los bloqueos de login en memoria: la prueba de fuerza bruta bloqueó `cliente@tienda.com` desde localhost por 15 minutos.
 5. **Documentación:** `05-correcciones.md` (causa raíz, cambio, ANTES/DESPUÉS y efecto en el negocio de cada hallazgo, más la sección sobre USA-03), `06-matriz-calidad.md` (matriz unificada con diagnóstico de una frase por dimensión), hoja de ruta de lo no corregido con esfuerzo y motivo, y actualizar este archivo.

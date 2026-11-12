@@ -101,7 +101,7 @@ export default function VentanaChat({ mensajes, esperando, onEnviar, onNuevaConv
             >
               {m.texto}
             </p>
-            {m.automatica && <span className="mt-0.5 px-1 text-[11px] text-slate-400">Respuesta automática</span>}
+            {m.automatica && <span className="mt-0.5 px-1 text-[11px] text-slate-600">Respuesta automática</span>}
           </div>
         ))}
 
@@ -156,7 +156,7 @@ export default function VentanaChat({ mensajes, esperando, onEnviar, onNuevaConv
             Enviar
           </button>
         </div>
-        <p className={`mt-1 text-right text-xs ${texto.length >= MAXIMO_CARACTERES ? 'text-red-600' : 'text-slate-400'}`}>
+        <p className={`mt-1 text-right text-xs ${texto.length >= MAXIMO_CARACTERES ? 'text-red-600' : 'text-slate-600'}`}>
           {texto.length}/{MAXIMO_CARACTERES}
         </p>
       </form>

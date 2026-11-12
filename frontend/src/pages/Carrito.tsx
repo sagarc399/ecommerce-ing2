@@ -44,7 +44,7 @@ export default function Carrito() {
                   <button
                     type="button"
                     onClick={() => quitar(item.producto_id)}
-                    className="shrink-0 text-sm text-slate-400 hover:text-red-600"
+                    className="shrink-0 text-sm text-slate-600 hover:text-red-600"
                     aria-label={`Quitar ${item.nombre} del carrito`}
                   >
                     Quitar
@@ -76,7 +76,7 @@ export default function Carrito() {
             <span>Total</span>
             <span>{formatearPrecio(total)}</span>
           </div>
-          <p className="mt-2 text-xs text-slate-400">El total final se confirma con los precios vigentes al momento de pagar.</p>
+          <p className="mt-2 text-xs text-slate-600">El total final se confirma con los precios vigentes al momento de pagar.</p>
           <Link
             to="/checkout"
             className="mt-4 block w-full rounded-md bg-indigo-600 px-4 py-2.5 text-center font-medium text-white hover:bg-indigo-700"
