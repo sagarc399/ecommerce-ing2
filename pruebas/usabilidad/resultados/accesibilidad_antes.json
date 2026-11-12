@@ -1,0 +1,194 @@
+[
+  {
+    "pagina": "Catálogo",
+    "ruta": "/",
+    "conteo": {
+      "critical": 0,
+      "serious": 1,
+      "moderate": 0,
+      "minor": 0
+    },
+    "reglasQuePasaron": 37,
+    "violaciones": [
+      {
+        "regla": "color-contrast",
+        "impacto": "serious",
+        "descripcion": "Elements must meet minimum color contrast ratio thresholds",
+        "nodos": 1,
+        "ejemplo": "footer",
+        "detalle": "Element has insufficient color contrast of 2.45 (foreground color: #94a3b8, background color: #f8fafc, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "pagina": "Detalle de producto",
+    "ruta": "/producto/4",
+    "conteo": {
+      "critical": 0,
+      "serious": 2,
+      "moderate": 0,
+      "minor": 0
+    },
+    "reglasQuePasaron": 33,
+    "violaciones": [
+      {
+        "regla": "color-contrast",
+        "impacto": "serious",
+        "descripcion": "Elements must meet minimum color contrast ratio thresholds",
+        "nodos": 2,
+        "ejemplo": ".mt-2.text-slate-400.text-xs",
+        "detalle": "Element has insufficient color contrast of 2.45 (foreground color: #94a3b8, background color: #f8fafc, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "pagina": "Carrito",
+    "ruta": "/carrito",
+    "conteo": {
+      "critical": 0,
+      "serious": 3,
+      "moderate": 0,
+      "minor": 0
+    },
+    "reglasQuePasaron": 35,
+    "violaciones": [
+      {
+        "regla": "color-contrast",
+        "impacto": "serious",
+        "descripcion": "Elements must meet minimum color contrast ratio thresholds",
+        "nodos": 3,
+        "ejemplo": ".hover\\:text-red-600.shrink-0.text-slate-400",
+        "detalle": "Element has insufficient color contrast of 2.56 (foreground color: #94a3b8, background color: #ffffff, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "pagina": "Checkout",
+    "ruta": "/checkout",
+    "conteo": {
+      "critical": 0,
+      "serious": 2,
+      "moderate": 0,
+      "minor": 0
+    },
+    "reglasQuePasaron": 39,
+    "violaciones": [
+      {
+        "regla": "color-contrast",
+        "impacto": "serious",
+        "descripcion": "Elements must meet minimum color contrast ratio thresholds",
+        "nodos": 2,
+        "ejemplo": ".mt-2",
+        "detalle": "Element has insufficient color contrast of 2.56 (foreground color: #94a3b8, background color: #ffffff, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "pagina": "Login",
+    "ruta": "/login",
+    "conteo": {
+      "critical": 0,
+      "serious": 1,
+      "moderate": 0,
+      "minor": 0
+    },
+    "reglasQuePasaron": 37,
+    "violaciones": [
+      {
+        "regla": "color-contrast",
+        "impacto": "serious",
+        "descripcion": "Elements must meet minimum color contrast ratio thresholds",
+        "nodos": 1,
+        "ejemplo": "footer",
+        "detalle": "Element has insufficient color contrast of 2.45 (foreground color: #94a3b8, background color: #f8fafc, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "pagina": "Mis pedidos",
+    "ruta": "/pedidos",
+    "conteo": {
+      "critical": 0,
+      "serious": 21,
+      "moderate": 0,
+      "minor": 0
+    },
+    "reglasQuePasaron": 33,
+    "violaciones": [
+      {
+        "regla": "color-contrast",
+        "impacto": "serious",
+        "descripcion": "Elements must meet minimum color contrast ratio thresholds",
+        "nodos": 21,
+        "ejemplo": "a[href=\"/pedidos/20\"] > .min-w-0 > .text-slate-400.text-xs",
+        "detalle": "Element has insufficient color contrast of 2.56 (foreground color: #94a3b8, background color: #ffffff, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+      }
+    ]
+  },
+  {
+    "pagina": "Admin productos",
+    "ruta": "/admin/productos",
+    "conteo": {
+      "critical": 0,
+      "serious": 11,
+      "moderate": 1,
+      "minor": 0
+    },
+    "reglasQuePasaron": 41,
+    "violaciones": [
+      {
+        "regla": "color-contrast",
+        "impacto": "serious",
+        "descripcion": "Elements must meet minimum color contrast ratio thresholds",
+        "nodos": 11,
+        "ejemplo": "tr:nth-child(1) > td:nth-child(1) > .gap-3.items-center.flex > div > .text-slate-400",
+        "detalle": "Element has insufficient color contrast of 2.56 (foreground color: #94a3b8, background color: #ffffff, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "regla": "landmark-unique",
+        "impacto": "moderate",
+        "descripcion": "Landmarks should have a unique role or role/label/title (i.e. accessible name) combination",
+        "nodos": 1,
+        "ejemplo": ".sm\\:gap-4",
+        "detalle": "The landmark must have a unique aria-label, aria-labelledby, or title to make landmarks distinguishable"
+      }
+    ]
+  },
+  {
+    "pagina": "Chat abierto",
+    "ruta": "/",
+    "conteo": {
+      "critical": 0,
+      "serious": 2,
+      "moderate": 2,
+      "minor": 0
+    },
+    "reglasQuePasaron": 41,
+    "violaciones": [
+      {
+        "regla": "color-contrast",
+        "impacto": "serious",
+        "descripcion": "Elements must meet minimum color contrast ratio thresholds",
+        "nodos": 2,
+        "ejemplo": "footer",
+        "detalle": "Element has insufficient color contrast of 2.45 (foreground color: #94a3b8, background color: #f8fafc, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+      },
+      {
+        "regla": "landmark-no-duplicate-banner",
+        "impacto": "moderate",
+        "descripcion": "Document should not have more than one banner landmark",
+        "nodos": 1,
+        "ejemplo": ".sticky",
+        "detalle": "Document has more than one banner landmark"
+      },
+      {
+        "regla": "landmark-unique",
+        "impacto": "moderate",
+        "descripcion": "Landmarks should have a unique role or role/label/title (i.e. accessible name) combination",
+        "nodos": 1,
+        "ejemplo": ".sticky",
+        "detalle": "The landmark must have a unique aria-label, aria-labelledby, or title to make landmarks distinguishable"
+      }
+    ]
+  }
+]

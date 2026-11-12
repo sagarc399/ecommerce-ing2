@@ -1,0 +1,835 @@
+[
+  {
+    "id": "T1",
+    "nombre": "Registrarse como cliente nuevo",
+    "exito": "Queda con la sesión iniciada en el catálogo y su nombre aparece en el encabezado",
+    "conteo": {
+      "clics": 5,
+      "campos": 3,
+      "caracteres": 49,
+      "teclas": 0,
+      "cambiosDePagina": 2,
+      "decisiones": 3
+    },
+    "klm": {
+      "operadores": {
+        "K": 49,
+        "P": 5,
+        "B": 5,
+        "H": 6,
+        "M": 3
+      },
+      "segundos": 26.17
+    },
+    "acciones": [
+      {
+        "tipo": "decision",
+        "texto": "buscar cómo crear una cuenta"
+      },
+      {
+        "tipo": "clic",
+        "texto": "Registrarse"
+      },
+      {
+        "tipo": "decision",
+        "texto": "llenar el formulario"
+      },
+      {
+        "tipo": "clic",
+        "texto": "campo nombre"
+      },
+      {
+        "tipo": "escribir",
+        "caracteres": 11,
+        "texto": "nombre"
+      },
+      {
+        "tipo": "clic",
+        "texto": "campo email"
+      },
+      {
+        "tipo": "escribir",
+        "caracteres": 28,
+        "texto": "email"
+      },
+      {
+        "tipo": "clic",
+        "texto": "campo contraseña"
+      },
+      {
+        "tipo": "escribir",
+        "caracteres": 10,
+        "texto": "contraseña"
+      },
+      {
+        "tipo": "decision",
+        "texto": "revisar y enviar"
+      },
+      {
+        "tipo": "clic",
+        "texto": "Registrarme"
+      }
+    ],
+    "corridas": [
+      {
+        "corrida": 1,
+        "ms": 510,
+        "exito": true,
+        "error": null
+      },
+      {
+        "corrida": 2,
+        "ms": 560,
+        "exito": true,
+        "error": null
+      },
+      {
+        "corrida": 3,
+        "ms": 500,
+        "exito": true,
+        "error": null
+      }
+    ],
+    "exitoMaquina": "3/3",
+    "maquinaMedianaS": 0.51
+  },
+  {
+    "id": "T2",
+    "nombre": "Buscar un producto por nombre y filtrar por categoría",
+    "exito": "El catálogo muestra 'Camiseta deportiva' y todos los resultados son de la categoría Ropa",
+    "conteo": {
+      "clics": 3,
+      "campos": 1,
+      "caracteres": 8,
+      "teclas": 0,
+      "cambiosDePagina": 0,
+      "decisiones": 3
+    },
+    "klm": {
+      "operadores": {
+        "K": 8,
+        "P": 3,
+        "B": 3,
+        "H": 2,
+        "M": 3
+      },
+      "segundos": 10.69
+    },
+    "acciones": [
+      {
+        "tipo": "decision",
+        "texto": "decidir qué buscar"
+      },
+      {
+        "tipo": "clic",
+        "texto": "campo buscador"
+      },
+      {
+        "tipo": "escribir",
+        "caracteres": 8,
+        "texto": "buscador"
+      },
+      {
+        "tipo": "decision",
+        "texto": "elegir la categoría"
+      },
+      {
+        "tipo": "clic",
+        "texto": "abrir filtro de categoría"
+      },
+      {
+        "tipo": "clic",
+        "texto": "elegir Ropa"
+      },
+      {
+        "tipo": "decision",
+        "texto": "revisar los resultados"
+      }
+    ],
+    "corridas": [
+      {
+        "corrida": 1,
+        "ms": 553,
+        "exito": true,
+        "error": null
+      },
+      {
+        "corrida": 2,
+        "ms": 541,
+        "exito": true,
+        "error": null
+      },
+      {
+        "corrida": 3,
+        "ms": 542,
+        "exito": true,
+        "error": null
+      }
+    ],
+    "exitoMaquina": "3/3",
+    "maquinaMedianaS": 0.542
+  },
+  {
+    "id": "T3",
+    "nombre": "Agregar 2 productos al carrito y cambiar la cantidad de uno",
+    "exito": "El carrito tiene 2 productos distintos y uno de ellos con cantidad 2",
+    "conteo": {
+      "clics": 4,
+      "campos": 0,
+      "caracteres": 0,
+      "teclas": 0,
+      "cambiosDePagina": 1,
+      "decisiones": 4
+    },
+    "klm": {
+      "operadores": {
+        "K": 0,
+        "P": 4,
+        "B": 4,
+        "H": 0,
+        "M": 4
+      },
+      "segundos": 10.2
+    },
+    "acciones": [
+      {
+        "tipo": "decision",
+        "texto": "elegir el primer producto"
+      },
+      {
+        "tipo": "clic",
+        "texto": "Agregar Mouse"
+      },
+      {
+        "tipo": "decision",
+        "texto": "elegir el segundo producto"
+      },
+      {
+        "tipo": "clic",
+        "texto": "Agregar Camiseta"
+      },
+      {
+        "tipo": "decision",
+        "texto": "ir al carrito"
+      },
+      {
+        "tipo": "clic",
+        "texto": "ícono del carrito"
+      },
+      {
+        "tipo": "decision",
+        "texto": "cambiar la cantidad"
+      },
+      {
+        "tipo": "clic",
+        "texto": "+ en Mouse"
+      }
+    ],
+    "corridas": [
+      {
+        "corrida": 1,
+        "ms": 239,
+        "exito": true,
+        "error": null
+      },
+      {
+        "corrida": 2,
+        "ms": 250,
+        "exito": true,
+        "error": null
+      },
+      {
+        "corrida": 3,
+        "ms": 246,
+        "exito": true,
+        "error": null
+      }
+    ],
+    "exitoMaquina": "3/3",
+    "maquinaMedianaS": 0.246
+  },
+  {
+    "id": "T4",
+    "nombre": "Completar una compra con tarjeta válida",
+    "exito": "Llega a la confirmación del pedido ('¡Gracias por tu compra!')",
+    "conteo": {
+      "clics": 6,
+      "campos": 4,
+      "caracteres": 33,
+      "teclas": 0,
+      "cambiosDePagina": 2,
+      "decisiones": 3
+    },
+    "klm": {
+      "operadores": {
+        "K": 33,
+        "P": 6,
+        "B": 6,
+        "H": 8,
+        "M": 3
+      },
+      "segundos": 23.69
+    },
+    "acciones": [
+      {
+        "tipo": "decision",
+        "texto": "decidir pagar"
+      },
+      {
+        "tipo": "clic",
+        "texto": "Proceder al pago"
+      },
+      {
+        "tipo": "decision",
+        "texto": "llenar los datos de la tarjeta"
+      },
+      {
+        "tipo": "clic",
+        "texto": "campo número de tarjeta"
+      },
+      {
+        "tipo": "escribir",
+        "caracteres": 16,
+        "texto": "número de tarjeta"
+      },
+      {
+        "tipo": "clic",
+        "texto": "campo titular"
+      },
+      {
+        "tipo": "escribir",
+        "caracteres": 10,
+        "texto": "titular"
+      },
+      {
+        "tipo": "clic",
+        "texto": "campo vencimiento"
+      },
+      {
+        "tipo": "escribir",
+        "caracteres": 4,
+        "texto": "vencimiento"
+      },
+      {
+        "tipo": "clic",
+        "texto": "campo CVV"
+      },
+      {
+        "tipo": "escribir",
+        "caracteres": 3,
+        "texto": "CVV"
+      },
+      {
+        "tipo": "decision",
+        "texto": "revisar y pagar"
+      },
+      {
+        "tipo": "clic",
+        "texto": "Pagar"
+      }
+    ],
+    "corridas": [
+      {
+        "corrida": 1,
+        "ms": 926,
+        "exito": true,
+        "error": null
+      },
+      {
+        "corrida": 2,
+        "ms": 948,
+        "exito": true,
+        "error": null
+      },
+      {
+        "corrida": 3,
+        "ms": 955,
+        "exito": true,
+        "error": null
+      }
+    ],
+    "exitoMaquina": "3/3",
+    "maquinaMedianaS": 0.948
+  },
+  {
+    "id": "T5",
+    "nombre": "Recibir un pago rechazado (0000) y reintentar con otra tarjeta",
+    "exito": "Ve el mensaje de rechazo y, con otra tarjeta, llega a la confirmación del pedido",
+    "conteo": {
+      "clics": 9,
+      "campos": 6,
+      "caracteres": 52,
+      "teclas": 0,
+      "cambiosDePagina": 2,
+      "decisiones": 5
+    },
+    "klm": {
+      "operadores": {
+        "K": 52,
+        "P": 9,
+        "B": 9,
+        "H": 12,
+        "M": 5
+      },
+      "segundos": 36.91
+    },
+    "acciones": [
+      {
+        "tipo": "decision",
+        "texto": "decidir pagar"
+      },
+      {
+        "tipo": "clic",
+        "texto": "Proceder al pago"
+      },
+      {
+        "tipo": "decision",
+        "texto": "llenar los datos de la tarjeta"
+      },
+      {
+        "tipo": "clic",
+        "texto": "campo número de tarjeta (termina en 0000)"
+      },
+      {
+        "tipo": "escribir",
+        "caracteres": 16,
+        "texto": "número de tarjeta (termina en 0000)"
+      },
+      {
+        "tipo": "clic",
+        "texto": "campo titular"
+      },
+      {
+        "tipo": "escribir",
+        "caracteres": 10,
+        "texto": "titular"
+      },
+      {
+        "tipo": "clic",
+        "texto": "campo vencimiento"
+      },
+      {
+        "tipo": "escribir",
+        "caracteres": 4,
+        "texto": "vencimiento"
+      },
+      {
+        "tipo": "clic",
+        "texto": "campo CVV"
+      },
+      {
+        "tipo": "escribir",
+        "caracteres": 3,
+        "texto": "CVV"
+      },
+      {
+        "tipo": "decision",
+        "texto": "revisar y pagar"
+      },
+      {
+        "tipo": "clic",
+        "texto": "Pagar"
+      },
+      {
+        "tipo": "decision",
+        "texto": "entender el rechazo y decidir usar otra tarjeta"
+      },
+      {
+        "tipo": "clic",
+        "texto": "campo número de otra tarjeta"
+      },
+      {
+        "tipo": "escribir",
+        "caracteres": 16,
+        "texto": "número de otra tarjeta"
+      },
+      {
+        "tipo": "clic",
+        "texto": "campo CVV de nuevo"
+      },
+      {
+        "tipo": "escribir",
+        "caracteres": 3,
+        "texto": "CVV de nuevo"
+      },
+      {
+        "tipo": "decision",
+        "texto": "revisar y pagar de nuevo"
+      },
+      {
+        "tipo": "clic",
+        "texto": "Pagar de nuevo"
+      }
+    ],
+    "corridas": [
+      {
+        "corrida": 1,
+        "ms": 1919,
+        "exito": true,
+        "error": null
+      },
+      {
+        "corrida": 2,
+        "ms": 1907,
+        "exito": true,
+        "error": null
+      },
+      {
+        "corrida": 3,
+        "ms": 1923,
+        "exito": true,
+        "error": null
+      }
+    ],
+    "exitoMaquina": "3/3",
+    "maquinaMedianaS": 1.919
+  },
+  {
+    "id": "T6",
+    "nombre": "Consultar el detalle de un pedido en 'Mis pedidos'",
+    "exito": "Ve el detalle de un pedido con sus productos, total y pago",
+    "conteo": {
+      "clics": 2,
+      "campos": 0,
+      "caracteres": 0,
+      "teclas": 0,
+      "cambiosDePagina": 2,
+      "decisiones": 3
+    },
+    "klm": {
+      "operadores": {
+        "K": 0,
+        "P": 2,
+        "B": 2,
+        "H": 0,
+        "M": 3
+      },
+      "segundos": 6.45
+    },
+    "acciones": [
+      {
+        "tipo": "decision",
+        "texto": "buscar dónde están los pedidos"
+      },
+      {
+        "tipo": "clic",
+        "texto": "Mis pedidos"
+      },
+      {
+        "tipo": "decision",
+        "texto": "elegir el pedido"
+      },
+      {
+        "tipo": "clic",
+        "texto": "primer pedido"
+      },
+      {
+        "tipo": "decision",
+        "texto": "leer el detalle"
+      }
+    ],
+    "corridas": [
+      {
+        "corrida": 1,
+        "ms": 236,
+        "exito": true,
+        "error": null
+      },
+      {
+        "corrida": 2,
+        "ms": 249,
+        "exito": true,
+        "error": null
+      },
+      {
+        "corrida": 3,
+        "ms": 278,
+        "exito": true,
+        "error": null
+      }
+    ],
+    "exitoMaquina": "3/3",
+    "maquinaMedianaS": 0.249
+  },
+  {
+    "id": "T7",
+    "nombre": "Preguntarle al chatbot el precio de un producto",
+    "exito": "El chatbot responde con el precio real del monitor ($1.250.000)",
+    "conteo": {
+      "clics": 2,
+      "campos": 1,
+      "caracteres": 26,
+      "teclas": 1,
+      "cambiosDePagina": 0,
+      "decisiones": 3
+    },
+    "klm": {
+      "operadores": {
+        "K": 27,
+        "P": 2,
+        "B": 2,
+        "H": 1,
+        "M": 3
+      },
+      "segundos": 14.41
+    },
+    "acciones": [
+      {
+        "tipo": "decision",
+        "texto": "buscar la ayuda"
+      },
+      {
+        "tipo": "clic",
+        "texto": "botón del chat"
+      },
+      {
+        "tipo": "decision",
+        "texto": "formular la pregunta"
+      },
+      {
+        "tipo": "clic",
+        "texto": "campo pregunta"
+      },
+      {
+        "tipo": "escribir",
+        "caracteres": 26,
+        "texto": "pregunta"
+      },
+      {
+        "tipo": "tecla",
+        "texto": "Enter (enviar)"
+      },
+      {
+        "tipo": "decision",
+        "texto": "leer la respuesta"
+      }
+    ],
+    "corridas": [
+      {
+        "corrida": 1,
+        "ms": 1285,
+        "exito": true,
+        "error": null,
+        "chatMs": 1150,
+        "automatica": false,
+        "respuesta": "El monitor de 24 pulgadas cuesta $1.250.000. Si deseas agregarlo al carrito, usa el ícono del carrito en la parte superior derecha."
+      },
+      {
+        "corrida": 2,
+        "ms": 1226,
+        "exito": true,
+        "error": null,
+        "chatMs": 1114,
+        "automatica": false,
+        "respuesta": "El monitor de 24 pulgadas cuesta $1.250.000. Si deseas agregarlo al carrito, usa el ícono del carrito en la parte superior derecha."
+      },
+      {
+        "corrida": 3,
+        "ms": 1170,
+        "exito": true,
+        "error": null,
+        "chatMs": 1046,
+        "automatica": false,
+        "respuesta": "El monitor de 24 pulgadas cuesta $1.250.000."
+      }
+    ],
+    "exitoMaquina": "3/3",
+    "maquinaMedianaS": 1.226,
+    "chatMedianaMs": 1114
+  },
+  {
+    "id": "T8",
+    "nombre": "(Admin) Crear un producto nuevo",
+    "exito": "El producto aparece en la tabla del panel admin",
+    "conteo": {
+      "clics": 7,
+      "campos": 4,
+      "caracteres": 29,
+      "teclas": 0,
+      "cambiosDePagina": 2,
+      "decisiones": 4
+    },
+    "klm": {
+      "operadores": {
+        "K": 29,
+        "P": 7,
+        "B": 7,
+        "H": 8,
+        "M": 4
+      },
+      "segundos": 25.12
+    },
+    "acciones": [
+      {
+        "tipo": "decision",
+        "texto": "ir al panel admin"
+      },
+      {
+        "tipo": "clic",
+        "texto": "Panel admin"
+      },
+      {
+        "tipo": "decision",
+        "texto": "iniciar la creación"
+      },
+      {
+        "tipo": "clic",
+        "texto": "+ Nuevo producto"
+      },
+      {
+        "tipo": "decision",
+        "texto": "llenar el formulario"
+      },
+      {
+        "tipo": "clic",
+        "texto": "campo nombre"
+      },
+      {
+        "tipo": "escribir",
+        "caracteres": 16,
+        "texto": "nombre"
+      },
+      {
+        "tipo": "clic",
+        "texto": "campo precio"
+      },
+      {
+        "tipo": "escribir",
+        "caracteres": 6,
+        "texto": "precio"
+      },
+      {
+        "tipo": "clic",
+        "texto": "campo stock"
+      },
+      {
+        "tipo": "escribir",
+        "caracteres": 2,
+        "texto": "stock"
+      },
+      {
+        "tipo": "clic",
+        "texto": "campo categoría"
+      },
+      {
+        "tipo": "escribir",
+        "caracteres": 5,
+        "texto": "categoría"
+      },
+      {
+        "tipo": "decision",
+        "texto": "revisar y guardar"
+      },
+      {
+        "tipo": "clic",
+        "texto": "Crear producto"
+      }
+    ],
+    "corridas": [
+      {
+        "corrida": 1,
+        "ms": 499,
+        "exito": true,
+        "error": null
+      },
+      {
+        "corrida": 2,
+        "ms": 446,
+        "exito": true,
+        "error": null
+      },
+      {
+        "corrida": 3,
+        "ms": 514,
+        "exito": true,
+        "error": null
+      }
+    ],
+    "exitoMaquina": "3/3",
+    "maquinaMedianaS": 0.499
+  },
+  {
+    "id": "T9",
+    "nombre": "(Admin) Desactivar un producto y volver a activarlo",
+    "exito": "El producto queda activo de nuevo después de haber estado inactivo",
+    "conteo": {
+      "clics": 4,
+      "campos": 1,
+      "caracteres": 7,
+      "teclas": 0,
+      "cambiosDePagina": 0,
+      "decisiones": 4
+    },
+    "klm": {
+      "operadores": {
+        "K": 7,
+        "P": 4,
+        "B": 4,
+        "H": 2,
+        "M": 4
+      },
+      "segundos": 12.96
+    },
+    "acciones": [
+      {
+        "tipo": "decision",
+        "texto": "buscar el producto"
+      },
+      {
+        "tipo": "clic",
+        "texto": "campo buscador del admin"
+      },
+      {
+        "tipo": "escribir",
+        "caracteres": 7,
+        "texto": "buscador del admin"
+      },
+      {
+        "tipo": "decision",
+        "texto": "desactivarlo"
+      },
+      {
+        "tipo": "clic",
+        "texto": "Desactivar"
+      },
+      {
+        "tipo": "decision",
+        "texto": "confirmar en el modal"
+      },
+      {
+        "tipo": "clic",
+        "texto": "Sí, desactivar"
+      },
+      {
+        "tipo": "decision",
+        "texto": "volver a activarlo"
+      },
+      {
+        "tipo": "clic",
+        "texto": "Activar"
+      }
+    ],
+    "corridas": [
+      {
+        "corrida": 1,
+        "ms": 845,
+        "exito": true,
+        "error": null
+      },
+      {
+        "corrida": 2,
+        "ms": 851,
+        "exito": true,
+        "error": null
+      },
+      {
+        "corrida": 3,
+        "ms": 843,
+        "exito": true,
+        "error": null
+      }
+    ],
+    "exitoMaquina": "3/3",
+    "maquinaMedianaS": 0.845
+  }
+]

@@ -1,0 +1,90 @@
+=== 1. Fuerza bruta: 50 logins fallidos contra cliente@tienda.com ===
+códigos: {"401":50} | total 6559 ms | peor 451 ms
+login correcto inmediatamente después: HTTP 200
+
+=== 2. Cabeceras de seguridad de la API ===
+content-security-policy: (ausente)
+x-frame-options: (ausente)
+x-content-type-options: (ausente)
+strict-transport-security: (ausente)
+referrer-policy: (ausente)
+x-powered-by: Express
+access-control-allow-origin: http://localhost:5173
+
+=== 3. JSON malformado y errores: ¿filtran información? ===
+JSON malformado en login: HTTP 400 | filtra: no | {"mensaje":"El cuerpo de la petición no es un JSON válido"}
+JSON malformado en ordenes: HTTP 400 | filtra: no | {"mensaje":"El cuerpo de la petición no es un JSON válido"}
+Cuerpo de 2 MB: HTTP 500 | filtra: no | {"mensaje":"Error interno del servidor"}
+id fuera de rango INT: HTTP 400 | filtra: no | {"mensaje":"El id debe ser un número entero positivo"}
+id negativo: HTTP 400 | filtra: no | {"mensaje":"El id debe ser un número entero positivo"}
+pagina enorme: HTTP 200 | filtra: no | {"datos":[],"total":63,"pagina":2147483647,"limite":50,"totalPaginas":2}
+limite 0: HTTP 400 | filtra: no | {"mensaje":"El parámetro limite debe ser un entero positivo"}
+email como objeto: HTTP 400 | filtra: no | {"mensaje":"Los campos email y password son obligatorios"}
+ruta inexistente: HTTP 404 | filtra: no | {"mensaje":"Ruta no encontrada"}
+null como body: HTTP 400 | filtra: no | {"mensaje":"El cuerpo de la petición no es un JSON válido"}
+
+=== 4. Inyección SQL en buscar y categoria ===
+buscar="' OR '1'='1" → HTTP 200, 24 ms, total=0, hash en respuesta: no
+categoria="' OR '1'='1" → HTTP 200, 30 ms, total=0, hash en respuesta: no
+buscar="'; DROP TABLE productos; --" → HTTP 200, 18 ms, total=0, hash en respuesta: no
+categoria="'; DROP TABLE productos; --" → HTTP 200, 27 ms, total=0, hash en respuesta: no
+buscar="' UNION SELECT id,email,password_hash,1,1,1,1,true,now(),now() FROM usuarios --" → HTTP 200, 18 ms, total=0, hash en respuesta: no
+categoria="' UNION SELECT id,email,password_hash,1,1,1,1,true,now(),now() FROM usuarios --" → HTTP 200, 30 ms, total=0, hash en respuesta: no
+buscar="%' AND pg_sleep(3) IS NULL --" → HTTP 200, 14 ms, total=0, hash en respuesta: no
+categoria="%' AND pg_sleep(3) IS NULL --" → HTTP 200, 14 ms, total=0, hash en respuesta: no
+buscar="\\" → HTTP 200, 16 ms, total=0, hash en respuesta: no
+categoria="\\" → HTTP 200, 16 ms, total=0, hash en respuesta: no
+buscar="%" → HTTP 200, 18 ms, total=0, hash en respuesta: no
+categoria="%" → HTTP 200, 26 ms, total=0, hash en respuesta: no
+buscar="_" → HTTP 200, 16 ms, total=0, hash en respuesta: no
+categoria="_" → HTTP 200, 22 ms, total=0, hash en respuesta: no
+productos antes=63, después=63; la tabla existe: t
+
+=== 6. Asignación masiva: registro con rol admin ===
+HTTP 201 | respuesta: {"id":60,"nombre":"Masiva","email":"masiva1793901486985@test.com","rol":"cliente"} | rol en BD: cliente
+
+=== 7. IDOR: cliente2 pide la orden de cliente ===
+orden #803 de cliente: dueño HTTP 200 | cliente2 HTTP 404 {"mensaje":"Orden no encontrada"} | admin HTTP 200
+cliente2 en GET /admin/ordenes: HTTP 403
+cliente2 en POST /productos: HTTP 403
+JWT alg=none con rol admin: HTTP 401
+
+=== 8. CORS con Origin: http://evil.com ===
+GET desde evil.com: HTTP 200 | access-control-allow-origin: http://localhost:5173
+Preflight desde evil.com: HTTP 204 | access-control-allow-origin: http://localhost:5173
+GET desde el origen legítimo: HTTP 200 | access-control-allow-origin: http://localhost:5173
+
+=== 9. Token: duración y contenido ===
+payload: {"id":2,"rol":"cliente","iat":1793901487,"exp":1793908687} | duración: 2 h | algoritmo: HS256
+
+=== 5. XSS almacenado: preparación ===
+con imagen_url javascript: → HTTP 400 {"mensaje":"El campo imagen_url debe ser una URL que empiece por http:// o https://, o una imagen local /produ
+sin imagen_url → HTTP 201 | id 64 | nombre guardado tal cual: <img src=x onerror=alert(1)>
+orden con ese producto: #804 PAGADA
+
+=== Extra. Enumeración de usuarios por tiempo (mediana de 15 logins fallidos) ===
+email existente: 143.9 ms
+email inexistente: 30.0 ms
+
+=== 5. XSS almacenado: revisión en el navegador (DOM de cada página) ===
+Producto: nombre <img src=x onerror=alert(1)>, descripción <script>alert(2)</script>, categoría <b>xss</b>
+Catálogo (/?buscar=onerror): texto literal visible; 0 <img> inyectadas, 0 <script>, 0 <b>
+Detalle (/producto/64): texto literal visible; 0 <img> inyectadas, 0 <script>
+Carrito (/carrito): texto literal visible; 0 <img> inyectadas, 0 <script>
+Mis pedidos (/pedidos/804): texto literal visible; 0 <img> inyectadas, 0 <script>
+Admin, detalle de orden (/admin/ordenes/804): texto literal visible; 0 <img> inyectadas, 0 <script>
+Admin, tabla de productos (/admin/productos): texto literal visible; 0 <img> inyectadas, 0 <script>
+
+=== 9. Token en el navegador ===
+localStorage: carrito, token | sessionStorage: vacío | cookies: ninguna
+El token es legible por JavaScript (typeof string). Duración 2 h. No hay endpoint de logout en el backend.
+
+=== Extra. Byte nulo (hallado por ZAP) ===
+productos?buscar=%00 → {"mensaje":"Error interno del servidor"} HTTP 500
+productos?categoria=%00 → {"mensaje":"Error interno del servidor"} HTTP 500
+productos?buscar=abc%00def → {"mensaje":"Error interno del servidor"} HTTP 500
+=== Extra. Política de contraseñas ===
+registro con password 12345678 → HTTP 201
+=== Extra. Exposición de PostgreSQL ===
+0.0.0.0:5434->5432/tcp, [::]:5434->5432/tcp
+8:      POSTGRES_PASSWORD: postgres

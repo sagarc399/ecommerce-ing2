@@ -125,7 +125,7 @@ export default function DetalleProducto() {
               </p>
             )}
             {!esAdmin && !agotado && (
-              <p className="mt-2 text-xs text-slate-400">
+              <p className="mt-2 text-xs text-slate-600">
                 Máximo {cantidadMaxima(producto.stock)} {cantidadMaxima(producto.stock) === 1 ? 'unidad' : 'unidades'} por compra.
               </p>
             )}

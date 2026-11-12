@@ -1,0 +1,10 @@
+SEG-09 exposición de la BD (antes) — 2026-11-12T16:37:56.284Z
+
+Puerto 5434 escuchando en: 0.0.0.0:5434, 127.0.0.1:5434, [::]:5434, [::1]:5434
+docker port ecommerce_db: 5432/tcp -> 0.0.0.0:5434 ; 5432/tcp -> [::]:5434
+
+| Origen | Contraseña "postgres" | Contraseña del .env |
+|---|---|---|
+| 127.0.0.1 (loopback) | CONECTA | CONECTA |
+| 172.26.208.1 (IP de red local) | CONECTA | CONECTA |
+| 192.168.194.203 (IP de red local) | CONECTA | CONECTA |

@@ -42,6 +42,7 @@ export default function Checkout() {
   const [problema, setProblema] = useState<Problema | null>(null)
   // El ref bloquea un segundo envío aunque el doble clic llegue antes de que React re-renderice.
   const enviandoRef = useRef(false)
+  const cvvRef = useRef<HTMLInputElement>(null)
 
   if (usuario?.rol === 'admin') {
     return (
@@ -89,6 +90,7 @@ export default function Checkout() {
     enviandoRef.current = true
     setEnviando(true)
     setProblema(null)
+    let rechazado = false
 
     try {
       const orden = await crearOrden(
@@ -104,6 +106,7 @@ export default function Checkout() {
       } else if (err.status === 401) {
         return // AuthContext cierra la sesión y redirige a /login
       } else if (err.status === 402) {
+        rechazado = true
         const ordenId = campo(err.datos, 'orden_id')
         setProblema({ tipo: 'rechazo', ordenId: typeof ordenId === 'number' ? ordenId : null })
         toast.error('Pago rechazado. Intenta con otra tarjeta.')
@@ -125,10 +128,20 @@ export default function Checkout() {
         setProblema({ tipo: 'error', mensaje: err.message })
       }
     } finally {
-      // Con cualquier resultado se borran el número de tarjeta y el CVV del formulario.
-      setForm((f) => ({ ...f, numero: '', cvv: '' }))
-      setTocados((t) => ({ ...t, numero: false, cvv: false }))
-      setErrores((er) => ({ ...er, numero: undefined, cvv: undefined }))
+      if (rechazado) {
+        // USA-03: tras un rechazo se conservan número, titular y vencimiento (solo en este estado de
+        // React, nunca en el almacenamiento del navegador) para no reescribir la tarjeta; el CVV se
+        // borra siempre por seguridad y el foco va a ese campo.
+        setForm((f) => ({ ...f, cvv: '' }))
+        setTocados((t) => ({ ...t, cvv: false }))
+        setErrores((er) => ({ ...er, cvv: undefined }))
+        cvvRef.current?.focus()
+      } else {
+        // Con cualquier otro resultado se borran todos los datos de la tarjeta.
+        setForm(FORMULARIO_VACIO)
+        setTocados({})
+        setErrores({})
+      }
       enviandoRef.current = false
       setEnviando(false)
     }
@@ -169,6 +182,7 @@ export default function Checkout() {
           {problema?.tipo === 'rechazo' && (
             <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700" role="alert">
               <p className="font-medium">Pago rechazado. Intenta con otra tarjeta.</p>
+              <p className="mt-1">Por seguridad, vuelve a ingresar el CVV.</p>
               {problema.ordenId && (
                 <p className="mt-1">
                   La orden #{problema.ordenId} quedó registrada como rechazada en{' '}
@@ -258,6 +272,7 @@ export default function Checkout() {
               </label>
               <input
                 id="cvv"
+                ref={cvvRef}
                 type="password"
                 inputMode="numeric"
                 autoComplete="off"
@@ -302,7 +317,7 @@ export default function Checkout() {
             </span>
             <span>{formatearPrecio(total)}</span>
           </div>
-          <p className="mt-2 text-xs text-slate-400">El total final lo calcula el servidor con los precios vigentes.</p>
+          <p className="mt-2 text-xs text-slate-600">El total final lo calcula el servidor con los precios vigentes.</p>
         </aside>
       </div>
     </div>

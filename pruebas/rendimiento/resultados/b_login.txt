@@ -1,0 +1,45 @@
+
+
+  █ THRESHOLDS 
+
+    http_req_duration{name:login}
+    ✗ 'p(95)<1500' p(95)=2.51s
+
+    http_req_failed{name:login}
+    ✓ 'rate<0.01' rate=0.00%
+
+    http_reqs{name:login}
+    ✓ 'count>0' count=1055
+
+
+  █ TOTAL RESULTS 
+
+    checks_total.......: 2110    19.952831/s
+    checks_succeeded...: 100.00% 2110 out of 2110
+    checks_failed......: 0.00%   0 out of 2110
+
+    ✓ HTTP 200
+    ✓ trae token
+
+    HTTP
+    http_req_duration..............: min=81.22ms avg=1.37s med=1.58s p(90)=2.16s p(95)=2.51s p(99)=3.15s max=5.1s 
+      { expected_response:true }...: min=81.22ms avg=1.37s med=1.58s p(90)=2.16s p(95)=2.51s p(99)=3.15s max=5.1s 
+      { name:login }...............: min=81.22ms avg=1.37s med=1.58s p(90)=2.16s p(95)=2.51s p(99)=3.15s max=5.1s 
+    http_req_failed................: 0.00%  0 out of 1055
+      { name:login }...............: 0.00%  0 out of 1055
+    http_reqs......................: 1055   9.976416/s
+      { name:login }...............: 1055   9.976416/s
+
+    EXECUTION
+    iteration_duration.............: min=1.08s   avg=2.37s med=2.58s p(90)=3.16s p(95)=3.51s p(99)=4.15s max=6.11s
+    iterations.....................: 1055   9.976416/s
+    vus............................: 1      min=1         max=30
+    vus_max........................: 30     min=30        max=30
+
+    NETWORK
+    data_received..................: 602 kB 5.7 kB/s
+    data_sent......................: 213 kB 2.0 kB/s
+
+
+
+time="2026-11-05T17:34:54Z" level=error msg="thresholds on metrics 'http_req_duration{name:login}' have been crossed"

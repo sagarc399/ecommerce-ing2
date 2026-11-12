@@ -167,7 +167,7 @@ export default function AdminProductos() {
                         <ImagenProducto src={p.imagen_url} alt={p.nombre} className="h-10 w-10 shrink-0 rounded-md" />
                         <div>
                           <p className="font-medium text-slate-800">{p.nombre}</p>
-                          <p className="text-xs text-slate-400">#{p.id}</p>
+                          <p className="text-xs text-slate-600">#{p.id}</p>
                         </div>
                       </div>
                     </td>

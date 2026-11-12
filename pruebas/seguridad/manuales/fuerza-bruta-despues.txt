@@ -1,0 +1,7 @@
+=== DESPUÉS: 50 logins fallidos contra cliente@tienda.com ===
+primer 429 en el intento 6: Demasiados intentos fallidos de inicio de sesión. Espera 15 minutos e intenta de nuevo. | RateLimit: "5-in-15min"; r=0; t=900
+códigos: {"401":5,"429":45}
+contraseña correcta tras el bloqueo (misma IP+email): HTTP 429 (bloqueado: el atacante no puede seguir probando)
+otro email desde la misma IP: HTTP 200 (no afecta a otros usuarios)
+admin login correcto: HTTP 200
+10 logins exitosos seguidos de cliente2: 10/10 con 200 (los exitosos no cuentan)

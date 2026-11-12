@@ -1,0 +1,435 @@
+openapi: 3.0.3
+info:
+  title: Tienda USCO API
+  description: API REST del ecommerce de la electiva Ingeniería de Software II (USCO). El pago es simulado.
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000/api
+    description: Desarrollo local
+tags:
+  - name: salud
+  - name: auth
+  - name: productos
+  - name: ordenes
+  - name: admin
+  - name: chat
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    id:
+      name: id
+      in: path
+      required: true
+      schema: { type: integer, minimum: 1, example: 1 }
+    pagina:
+      name: pagina
+      in: query
+      schema: { type: integer, minimum: 1, default: 1, example: 1 }
+    limite:
+      name: limite
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 50, default: 12, example: 12 }
+    buscar:
+      name: buscar
+      in: query
+      schema: { type: string, example: monitor }
+    categoria:
+      name: categoria
+      in: query
+      schema: { type: string, example: Hogar }
+  schemas:
+    Mensaje:
+      type: object
+      properties:
+        mensaje: { type: string }
+    Registro:
+      type: object
+      required: [nombre, email, password]
+      properties:
+        nombre: { type: string, example: Usuario ZAP }
+        email: { type: string, format: email, example: zap@tienda.com }
+        password: { type: string, minLength: 8, example: Prueba12345 }
+    Login:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email, example: cliente@tienda.com }
+        password: { type: string, example: Cliente123 }
+    Usuario:
+      type: object
+      properties:
+        id: { type: integer }
+        nombre: { type: string }
+        email: { type: string }
+        rol: { type: string, enum: [admin, cliente] }
+    RespuestaLogin:
+      type: object
+      properties:
+        token: { type: string }
+        usuario: { $ref: "#/components/schemas/Usuario" }
+    ProductoEntrada:
+      type: object
+      required: [nombre, precio, stock]
+      properties:
+        nombre: { type: string, minLength: 2, maxLength: 150, example: Producto ZAP }
+        descripcion: { type: string, nullable: true, example: Creado por el escaneo }
+        precio: { type: number, minimum: 0, example: 50000 }
+        stock: { type: integer, minimum: 0, example: 5 }
+        imagen_url: { type: string, nullable: true, example: /productos/monitor-24.jpg }
+        categoria: { type: string, nullable: true, example: Hogar }
+    Producto:
+      allOf:
+        - $ref: "#/components/schemas/ProductoEntrada"
+        - type: object
+          properties:
+            id: { type: integer }
+            activo: { type: boolean }
+            creado_en: { type: string, format: date-time }
+            actualizado_en: { type: string, format: date-time }
+    ListaProductos:
+      type: object
+      properties:
+        datos:
+          type: array
+          items: { $ref: "#/components/schemas/Producto" }
+        total: { type: integer }
+        pagina: { type: integer }
+        limite: { type: integer }
+        totalPaginas: { type: integer }
+    OrdenEntrada:
+      type: object
+      required: [items, pago]
+      properties:
+        items:
+          type: array
+          minItems: 1
+          maxItems: 20
+          items:
+            type: object
+            required: [producto_id, cantidad]
+            properties:
+              producto_id: { type: integer, example: 3 }
+              cantidad: { type: integer, minimum: 1, maximum: 10, example: 1 }
+        pago:
+          type: object
+          required: [numero_tarjeta, titular, vencimiento, cvv]
+          properties:
+            numero_tarjeta: { type: string, example: 4111 1111 1111 1111 }
+            titular: { type: string, example: Juan Perez }
+            vencimiento: { type: string, example: 12/28 }
+            cvv: { type: string, example: "123" }
+    Orden:
+      type: object
+      properties:
+        id: { type: integer }
+        usuario_id: { type: integer }
+        total: { type: number }
+        estado: { type: string, enum: [PAGADA, RECHAZADA] }
+        creado_en: { type: string, format: date-time }
+        comprador: { $ref: "#/components/schemas/Usuario" }
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              producto_id: { type: integer }
+              nombre: { type: string }
+              cantidad: { type: integer }
+              precio_unitario: { type: number }
+              subtotal: { type: number }
+        pago:
+          type: object
+          properties:
+            estado: { type: string, enum: [APROBADO, RECHAZADO] }
+            ultimos4: { type: string }
+            referencia: { type: string }
+            monto: { type: number }
+    ChatEntrada:
+      type: object
+      required: [mensajes]
+      properties:
+        mensajes:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required: [rol, texto]
+            properties:
+              rol: { type: string, enum: [usuario, asistente], example: usuario }
+              texto: { type: string, minLength: 1, maxLength: 500, example: Hola }
+  responses:
+    Invalido:
+      description: Datos inválidos
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Mensaje" }
+    NoAutorizado:
+      description: Sin token o token inválido
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Mensaje" }
+    Prohibido:
+      description: Sin permiso por rol
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Mensaje" }
+    NoEncontrado:
+      description: No encontrado
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Mensaje" }
+paths:
+  /health:
+    get:
+      tags: [salud]
+      summary: Estado del servidor y de la BD
+      responses:
+        "200": { description: OK }
+  /auth/registro:
+    post:
+      tags: [auth]
+      summary: Crea un cliente
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/Registro" }
+      responses:
+        "201":
+          description: Creado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Usuario" }
+        "400": { $ref: "#/components/responses/Invalido" }
+        "409": { description: El email ya está registrado }
+  /auth/login:
+    post:
+      tags: [auth]
+      summary: Inicia sesión
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/Login" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/RespuestaLogin" }
+        "400": { $ref: "#/components/responses/Invalido" }
+        "401": { $ref: "#/components/responses/NoAutorizado" }
+  /auth/me:
+    get:
+      tags: [auth]
+      summary: Usuario del token
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Usuario" }
+        "401": { $ref: "#/components/responses/NoAutorizado" }
+  /productos:
+    get:
+      tags: [productos]
+      summary: Catálogo de productos activos
+      parameters:
+        - { $ref: "#/components/parameters/buscar" }
+        - { $ref: "#/components/parameters/categoria" }
+        - { $ref: "#/components/parameters/pagina" }
+        - { $ref: "#/components/parameters/limite" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ListaProductos" }
+        "400": { $ref: "#/components/responses/Invalido" }
+    post:
+      tags: [admin]
+      summary: Crea un producto
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ProductoEntrada" }
+      responses:
+        "201":
+          description: Creado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Producto" }
+        "400": { $ref: "#/components/responses/Invalido" }
+        "401": { $ref: "#/components/responses/NoAutorizado" }
+        "403": { $ref: "#/components/responses/Prohibido" }
+  /productos/categorias:
+    get:
+      tags: [productos]
+      summary: Categorías con productos activos
+      responses:
+        "200": { description: OK }
+  /productos/{id}:
+    get:
+      tags: [productos]
+      summary: Detalle de un producto activo
+      parameters:
+        - { $ref: "#/components/parameters/id" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Producto" }
+        "400": { $ref: "#/components/responses/Invalido" }
+        "404": { $ref: "#/components/responses/NoEncontrado" }
+    put:
+      tags: [admin]
+      summary: Reemplaza un producto
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/id" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ProductoEntrada" }
+      responses:
+        "200": { description: OK }
+        "400": { $ref: "#/components/responses/Invalido" }
+        "401": { $ref: "#/components/responses/NoAutorizado" }
+        "403": { $ref: "#/components/responses/Prohibido" }
+        "404": { $ref: "#/components/responses/NoEncontrado" }
+    delete:
+      tags: [admin]
+      summary: Borrado lógico de un producto
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/id" }
+      responses:
+        "200": { description: Producto desactivado }
+        "401": { $ref: "#/components/responses/NoAutorizado" }
+        "403": { $ref: "#/components/responses/Prohibido" }
+        "404": { $ref: "#/components/responses/NoEncontrado" }
+  /productos/{id}/activar:
+    patch:
+      tags: [admin]
+      summary: Reactiva un producto
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/id" }
+      responses:
+        "200": { description: Producto activado }
+        "401": { $ref: "#/components/responses/NoAutorizado" }
+        "403": { $ref: "#/components/responses/Prohibido" }
+        "404": { $ref: "#/components/responses/NoEncontrado" }
+  /admin/productos:
+    get:
+      tags: [admin]
+      summary: Todos los productos, incluidos los inactivos
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/buscar" }
+        - name: activo
+          in: query
+          schema: { type: boolean, example: true }
+        - { $ref: "#/components/parameters/pagina" }
+        - { $ref: "#/components/parameters/limite" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ListaProductos" }
+        "401": { $ref: "#/components/responses/NoAutorizado" }
+        "403": { $ref: "#/components/responses/Prohibido" }
+  /ordenes:
+    post:
+      tags: [ordenes]
+      summary: Checkout en una transacción
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/OrdenEntrada" }
+      responses:
+        "201":
+          description: Orden pagada
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Orden" }
+        "400": { $ref: "#/components/responses/Invalido" }
+        "401": { $ref: "#/components/responses/NoAutorizado" }
+        "402": { description: Pago rechazado }
+        "403": { $ref: "#/components/responses/Prohibido" }
+        "404": { $ref: "#/components/responses/NoEncontrado" }
+        "409": { description: Stock insuficiente }
+  /ordenes/mias:
+    get:
+      tags: [ordenes]
+      summary: Pedidos del cliente del token
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Orden" }
+        "401": { $ref: "#/components/responses/NoAutorizado" }
+        "403": { $ref: "#/components/responses/Prohibido" }
+  /ordenes/{id}:
+    get:
+      tags: [ordenes]
+      summary: Detalle de una orden propia (el admin ve cualquiera)
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/id" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Orden" }
+        "400": { $ref: "#/components/responses/Invalido" }
+        "401": { $ref: "#/components/responses/NoAutorizado" }
+        "404": { $ref: "#/components/responses/NoEncontrado" }
+  /admin/ordenes:
+    get:
+      tags: [admin]
+      summary: Todas las órdenes
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: estado
+          in: query
+          schema: { type: string, enum: [PAGADA, RECHAZADA], example: PAGADA }
+        - { $ref: "#/components/parameters/pagina" }
+        - { $ref: "#/components/parameters/limite" }
+      responses:
+        "200": { description: OK }
+        "401": { $ref: "#/components/responses/NoAutorizado" }
+        "403": { $ref: "#/components/responses/Prohibido" }
+  /chat:
+    post:
+      tags: [chat]
+      summary: Chatbot (token opcional; 10 peticiones por minuto por IP)
+      security:
+        - {}
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ChatEntrada" }
+      responses:
+        "200": { description: OK }
+        "400": { $ref: "#/components/responses/Invalido" }
+        "429": { description: Demasiadas peticiones }

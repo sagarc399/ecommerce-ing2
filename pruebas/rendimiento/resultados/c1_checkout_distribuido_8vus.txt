@@ -1,0 +1,45 @@
+
+
+  █ THRESHOLDS 
+
+    http_req_duration{name:checkout}
+    ✗ 'p(95)<1500' p(95)=1.7s
+
+    http_req_failed{name:checkout}
+    ✓ 'rate<0.01' rate=0.00%
+
+    http_reqs{name:checkout}
+    ✓ 'count>0' count=362
+
+
+  █ TOTAL RESULTS 
+
+    checks_total.......: 724     6.693261/s
+    checks_succeeded...: 100.00% 724 out of 724
+    checks_failed......: 0.00%   0 out of 724
+
+    ✓ HTTP 201
+    ✓ orden PAGADA
+
+    HTTP
+    http_req_duration..............: min=13.04ms  avg=815.32ms med=590.43ms p(90)=1.62s p(95)=1.7s p(99)=2.24s max=2.25s
+      { expected_response:true }...: min=13.04ms  avg=815.32ms med=590.43ms p(90)=1.62s p(95)=1.7s p(99)=2.24s max=2.25s
+      { name:checkout }............: min=526.38ms avg=865.33ms med=597.37ms p(90)=1.62s p(95)=1.7s p(99)=2.24s max=2.25s
+    http_req_failed................: 0.00%  0 out of 388
+      { name:checkout }............: 0.00%  0 out of 362
+    http_reqs......................: 388    3.586996/s
+      { name:checkout }............: 362    3.346631/s
+
+    EXECUTION
+    iteration_duration.............: min=1.52s    avg=1.86s    med=1.59s    p(90)=2.63s p(95)=2.7s p(99)=3.24s max=3.25s
+    iterations.....................: 362    3.346631/s
+    vus............................: 1      min=0        max=8
+    vus_max........................: 8      min=8        max=8
+
+    NETWORK
+    data_received..................: 265 kB 2.4 kB/s
+    data_sent......................: 179 kB 1.7 kB/s
+
+
+
+time="2026-11-05T17:53:21Z" level=error msg="thresholds on metrics 'http_req_duration{name:checkout}' have been crossed"

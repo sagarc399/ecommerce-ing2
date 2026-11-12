@@ -1,0 +1,11 @@
+=== DESPUÉS: cabeceras de seguridad de la API (GET /api/productos) ===
+content-security-policy: default-src 'none';frame-ancestors 'none'
+x-frame-options: SAMEORIGIN
+x-content-type-options: nosniff
+strict-transport-security: max-age=31536000; includeSubDomains
+referrer-policy: no-referrer
+cross-origin-resource-policy: same-origin
+cross-origin-opener-policy: same-origin
+x-powered-by: (ausente)
+access-control-allow-origin: http://localhost:5173
+preflight CORS desde el frontend: HTTP 204 | allow-origin http://localhost:5173 | allow-headers authorization,content-type

@@ -1,0 +1,67 @@
+time="2026-11-05T17:45:09Z" level=warning msg="Request Failed" error="Post \"http://host.docker.internal:3000/api/ordenes\": request timeout"
+time="2026-11-05T17:45:09Z" level=warning msg="Request Failed" error="Post \"http://host.docker.internal:3000/api/ordenes\": request timeout"
+time="2026-11-05T17:45:09Z" level=warning msg="Request Failed" error="Post \"http://host.docker.internal:3000/api/ordenes\": request timeout"
+time="2026-11-05T17:45:10Z" level=warning msg="Request Failed" error="Post \"http://host.docker.internal:3000/api/ordenes\": request timeout"
+time="2026-11-05T17:45:10Z" level=warning msg="Request Failed" error="Post \"http://host.docker.internal:3000/api/ordenes\": request timeout"
+time="2026-11-05T17:45:10Z" level=warning msg="Request Failed" error="Post \"http://host.docker.internal:3000/api/ordenes\": request timeout"
+time="2026-11-05T17:45:10Z" level=warning msg="Request Failed" error="Post \"http://host.docker.internal:3000/api/ordenes\": request timeout"
+time="2026-11-05T17:45:10Z" level=warning msg="Request Failed" error="Post \"http://host.docker.internal:3000/api/ordenes\": request timeout"
+time="2026-11-05T17:45:10Z" level=warning msg="Request Failed" error="Post \"http://host.docker.internal:3000/api/ordenes\": request timeout"
+time="2026-11-05T17:45:10Z" level=warning msg="Request Failed" error="Post \"http://host.docker.internal:3000/api/ordenes\": request timeout"
+time="2026-11-05T17:45:11Z" level=warning msg="Request Failed" error="Post \"http://host.docker.internal:3000/api/ordenes\": request timeout"
+time="2026-11-05T17:45:11Z" level=warning msg="Request Failed" error="Post \"http://host.docker.internal:3000/api/ordenes\": request timeout"
+time="2026-11-05T17:45:12Z" level=warning msg="Request Failed" error="Post \"http://host.docker.internal:3000/api/ordenes\": request timeout"
+time="2026-11-05T17:45:14Z" level=warning msg="Request Failed" error="Post \"http://host.docker.internal:3000/api/ordenes\": request timeout"
+time="2026-11-05T17:45:15Z" level=warning msg="Request Failed" error="Post \"http://host.docker.internal:3000/api/ordenes\": request timeout"
+time="2026-11-05T17:45:17Z" level=warning msg="Request Failed" error="Post \"http://host.docker.internal:3000/api/ordenes\": request timeout"
+time="2026-11-05T17:45:18Z" level=warning msg="Request Failed" error="Post \"http://host.docker.internal:3000/api/ordenes\": request timeout"
+time="2026-11-05T17:45:20Z" level=warning msg="Request Failed" error="Post \"http://host.docker.internal:3000/api/ordenes\": request timeout"
+time="2026-11-05T17:45:21Z" level=warning msg="Request Failed" error="Post \"http://host.docker.internal:3000/api/ordenes\": request timeout"
+time="2026-11-05T17:45:23Z" level=warning msg="Request Failed" error="Post \"http://host.docker.internal:3000/api/ordenes\": request timeout"
+
+
+  █ THRESHOLDS 
+
+    http_req_duration{name:checkout}
+    ✗ 'p(95)<1500' p(95)=59.99s
+
+    http_req_failed{name:checkout}
+    ✗ 'rate<0.01' rate=27.02%
+
+    http_reqs{name:checkout}
+    ✓ 'count>0' count=74
+
+
+  █ TOTAL RESULTS 
+
+    checks_total.......: 148    1.071364/s
+    checks_succeeded...: 72.97% 108 out of 148
+    checks_failed......: 27.02% 40 out of 148
+
+    ✗ HTTP 201
+      ↳  72% — ✓ 54 / ✗ 20
+    ✗ orden PAGADA
+      ↳  72% — ✓ 54 / ✗ 20
+
+    HTTP
+    http_req_duration..............: min=12.9ms   avg=12.49s   med=570.49ms p(90)=59.99s p(95)=59.99s p(99)=59.99s max=59.99s
+      { expected_response:true }...: min=12.9ms   avg=616.24ms med=545.71ms p(90)=1.35s  p(95)=1.53s  p(99)=2s     max=2.22s 
+      { name:checkout }............: min=524.75ms avg=16.83s   med=1.01s    p(90)=59.99s p(95)=59.99s p(99)=59.99s max=59.99s
+    http_req_failed................: 20.00% 20 out of 100
+      { name:checkout }............: 27.02% 20 out of 74
+    http_reqs......................: 100    0.723895/s
+      { name:checkout }............: 74     0.535682/s
+
+    EXECUTION
+    iteration_duration.............: min=1.52s    avg=17.84s   med=2.01s    p(90)=1m1s   p(95)=1m1s   p(99)=1m1s   max=1m1s  
+    iterations.....................: 74     0.535682/s
+    vus............................: 1      min=0         max=20
+    vus_max........................: 20     min=20        max=20
+
+    NETWORK
+    data_received..................: 53 kB  381 B/s
+    data_sent......................: 50 kB  360 B/s
+
+
+
+time="2026-11-05T17:46:11Z" level=error msg="thresholds on metrics 'http_req_duration{name:checkout}, http_req_failed{name:checkout}' have been crossed"

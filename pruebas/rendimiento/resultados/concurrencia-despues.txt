@@ -1,0 +1,15 @@
+===== Ejecución 1 =====
+   cliente@tienda.com: HTTP 201 → orden 779 PAGADA
+   cliente2@tienda.com: HTTP 409 → Stock insuficiente para "Monitor 24 pulgadas"
+4. Stock final en la BD: 0
+PRUEBA SUPERADA
+===== Ejecución 2 =====
+   cliente@tienda.com: HTTP 201 → orden 780 PAGADA
+   cliente2@tienda.com: HTTP 409 → Stock insuficiente para "Monitor 24 pulgadas"
+4. Stock final en la BD: 0
+PRUEBA SUPERADA
+===== Ejecución 3 =====
+   cliente@tienda.com: HTTP 201 → orden 781 PAGADA
+   cliente2@tienda.com: HTTP 409 → Stock insuficiente para "Monitor 24 pulgadas"
+4. Stock final en la BD: 0
+PRUEBA SUPERADA

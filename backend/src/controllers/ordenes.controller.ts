@@ -124,7 +124,9 @@ export async function crearOrden(req: Request, res: Response) {
       return res.status(402).json({ mensaje: "Pago rechazado", orden_id: ordenId });
     }
 
-    const { rows } = await pool.query(`${SELECT_ORDEN} WHERE o.id = $1`, [ordenId]);
+    // Con el MISMO cliente: pedir otra conexión al pool mientras esta sigue tomada provocaba un
+    // autobloqueo con 10 checkouts simultáneos (REN-01). La transacción ya terminó (COMMIT).
+    const { rows } = await cliente.query(`${SELECT_ORDEN} WHERE o.id = $1`, [ordenId]);
     return res.status(201).json(formatearOrden(rows[0]));
   } catch (err) {
     await cliente.query("ROLLBACK").catch(() => {});

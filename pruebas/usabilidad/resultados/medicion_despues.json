@@ -1,0 +1,140 @@
+[
+  {
+    "id": "T5",
+    "nombre": "Recibir un pago rechazado (0000) y reintentar con otra tarjeta",
+    "exito": "Ve el mensaje de rechazo y, con otra tarjeta, llega a la confirmación del pedido",
+    "conteo": {
+      "clics": 9,
+      "campos": 6,
+      "caracteres": 52,
+      "teclas": 1,
+      "cambiosDePagina": 2,
+      "decisiones": 5
+    },
+    "klm": {
+      "operadores": {
+        "K": 54,
+        "P": 9,
+        "B": 9,
+        "H": 12,
+        "M": 5
+      },
+      "segundos": 37.47
+    },
+    "acciones": [
+      {
+        "tipo": "decision",
+        "texto": "decidir pagar"
+      },
+      {
+        "tipo": "clic",
+        "texto": "Proceder al pago"
+      },
+      {
+        "tipo": "decision",
+        "texto": "llenar los datos de la tarjeta"
+      },
+      {
+        "tipo": "clic",
+        "texto": "campo número de tarjeta (termina en 0000)"
+      },
+      {
+        "tipo": "escribir",
+        "caracteres": 16,
+        "texto": "número de tarjeta (termina en 0000)"
+      },
+      {
+        "tipo": "clic",
+        "texto": "campo titular"
+      },
+      {
+        "tipo": "escribir",
+        "caracteres": 10,
+        "texto": "titular"
+      },
+      {
+        "tipo": "clic",
+        "texto": "campo vencimiento"
+      },
+      {
+        "tipo": "escribir",
+        "caracteres": 4,
+        "texto": "vencimiento"
+      },
+      {
+        "tipo": "clic",
+        "texto": "campo CVV"
+      },
+      {
+        "tipo": "escribir",
+        "caracteres": 3,
+        "texto": "CVV"
+      },
+      {
+        "tipo": "decision",
+        "texto": "revisar y pagar"
+      },
+      {
+        "tipo": "clic",
+        "texto": "Pagar"
+      },
+      {
+        "tipo": "decision",
+        "texto": "entender el rechazo y decidir usar otra tarjeta"
+      },
+      {
+        "tipo": "clic",
+        "texto": "campo número de tarjeta (conservado)"
+      },
+      {
+        "tipo": "tecla",
+        "texto": "Control+a (seleccionar el número anterior)",
+        "pulsaciones": 2
+      },
+      {
+        "tipo": "escribir",
+        "caracteres": 16,
+        "texto": "número de otra tarjeta"
+      },
+      {
+        "tipo": "clic",
+        "texto": "campo CVV de nuevo"
+      },
+      {
+        "tipo": "escribir",
+        "caracteres": 3,
+        "texto": "CVV de nuevo"
+      },
+      {
+        "tipo": "decision",
+        "texto": "revisar y pagar de nuevo"
+      },
+      {
+        "tipo": "clic",
+        "texto": "Pagar de nuevo"
+      }
+    ],
+    "corridas": [
+      {
+        "corrida": 1,
+        "ms": 1953,
+        "exito": true,
+        "error": null
+      },
+      {
+        "corrida": 2,
+        "ms": 2012,
+        "exito": true,
+        "error": null
+      },
+      {
+        "corrida": 3,
+        "ms": 2065,
+        "exito": true,
+        "error": null
+      }
+    ],
+    "exitoMaquina": "3/3",
+    "maquinaMedianaS": 2.012
+  }
+]

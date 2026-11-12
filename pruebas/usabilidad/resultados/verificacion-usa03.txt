@@ -1,0 +1,19 @@
+Verificación USA-03 — 2026-11-12T16:53:09.437Z
+
+Escenario 1: pago rechazado (tarjeta terminada en 0000)
+OK    número conservado (4000 0000 0000 0000)
+OK    titular conservado (Juan Perez)
+OK    vencimiento conservado (12/28)
+OK    CVV borrado
+OK    foco en el CVV (foco en #cvv)
+OK    mensaje de rechazo visible
+OK    sin datos de tarjeta en localStorage ni sessionStorage (claves: carrito, token)
+Escenario 2: reintento con otra tarjeta (titular y vencimiento conservados; nuevo número y CVV)
+OK    compra aprobada tras el reintento (/pedidos/10)
+Escenario 3: otro resultado (409, sin stock suficiente)
+OK    número borrado
+OK    titular borrado
+OK    vencimiento borrado
+OK    CVV borrado
+
+USA-03 VERIFICADO

@@ -26,7 +26,7 @@ export default function Paginacion({ pagina, totalPaginas, onCambiar }: Props) {
       </button>
       {paginasVisibles(pagina, totalPaginas).map((p, i) =>
         p === '…' ? (
-          <span key={`hueco-${i}`} className="px-1 text-slate-400">
+          <span key={`hueco-${i}`} className="px-1 text-slate-600">
             …
           </span>
         ) : (

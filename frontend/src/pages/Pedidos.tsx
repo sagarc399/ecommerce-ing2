@@ -50,7 +50,7 @@ export default function Pedidos() {
                 <div className="min-w-0">
                   <p className="font-semibold">Pedido #{o.id}</p>
                   <p className="text-sm text-slate-500">{formatearFecha(o.creado_en)}</p>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-slate-600">
                     {unidades(o)} {unidades(o) === 1 ? 'unidad' : 'unidades'} · {o.items.length}{' '}
                     {o.items.length === 1 ? 'producto' : 'productos'}
                   </p>

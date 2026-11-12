@@ -1,0 +1,44 @@
+
+
+  █ THRESHOLDS 
+
+    http_req_duration{name:login}
+    ✓ 'p(95)<1500' p(95)=1.21s
+
+    http_req_failed{name:login}
+    ✓ 'rate<0.01' rate=0.00%
+
+    http_reqs{name:login}
+    ✓ 'count>0' count=1375
+
+
+  █ TOTAL RESULTS 
+
+    checks_total.......: 2750    25.961539/s
+    checks_succeeded...: 100.00% 2750 out of 2750
+    checks_failed......: 0.00%   0 out of 2750
+
+    ✓ HTTP 200
+    ✓ trae token
+
+    HTTP
+    http_req_duration..............: min=67.83ms avg=820.61ms med=972.33ms p(90)=1.16s p(95)=1.21s p(99)=1.31s max=4s
+      { expected_response:true }...: min=67.83ms avg=820.61ms med=972.33ms p(90)=1.16s p(95)=1.21s p(99)=1.31s max=4s
+      { name:login }...............: min=67.83ms avg=820.61ms med=972.33ms p(90)=1.16s p(95)=1.21s p(99)=1.31s max=4s
+    http_req_failed................: 0.00%  0 out of 1375
+      { name:login }...............: 0.00%  0 out of 1375
+    http_reqs......................: 1375   12.98077/s
+      { name:login }...............: 1375   12.98077/s
+
+    EXECUTION
+    iteration_duration.............: min=1.06s   avg=1.82s    med=1.97s    p(90)=2.16s p(95)=2.21s p(99)=2.31s max=5s
+    iterations.....................: 1375   12.98077/s
+    vus............................: 1      min=1         max=30
+    vus_max........................: 30     min=30        max=30
+
+    NETWORK
+    data_received..................: 928 kB 8.8 kB/s
+    data_sent......................: 278 kB 2.6 kB/s
+
+
+

@@ -38,7 +38,7 @@ export default function Modal({ titulo, abierto, onCerrar, children, ancho = 'ma
           <h2 id="titulo-modal" className="text-lg font-semibold">
             {titulo}
           </h2>
-          <button type="button" onClick={onCerrar} className="text-slate-400 hover:text-slate-700" aria-label="Cerrar">
+          <button type="button" onClick={onCerrar} className="text-slate-500 hover:text-slate-700" aria-label="Cerrar">
             ✕
           </button>
         </div>
