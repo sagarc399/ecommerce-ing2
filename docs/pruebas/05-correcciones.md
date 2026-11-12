@@ -10,7 +10,7 @@ La práctica pide corregir **al menos un problema crítico en cada una de las tr
 | Seguridad | **SEG-02** login sin límite de intentos | Intentos de fuerza bruta aceptados (50 seguidos) | 50 de 50 | **5** (bloqueo en el intento 6) |
 | Usabilidad | **USA-02** contraste insuficiente (severidad 3) | Violaciones graves de accesibilidad (axe-core, 8 pantallas) | 43 | **0** |
 
-Además se corrigieron SEG-04 en la API y SEG-05 (cabeceras de seguridad) y SEG-09 (base de datos expuesta), y se aplicó USA-03 (conservar la tarjeta tras un rechazo), que se documenta como **análisis de compromiso entre usabilidad y seguridad**, no como mejora.
+Además se corrigieron SEG-04 (cabeceras de seguridad, en la API y en el frontend) y SEG-05 y SEG-09 (base de datos expuesta), y se aplicó USA-03 (conservar la tarjeta tras un rechazo), que se documenta como **análisis de compromiso entre usabilidad y seguridad**, no como mejora.
 
 ## Método
 
@@ -109,9 +109,18 @@ El límite no afecta a los usuarios legítimos. La mejora de tiempos del escenar
 
 Desaparecen "X-Powered-By" (5 instancias) y "X-Content-Type-Options Header Missing" (5). Queda el 500 con `buscar=%00` (SEG-07, hoja de ruta). Las informativas son esperadas (errores 4xx correctos, el login identificado y respuestas no cacheables).
 
-**Alcance.** La corrección cubre las respuestas de la API. El paso 2.3.1 (ZAP como proxy, ver `03-seguridad.md`) confirmó que el **frontend** sigue sin CSP, X-Frame-Options ni `nosniff`, porque esas cabeceras las pone el servidor que entrega el HTML; esa parte de SEG-04 queda en la hoja de ruta.
+**SEG-04 en el frontend** (`frontend/vite.config.ts`, commit `HASH_SEG04`). El paso 2.3.1 mostró que el frontend seguía sin estas cabeceras, porque las pone el servidor que entrega el HTML. Se agregaron en `preview.headers` (build): CSP `default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https:; connect-src 'self' http://localhost:3000; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'`, `X-Frame-Options: DENY` y `nosniff`; en `server.headers` (desarrollo) solo `X-Frame-Options` y `nosniff`, para no romper la recarga en caliente. `img-src` admite `https:` porque con `'self' data:` el navegador bloqueaba la vista previa de imágenes externas del panel admin.
 
-**Efecto en el negocio.** Las respuestas de la API llevan instrucciones explícitas contra *clickjacking*, *MIME sniffing* y fugas por *referrer*, y el servidor deja de anunciar su tecnología a quien lo escanea.
+| ZAP baseline sobre el build (:4173), mismo comando del antes | Antes | Después |
+|---|---|---|
+| CSP Header Not Set (Media) | 3 | **0** |
+| Missing Anti-clickjacking Header (Media) | 1 | **0** |
+| X-Content-Type-Options Header Missing (Baja) | 5 | **0** |
+| Alta / Media / Baja / Informativa | 0 / 2 / 1 / 2 | 0 / 1 / 4 / 3 |
+
+Las 3 alertas de SEG-04 desaparecen. Las nuevas se registraron como hallazgos: SEG-14 (comodín `https:` en `img-src`, el compromiso para permitir imágenes externas) y SEG-15 (faltan COOP, COEP, CORP y `Permissions-Policy`), ambas en la hoja de ruta. Verificación: el flujo completo contra el build pasa 9 de 9 con 0 violaciones de CSP, y en desarrollo también 9 de 9, con la recarga en caliente funcionando.
+
+**Efecto en el negocio.** La API y las páginas de la tienda llevan instrucciones explícitas contra *clickjacking*, *MIME sniffing* y fugas por *referrer*, y el servidor deja de anunciar su tecnología a quien lo escanea.
 
 ### SEG-09 — Base de datos expuesta a la red con la contraseña por defecto (Media)
 

@@ -9,7 +9,8 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "../usabilidad/node_modules/playwright/index.mjs";
 
-const APP = "http://localhost:5173";
+// APP_URL=http://localhost:4173 corre el flujo contra el build de producción (vite preview, con CSP).
+const APP = process.env.APP_URL || "http://localhost:5173";
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const lineas = [];
 let fallos = 0;
@@ -33,6 +34,12 @@ const page = await ctx.newPage();
 const erroresConsola = [];
 page.on("console", (m) => m.type() === "error" && erroresConsola.push(m.text()));
 page.on("pageerror", (e) => erroresConsola.push(e.message));
+// Violaciones de CSP reportadas por el propio navegador (evento securitypolicyviolation).
+const violacionesCsp = [];
+await page.exposeFunction("reportarCsp", (texto) => violacionesCsp.push(`CSP violation: ${texto}`));
+await page.addInitScript(() =>
+  document.addEventListener("securitypolicyviolation", (e) => window.reportarCsp(`${e.violatedDirective} ${e.blockedURI}`))
+);
 
 const tarjeta = (nombre) => page.locator("article").filter({ has: page.getByRole("link", { name: nombre }).first() });
 async function iniciarSesion(email, password) {
@@ -138,9 +145,16 @@ await paso("8. Sin errores de JavaScript en la consola", async () => {
   return `${erroresConsola.length} mensajes de red esperados (402)`;
 });
 
+await paso("9. Sin violaciones de Content-Security-Policy", async () => {
+  const csp = [...erroresConsola, ...violacionesCsp].filter((e) => /Content Security Policy|Content-Security-Policy|violat/i.test(e));
+  if (csp.length) throw new Error(`${csp.length}: ${csp.slice(0, 2).join(" | ")}`);
+  const cabecera = (await (await fetch(`${APP}/`)).headers.get("content-security-policy")) ?? "sin CSP";
+  return `0 violaciones; CSP de la página: ${cabecera === "sin CSP" ? "ninguna (servidor de desarrollo)" : "presente"}`;
+});
+
 await navegador.close();
 lineas.push("", fallos === 0 ? "FLUJO COMPLETO SIN REGRESIONES" : `FLUJO CON ${fallos} FALLAS`);
 mkdirSync(join(AQUI, "resultados"), { recursive: true });
-writeFileSync(join(AQUI, "resultados", PROXY ? "flujo-proxy.txt" : "flujo.txt"), `Regresión del flujo en el navegador — ${new Date().toISOString()}\n\n${lineas.join("\n")}\n`);
+writeFileSync(join(AQUI, "resultados", PROXY ? "flujo-proxy.txt" : process.env.APP_URL ? "flujo-build-csp.txt" : "flujo.txt"), `Regresión del flujo en el navegador — ${new Date().toISOString()}\n\n${lineas.join("\n")}\n`);
 console.log(lineas.at(-1));
 process.exit(fallos ? 1 : 0);

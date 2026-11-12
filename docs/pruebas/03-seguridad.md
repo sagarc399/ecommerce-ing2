@@ -41,13 +41,15 @@ Notas del escaneo:
 3. **AJAX spider** de ZAP (Firefox headless, 3 minutos) sobre `http://localhost:5173/`.
 4. Extracción del árbol de sitios y de las alertas pasivas: `node pruebas/seguridad/extraer-zap-proxy.mjs` → `pruebas/seguridad/proxy/arbol-sitios.json`, `alertas-pasivas.json` y `resumen.txt`.
 
-| URL mapeadas | Antes (spider tradicional del baseline) | Después (proxy + AJAX spider) |
-|---|---|---|
-| Objetivo | Build de producción en `vite preview` :4173 | Servidor de desarrollo :5173 y API :3000 |
-| Mensajes HTTP registrados | No aplica | 8879 |
-| URL únicas del frontend (sin query) | 6 | 15 (`/`, `/favicon.svg` y las imágenes de `/productos/`) |
-| Recursos del servidor de desarrollo de Vite (`/src`, `/node_modules`, `/@vite`…) | No aplica | 65 (no existen en el build de producción) |
-| URL únicas del API | 0 (se mapeó por OpenAPI) | 32 URL; **12 endpoints distintos** (sin contar `OPTIONS`) de los 17 del inventario |
+> El antes y el después no apuntan al mismo servidor: el antes se midió contra el **build** (:4173) y el después contra el servidor de **desarrollo** (:5173), que además entrega los archivos fuente de la app. La última columna quita esos archivos internos para que la comparación sea de la misma naturaleza.
+
+| URL mapeadas | Antes: spider tradicional sobre el **build** (`vite preview` :4173) | Después: proxy + AJAX spider sobre el servidor de **desarrollo** (:5173) y la API (:3000) | Después, comparable con el antes (sin archivos internos de Vite) |
+|---|---|---|---|
+| Objetivo | Build de producción | Servidor de desarrollo y API | Igual que el después |
+| Mensajes HTTP registrados | No aplica | 8879 | No aplica |
+| URL únicas del frontend (sin query) | **6** (`/`, `/robots.txt`, `/sitemap.xml`, `/favicon.svg`, JS y CSS del bundle) | 80 (15 de la app + 65 internas de Vite) | **15** (`/`, `/favicon.svg`, `/productos` y 12 imágenes de productos) |
+| Archivos internos del servidor de desarrollo de Vite (`/src`, `/node_modules`, `/@vite`…) | No aplica (el build no los tiene) | 65 | Excluidos |
+| URL únicas del API | 0 (la API se mapeó por OpenAPI) | 32 URL; **12 endpoints distintos** (sin `OPTIONS`) de los 17 del inventario | 12 endpoints |
 
 Endpoints alcanzados navegando: `GET /productos`, `/productos/:id`, `/productos/categorias`, `/auth/me`, `/ordenes/mias`, `/ordenes/:id`, `/admin/productos`; `POST /auth/registro`, `/auth/login`, `/ordenes`, `/productos` y `/chat` (este último lo disparó el AJAX spider al abrir el chat). No se alcanzaron `PUT`, `DELETE` y `PATCH` de productos, `GET /admin/ordenes` ni `GET /health`, porque el flujo no edita ni desactiva productos ni abre las órdenes del admin; esos endpoints sí estaban en el escaneo por OpenAPI. Las rutas de la SPA (`/carrito`, `/checkout`, `/pedidos`, `/admin`…) no aparecen como URL porque React cambia de pantalla sin pedir nada al servidor.
 
@@ -55,17 +57,41 @@ Endpoints alcanzados navegando: `GET /productos`, `/productos/:id`, `/productos/
 
 | Regla de ZAP | Riesgo ZAP | Frontend / Vite / API | ¿Nueva? | Clasificación |
 |---|---|---|---|---|
-| Content Security Policy (CSP) Header Not Set (10038) | Media | 1 / 0 / 0 | No (estaba en el baseline) | **SEG-04 sigue abierto en el frontend** |
+| Content Security Policy (CSP) Header Not Set (10038) | Media | 1 / 0 / 0 | No (estaba en el baseline) | SEG-04 en el frontend (**corregido después**, ver abajo) |
 | Missing Anti-clickjacking Header (10020) | Media | 1 / 0 / 0 | No | SEG-04 en el frontend |
 | X-Content-Type-Options Header Missing (10021) | Baja | 14 / 50 / 0 | No | SEG-04 en el frontend |
-| Timestamp Disclosure - Unix (10096) | Baja | 0 / 1 / 0 | **Sí** | **SEG-11** (falso positivo) |
-| Information Disclosure - Sensitive Information in URL (10024) | Informativa | 1 / 0 / 0 | **Sí** | **SEG-12** |
+| Timestamp Disclosure - Unix (10096) | Baja | 0 / 1 / 0 | **Sí** | **SEG-11, descartado** (falso positivo) |
+| Information Disclosure - Sensitive Information in URL (10024) | Informativa | 1 / 0 / 0 | **Sí** | **SEG-12, descartado** (solo de desarrollo) |
 | Session Management Response Identified (10112) | Informativa | 0 / 0 / 1 | **Sí** | **SEG-13** |
 | Authentication Request Identified (10111) | Informativa | 0 / 0 / 3 | No | Esperada |
 | Information Disclosure - Suspicious Comments (10027) | Informativa | 0 / 7 / 0 | No (en el baseline salía en el bundle) | Código de terceros (React) |
 | Modern Web Application (10109) | Informativa | 1 / 0 / 0 | No | Esperada |
 
-**Lo que confirma y lo que revela.** El API no tiene alertas de cabeceras: la corrección de SEG-04 y SEG-05 con `helmet` funciona. Pero el **frontend sigue sin CSP, X-Frame-Options ni `nosniff`**: esas cabeceras las pone el servidor que entrega el HTML (Vite en desarrollo; en producción, el servidor web que sirva el build), no Express. La corrección de SEG-04 solo cubrió la API; la parte del frontend queda en la hoja de ruta. Las evidencias del resumen se restauraron a mano tras un error de extracción, sin afectar los conteos (ver la nota en `proxy/resumen.txt`).
+**Lo que confirma y lo que revela.** El API no tiene alertas de cabeceras: la corrección de SEG-04 y SEG-05 con `helmet` funciona. Pero el **frontend sigue sin CSP, X-Frame-Options ni `nosniff`**: esas cabeceras las pone el servidor que entrega el HTML (Vite en desarrollo; en producción, el servidor web que sirva el build), no Express. La corrección de SEG-04 solo cubría la API; la parte del frontend se corrigió después en `frontend/vite.config.ts` (ver "SEG-04 en el frontend"). Las evidencias del resumen se restauraron a mano tras un error de extracción, sin afectar los conteos (ver la nota en `proxy/resumen.txt`).
+
+### SEG-04 en el frontend: corrección y medición (12 de noviembre)
+
+**Cambio** (`frontend/vite.config.ts`). En el build servido con `vite preview`, cabeceras `Content-Security-Policy`, `X-Frame-Options: DENY` y `X-Content-Type-Options: nosniff`. La CSP es: `default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https:; connect-src 'self' http://localhost:3000; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'`. En el servidor de desarrollo, solo `X-Frame-Options` y `nosniff`, sin CSP, para no romper la recarga en caliente. `img-src` admite `https:` porque el admin puede usar una URL de imagen externa con vista previa: con `img-src 'self' data:` el navegador la bloqueaba (decisión del estudiante: opción A).
+
+**Verificación funcional** (build en :4173 con CORS del backend apuntado temporalmente a :4173): `APP_URL=http://localhost:4173 node pruebas/regresion/flujo.mjs` → 9 de 9 pasos, **0 violaciones de CSP** (`pruebas/regresion/resultados/flujo-build-csp.txt`); la vista previa de una imagen externa en el panel admin ya no viola la CSP. En desarrollo (:5173) el flujo también pasa 9 de 9 y la recarga en caliente responde.
+
+**Medición con el mismo método del baseline original** (`SUFIJO=_despues bash pruebas/seguridad/ejecutar-zap.sh baseline`, ZAP 2.17.0 sobre :4173; `reportes/baseline-frontend_despues.*`):
+
+| Alerta del frontend | Antes (5 nov) | Después (12 nov) |
+|---|---|---|
+| Content Security Policy (CSP) Header Not Set — Media | 3 instancias | **desaparece** |
+| Missing Anti-clickjacking Header — Media | 1 | **desaparece** |
+| X-Content-Type-Options Header Missing — Baja | 5 | **desaparece** |
+| CSP: Wildcard Directive — Media | — | **nueva**, 3 (por `https:` en `img-src`): **SEG-14** |
+| Cross-Origin-Embedder/Opener/Resource-Policy Missing — Baja | — | **nueva**, 3 + 3 + 5: **SEG-15** |
+| Permissions Policy Header Not Set — Baja | — | **nueva**, 4: **SEG-15** |
+| Suspicious Comments — Informativa | 1 | 1 (código de terceros en el bundle) |
+| Modern Web Application — Informativa | 3 | 3 |
+| Storable but Non-Cacheable Content — Informativa | — | 5 (esperada) |
+| **Total por severidad (Alta / Media / Baja / Informativa)** | **0 / 2 / 1 / 2** | **0 / 1 / 4 / 3** |
+| Reglas que pasaron | 57 | 62 |
+
+Las 3 alertas que definían SEG-04 en el frontend desaparecen: **SEG-04 queda corregido en la API y en el frontend**. Aparecen alertas nuevas: la de comodín es consecuencia directa de admitir imágenes `https:` (SEG-14), y las de aislamiento entre orígenes y `Permissions-Policy` (SEG-15) son cabeceras que ZAP no reportó en la corrida del 5 de noviembre. Ambas corridas usaron ZAP 2.17.0 y el mismo comando; en la segunda se evaluaron 62 reglas frente a 57, probablemente porque `zap-baseline.py` actualiza los complementos al arrancar (no se pudo confirmar).
 
 ### Análisis pedido por el enunciado (Módulo 3, punto 3)
 
@@ -115,9 +141,11 @@ Pruebas adicionales:
 | SEG-07 | Errores 500 ante entradas inválidas (byte nulo, cuerpo grande) | Baja | A10 Manejo incorrecto de condiciones excepcionales |
 | SEG-08 | Política de contraseñas débil (solo 8 caracteres) | Baja | A07 Fallas de autenticación |
 | SEG-10 | Sin registro de eventos de seguridad (logins fallidos, 403) | Baja | A09 Fallas de registro y alertas |
-| SEG-11 | Timestamp Disclosure en una dependencia del servidor de desarrollo (falso positivo) | Informativa | No aplica |
-| SEG-12 | Token en la URL del servidor de desarrollo de Vite (recarga en caliente) | Informativa | A02 Configuración de seguridad incorrecta |
+| SEG-11 | Timestamp Disclosure en una dependencia del servidor de desarrollo | **Descartado** (falso positivo) | No aplica |
+| SEG-12 | Token en la URL del servidor de desarrollo de Vite (recarga en caliente) | **Descartado** (solo de desarrollo) | No aplica |
 | SEG-13 | El login devuelve el token de sesión en el cuerpo JSON | Informativa | A07 Fallas de autenticación |
+| SEG-14 | La CSP del frontend admite imágenes de cualquier origen `https:` | Baja (ZAP: Media) | A02 Configuración de seguridad incorrecta |
+| SEG-15 | Faltan cabeceras de aislamiento entre orígenes (COOP, COEP, CORP) y `Permissions-Policy` en el frontend | Baja | A02 Configuración de seguridad incorrecta |
 
 ### SEG-01 — Denegación de servicio con 10 checkouts simultáneos (Alta)
 
@@ -179,23 +207,35 @@ Pruebas adicionales:
 - **Evidencia:** revisión del código (`errorHandler.ts` es el único `console.*` de los middlewares y de auth).
 - **Corrección:** registro estructurado de eventos de autenticación y autorización, sin contraseñas ni tokens, con alertas ante ráfagas.
 
-### SEG-11 — Timestamp Disclosure en una dependencia de desarrollo (Informativa)
+### SEG-11 — Timestamp Disclosure en una dependencia de desarrollo (Descartado)
 
 - **Descripción:** ZAP (regla 10096, riesgo Bajo) marca el número `2080374784` en `/node_modules/.vite/deps/react-dom_client.js` como una marca de tiempo Unix.
 - **Análisis:** es `0x7C000000`, una máscara de bits interna de React, no una fecha; además el archivo solo existe en el servidor de desarrollo de Vite. Se clasifica como **falso positivo** (Informativa). Encontrado en el paso 2.3.1 (proxy + AJAX spider).
-- **Destino:** hoja de ruta, esfuerzo Bajo: confirmar con un baseline sobre el build de producción y marcarlo como falso positivo en la configuración de ZAP.
+- **Destino:** **descartado** (falso positivo): no es una fecha ni existe en el build de producción. Fuera de la hoja de ruta.
 
-### SEG-12 — Token en la URL del servidor de desarrollo (Informativa)
+### SEG-12 — Token en la URL del servidor de desarrollo (Descartado)
 
 - **Descripción:** ZAP (regla 10024) encuentra un parámetro `token` en `GET http://localhost:5173/?token=…`.
 - **Análisis:** es el `wsToken` de 12 caracteres que Vite 8.3.5 usa para el WebSocket de recarga en caliente, no el JWT de la app (no empieza por `eyJ`). Solo existe en modo desarrollo. Encontrado en el paso 2.3.1.
-- **Destino:** hoja de ruta, esfuerzo Bajo: entregar y evaluar la app con el build de producción (ligado a REN-05).
+- **Destino:** **descartado** (solo de desarrollo): el token no existe en el build y no da acceso a datos de la app. Fuera de la hoja de ruta.
 
 ### SEG-13 — El login devuelve el token de sesión en el cuerpo JSON (Informativa)
 
 - **Descripción:** ZAP (regla 10112) identifica `POST /api/auth/login` como respuesta de gestión de sesión: el JWT viaja en el campo `token` del JSON.
 - **Análisis:** es el diseño actual y no es una vulnerabilidad por sí mismo; el riesgo está en que el frontend lo guarda donde JavaScript puede leerlo (SEG-03). Encontrado en el paso 2.3.1.
 - **Destino:** hoja de ruta junto con SEG-03 (cookie `HttpOnly`), esfuerzo Alto.
+
+### SEG-14 — La CSP del frontend admite imágenes de cualquier origen `https:` (Baja)
+
+- **Descripción:** ZAP (regla 10055, riesgo Medio) marca `img-src 'self' data: https:` como directiva con comodín.
+- **Análisis:** es el compromiso elegido para que el admin pueda usar imágenes externas. Una imagen no ejecuta código: `script-src`, `style-src`, `connect-src` y `frame-ancestors` siguen cerrados. El riesgo que queda es cargar imágenes de terceros (rastreo o contenido engañoso puesto por un admin). Por eso se clasifica como **Baja** en la escala de este informe, aunque ZAP la reporte como Media. Encontrado en la medición del después de SEG-04.
+- **Destino:** hoja de ruta, esfuerzo Medio: subir las imágenes al propio servidor o permitir solo una lista de dominios.
+
+### SEG-15 — Faltan cabeceras de aislamiento y `Permissions-Policy` en el frontend (Baja)
+
+- **Descripción:** ZAP (reglas 90004 y 10063, riesgo Bajo) reporta la ausencia de `Cross-Origin-Opener-Policy`, `Cross-Origin-Embedder-Policy`, `Cross-Origin-Resource-Policy` y `Permissions-Policy` en el build.
+- **Análisis:** son defensas adicionales contra ataques de canal lateral entre pestañas y para restringir APIs del navegador (cámara, micrófono…), que la app no usa. Encontrado en la medición del después de SEG-04.
+- **Destino:** hoja de ruta, esfuerzo Bajo: agregar `Cross-Origin-Opener-Policy: same-origin`, `Cross-Origin-Resource-Policy: same-origin` y una `Permissions-Policy` restrictiva en `preview.headers` (COEP `require-corp` bloquearía las imágenes externas de SEG-14).
 
 ## Controles que funcionaron
 

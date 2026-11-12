@@ -59,9 +59,11 @@ Para repetir las mediciones después de corregir, usa las mismas condiciones: ba
 | 12 | SEG-10 | Sin registro de eventos de seguridad | Baja |
 | 13 | SEG-05 | Cabecera `X-Powered-By: Express` | Baja |
 | 14 | REN-05 | Mediciones en modo desarrollo, en un portátil compartido con k6 y ZAP | Informativa |
-| 15 | SEG-11 | Timestamp Disclosure en una dependencia de desarrollo (falso positivo; paso 2.3.1) | Informativa |
-| 16 | SEG-12 | Token de recarga en caliente de Vite en la URL (solo desarrollo; paso 2.3.1) | Informativa |
-| 17 | SEG-13 | El login devuelve el token de sesión en el cuerpo JSON (paso 2.3.1) | Informativa |
+| — | SEG-11 | Timestamp Disclosure en una dependencia de desarrollo (paso 2.3.1) | **Descartado** (falso positivo) |
+| — | SEG-12 | Token de recarga en caliente de Vite en la URL (paso 2.3.1) | **Descartado** (solo de desarrollo) |
+| 15 | SEG-13 | El login devuelve el token de sesión en el cuerpo JSON (paso 2.3.1) | Informativa |
+| 16 | SEG-14 | La CSP del frontend admite imágenes de cualquier origen `https:` (medición de SEG-04) | Baja |
+| 17 | SEG-15 | Faltan COOP, COEP, CORP y `Permissions-Policy` en el frontend (medición de SEG-04) | Baja |
 
 ### Usabilidad (severidad de Nielsen, 0 a 4)
 
@@ -83,7 +85,7 @@ Para repetir las mediciones después de corregir, usa las mismas condiciones: ba
 
 ## Progreso de correcciones (completo)
 
-**Paso 2.3.1 (proxy y spider):** hecho el 12 de noviembre: ZAP como proxy con el flujo de Playwright (cliente y admin) y el AJAX spider; de 6 a 15 URL del frontend y 12 endpoints del API. Agregó SEG-11, SEG-12 y SEG-13 (Informativas) y mostró que SEG-04 sigue abierto en el frontend. Total: 32 hallazgos (ver `06-matriz-calidad.md`, "Trazabilidad").
+**Paso 2.3.1 (proxy y spider):** hecho el 12 de noviembre: ZAP como proxy con el flujo de Playwright (cliente y admin) y el AJAX spider; frontend de 6 URL (build) a 15 comparables (desarrollo, sin archivos internos de Vite) y 12 endpoints del API. Agregó SEG-13 (Informativa) y dos descartados (SEG-11 y SEG-12), y mostró que SEG-04 seguía abierto en el frontend. **SEG-04 en el frontend** se corrigió después en `frontend/vite.config.ts` (`HASH_SEG04`): el ZAP baseline sobre :4173 pasa de Media 2 / Baja 1 a Media 1 / Baja 4, sin las 3 alertas de SEG-04 y con dos hallazgos nuevos (SEG-14 y SEG-15). Total: **32 hallazgos válidos y 2 descartados** (ver `06-matriz-calidad.md`, "Trazabilidad").
 
 **Entregable:** un informe técnico en PDF, sin enfoque de venta, que el usuario arma fuera del repositorio. No queda ninguna tarea pendiente en el repo.
 
@@ -250,7 +252,7 @@ Observación (no es regresión: `backend/src/chat` no cambia desde la Fase 9): e
 ### Falta del plan, sección por sección
 
 1. **Rendimiento:** completo.
-2. **Seguridad:** completo (SEG-04 en la API, SEG-05 y SEG-09 cerrados, ver arriba; SEG-04 sigue abierto en el frontend, según el paso 2.3.1).
+2. **Seguridad:** completo (SEG-04 en la API y en el frontend, SEG-05 y SEG-09 cerrados, ver arriba).
 3. **Usabilidad:** completo (USA-02 y USA-03, ver arriba).
 4. **Regresión:** completa (ver arriba).
 5. **Documentación:** completa. `05-correcciones.md` (causa raíz, cambio, ANTES/DESPUÉS y efecto en el negocio; USA-03 como análisis de compromiso) y `06-matriz-calidad.md` (matriz unificada, calificación Requiere mejora → Aceptable en las tres dimensiones, diagnóstico por dimensión y hoja de ruta con esfuerzo y motivo).
