@@ -194,13 +194,36 @@ Método: los mismos datos del ANTES original (`npm run db:reset` + 20 pedidos de
 
 Críticas y menores: 0 antes y 0 después. Las 3 moderadas que quedan son de landmarks (`landmark-unique` y `landmark-no-duplicate-banner`), es decir USA-12, que está en la hoja de ruta. `color-contrast` ya no aparece en ninguna pantalla. `npm run build` del frontend compila. USA-02 queda **cerrado**.
 
+**USA-03: tras un rechazo hay que reescribir la tarjeta** (`frontend/src/pages/Checkout.tsx`; `pruebas/usabilidad/resultados/medicion_antes.json`, `medicion_despues.json` y `verificacion-usa03.txt`)
+
+Estado real antes del cambio: tras cualquier resultado la app ya conservaba titular y vencimiento y borraba **número y CVV** sin explicar por qué. Cambio: con un **402 (rechazo)** se conservan número, titular y vencimiento **solo en el estado de React** (nunca en `localStorage`, `sessionStorage`, logs ni URL), se borra el CVV, el foco va al CVV y la alerta agrega "Por seguridad, vuelve a ingresar el CVV."; con **cualquier otro resultado** (aprobado, 409, 404, 400, 401, error de red) se borran todos los datos de la tarjeta.
+
+Verificación funcional en el navegador (`node pruebas/usabilidad/verificar-usa03.mjs`, 12 de 12 OK): tras el rechazo quedan número `4000 0000 0000 0000`, titular y vencimiento, CVV vacío y con el foco, mensaje visible y en el almacenamiento del navegador solo están `carrito` y `token`; el reintento con otra tarjeta se aprueba; con un 409 (2 monitores con 1 disponible) se borran los 4 campos.
+
+Medición de T5 (Playwright, 1366×768, 3 corridas, `db:reset`; `SOLO=T5 SUFIJO=_antes|_despues node pruebas/usabilidad/medir.mjs`). La automatización detecta si el número quedó conservado: si quedó, hace clic, **Ctrl+A (2 K)** y escribe el número nuevo encima; si no, clic y escribe. El ANTES repetido en esta sesión dio el mismo KLM que el original.
+
+| T5 "rechazo y reintento con OTRA tarjeta" | Antes | Después |
+|---|---|---|
+| Éxito máquina | 3/3 | 3/3 |
+| Mediana de máquina | 2,014 s (original: 1,92 s) | 2,012 s |
+| Clics / campos (caracteres) / teclas | 9 / 6 (52) / 0 | 9 / 6 (52) / 1 (Ctrl+A) |
+| KLM | **36,91 s** (52K 9P 9B 12H 5M) | **37,47 s** (54K 9P 9B 12H 5M) |
+
+En la tarea tal como está definida, USA-03 **no** reduce el esfuerzo: lo sube 0,56 s (+1,5 %) porque el usuario debe seleccionar el número anterior antes de escribir el nuevo. La ganancia aparece cuando se reintenta con la **misma** tarjeta (por ejemplo, tras un rechazo temporal del banco o un CVV mal escrito): el pago simulado de esta app rechaza siempre las tarjetas terminadas en 0000, así que ese caso **no se puede automatizar** y se calcula con el mismo KLM (análisis, no medición):
+
+| Tramo de reintento (desde "entender el rechazo") | KLM |
+|---|---|
+| Antes: reescribir el número (16) y el CVV (3) | 11,87 s |
+| Después, con otra tarjeta: clic, Ctrl+A, 16 dígitos, clic en CVV, 3 | 12,43 s (+0,56 s) |
+| Después, con la misma tarjeta: el foco ya está en el CVV, 3 teclas | **4,19 s (−7,68 s, −65 %)** |
+
+Equilibrio entre usabilidad y seguridad: conservar el número evita reescribir 16 dígitos en el caso más común de reintento, pero el CVV se pide siempre de nuevo (no debe quedar en memoria tras un intento, criterio alineado con PCI DSS) y ningún dato sale del estado del componente. El SUS **no** se repite (decisión H del traspaso); la mejora se expresa con KLM y con la verificación funcional. USA-03 queda **cerrado** y se documenta como **análisis de compromiso usabilidad-seguridad, no como mejora**: en el simulador el rechazo solo ocurre con tarjetas terminadas en 0000 (se reintenta con otra, +0,56 s); en pasarelas reales con rechazos transitorios se reintenta con la misma (11,87 → 4,19 s). La corrección crítica de usabilidad es USA-02.
+
 ### Falta del plan, sección por sección
 
 1. **Rendimiento:** completo.
 2. **Seguridad:** completo (SEG-04/05 y SEG-09 cerrados, ver arriba).
-3. **Usabilidad:**
-   - **USA-02:** completo (ver arriba).
-   - **USA-03:** en `frontend/src/pages/Checkout.tsx`, tras un 402 conservar el número, el titular y el vencimiento en memoria, borrar solo el CVV, poner el foco en el CVV y mostrar "Por seguridad, vuelve a ingresar el CVV"; con cualquier otro resultado, borrar todo. Verificar con el script de la prueba 11 de la Fase 6 y volver a medir T5 con Playwright y KLM. **Ojo:** T5 pide reintentar con *otra* tarjeta, así que con el número conservado el usuario debe borrarlo antes de escribir el nuevo (selección + Ctrl+A en el KLM). Hay que medirlo y explicar el compromiso en "USA-03: equilibrio entre usabilidad y seguridad". No repetir el SUS.
+3. **Usabilidad:** completo (USA-02 y USA-03, ver arriba).
 4. **Regresión:** `npm run build` del frontend; pruebas del chatbot v2 (precio real, pedido sin sesión, IDOR con cliente2), espaciadas por la cuota de Groq; flujo completo en el navegador. Antes, reiniciar el backend para borrar los bloqueos de login en memoria: la prueba de fuerza bruta bloqueó `cliente@tienda.com` desde localhost por 15 minutos.
 5. **Documentación:** `05-correcciones.md` (causa raíz, cambio, ANTES/DESPUÉS y efecto en el negocio de cada hallazgo, más la sección sobre USA-03), `06-matriz-calidad.md` (matriz unificada con diagnóstico de una frase por dimensión), hoja de ruta de lo no corregido con esfuerzo y motivo, y actualizar este archivo.
 6. **Cierre:** `npm run db:reset` (la BD tiene ahora los datos de `db:poblar` y las órdenes de k6), revisar `.env`, keys y tokens (incluidos los JSON de k6, que guardan tokens en `setup_data`), y el commit "Correcciones de rendimiento, seguridad y usabilidad con nueva medición". No unir a master.

@@ -58,6 +58,13 @@ export class Medidor {
     this.revisarRuta();
   }
 
+  // Escritura sin clic previo (el foco ya está en el campo, p. ej. tras seleccionar todo).
+  async teclear(locator, valor, texto) {
+    await locator.fill(valor);
+    this.acciones.push({ tipo: "escribir", caracteres: valor.length, texto });
+    this.revisarRuta();
+  }
+
   // Un <select> nativo: un clic para abrirlo y otro para elegir la opción.
   async seleccionar(locator, valor, texto) {
     await locator.selectOption(valor);
@@ -65,9 +72,10 @@ export class Medidor {
     this.revisarRuta();
   }
 
-  async tecla(locator, tecla, texto) {
+  // pulsaciones: teclas físicas del atajo (Control+A = 2) para el KLM.
+  async tecla(locator, tecla, texto, pulsaciones = 1) {
     await locator.press(tecla);
-    this.acciones.push({ tipo: "tecla", texto: `${tecla} (${texto})` });
+    this.acciones.push({ tipo: "tecla", texto: `${tecla} (${texto})`, pulsaciones });
     this.revisarRuta();
   }
 
@@ -114,7 +122,7 @@ export function calcularKLM(acciones) {
       n.K += a.caracteres;
     } else if (a.tipo === "tecla") {
       usar("teclado");
-      n.K++;
+      n.K += a.pulsaciones ?? 1;
     }
   }
   const segundos = Object.entries(n).reduce((s, [op, cant]) => s + cant * KLM[op], 0);
@@ -237,8 +245,17 @@ export const EJECUTAR = {
     await m.clic(page.getByRole("button", { name: /^Pagar \$/ }), "Pagar");
     await page.getByText("Pago rechazado. Intenta con otra tarjeta.", { exact: true }).first().waitFor();
     m.decision("entender el rechazo y decidir usar otra tarjeta");
-    // Tras el intento, la app borra el número y el CVV: hay que escribirlos de nuevo.
-    await m.escribir(page.locator("#numero"), "4111111111111111", "número de otra tarjeta");
+    const numero = page.locator("#numero");
+    if (await numero.inputValue()) {
+      // Con USA-03 la app conserva el número (y borra solo el CVV): para usar OTRA tarjeta hay que
+      // seleccionar el número anterior (Control+A) y escribir el nuevo encima.
+      await m.clic(numero, "campo número de tarjeta (conservado)");
+      await m.tecla(numero, "Control+a", "seleccionar el número anterior", 2);
+      await m.teclear(numero, "4111111111111111", "número de otra tarjeta");
+    } else {
+      // Antes de USA-03 la app borraba el número y el CVV: hay que escribirlos de nuevo.
+      await m.escribir(numero, "4111111111111111", "número de otra tarjeta");
+    }
     await m.escribir(page.locator("#cvv"), "123", "CVV de nuevo");
     m.decision("revisar y pagar de nuevo");
     await m.clic(page.getByRole("button", { name: /^Pagar \$/ }), "Pagar de nuevo");

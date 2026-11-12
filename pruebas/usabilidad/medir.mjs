@@ -1,5 +1,7 @@
 // Medición real: ejecuta cada tarea 3 veces en Chromium (1366×768) y guarda tiempos, conteos y KLM.
 // Uso: npm --prefix pruebas/usabilidad run medir   (app en :5173, API en :3000, datos de db:reset)
+// SOLO=T5 mide solo esas tareas (separadas por coma); SUFIJO=_despues escribe medicion_despues.json y
+// capturas con sufijo, sin pisar la medición del ANTES.
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -10,6 +12,8 @@ const AQUI = dirname(fileURLToPath(import.meta.url));
 const SALIDA = join(AQUI, "resultados");
 const CAPTURAS = join(AQUI, "..", "..", "docs", "pruebas", "capturas");
 const CORRIDAS = 3;
+const SOLO = process.env.SOLO ? process.env.SOLO.split(",") : null;
+const SUFIJO = process.env.SUFIJO ?? "";
 const PAUSA_CHAT_MS = 25000; // cuota de Groq: ~2-3 preguntas con herramientas por minuto
 
 mkdirSync(SALIDA, { recursive: true });
@@ -23,7 +27,7 @@ const mediana = (xs) => {
 const navegador = await chromium.launch();
 const resultados = [];
 
-for (const tarea of TAREAS) {
+for (const tarea of TAREAS.filter((t) => !SOLO || SOLO.includes(t.id))) {
   const corridas = [];
   for (let c = 1; c <= CORRIDAS; c++) {
     if (tarea.id === "T7" && c > 1) await new Promise((r) => setTimeout(r, PAUSA_CHAT_MS));
@@ -39,7 +43,7 @@ for (const tarea of TAREAS) {
       error = e.message.split("\n")[0];
     }
     const ms = m.inicio ? m.terminar() : null;
-    if (c === 1) await page.screenshot({ path: join(CAPTURAS, `tarea-${tarea.id}-final-escritorio.png`) });
+    if (c === 1) await page.screenshot({ path: join(CAPTURAS, `tarea-${tarea.id}-final-escritorio${SUFIJO}.png`) });
     corridas.push({ corrida: c, ms: ms && Math.round(ms), exito, error, ...extra });
     console.log(`${tarea.id} corrida ${c}: ${exito ? "éxito" : "FALLO"} en ${ms ? (ms / 1000).toFixed(2) : "-"} s${extra.chatMs ? ` (chat ${extra.chatMs} ms${extra.automatica ? ", respuesta automática" : ""})` : ""}${error ? ` | ${error}` : ""}`);
     if (c === CORRIDAS) {
@@ -60,7 +64,7 @@ for (const tarea of TAREAS) {
 }
 
 await navegador.close();
-writeFileSync(join(SALIDA, "medicion.json"), JSON.stringify(resultados, null, 2));
+writeFileSync(join(SALIDA, `medicion${SUFIJO}.json`), JSON.stringify(resultados, null, 2));
 
 console.log("\n| Tarea | Éxito máquina | Mediana máquina | Clics | Campos (caracteres) | Teclas | Cambios de página | Decisiones | KLM | Operadores |");
 console.log("|---|---|---|---|---|---|---|---|---|---|");
