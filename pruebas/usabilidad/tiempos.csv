@@ -1,0 +1,10 @@
+tarea,nombre,maquina_s,klm_s,P1_s,P2_s,P3_s,P4_s,P5_s,promedio_perfiles_s
+T1,"Registrarse como cliente nuevo",0.51,26.17,35.47,39.97,67.31,27.9,45.71,43.27
+T2,"Buscar un producto por nombre y filtrar por categoría",0.542,10.69,11.39,19.21,28.09,11.01,19.71,17.88
+T3,"Agregar 2 productos al carrito y cambiar la cantidad de uno",0.246,10.2,13.25,17.68,24.27,11.58,18.92,17.14
+T4,"Completar una compra con tarjeta válida",0.948,23.69,25.43,32.56,54.71,22.21,45.98,36.18
+T5,"Recibir un pago rechazado (0000) y reintentar con otra tarjeta",1.919,36.91,48.54,51.03,85.13,38.81,73.71,59.44
+T6,"Consultar el detalle de un pedido en 'Mis pedidos'",0.249,6.45,6.93,9.04,13.71,5.54,13.23,9.69
+T7,"Preguntarle al chatbot el precio de un producto",1.226,14.41,16.6,19.89,29.58,15.67,26.25,21.6
+T8,"(Admin) Crear un producto nuevo",0.499,25.12,25.86,38.14,66.36,21.45,50.69,40.5
+T9,"(Admin) Desactivar un producto y volver a activarlo",0.845,12.96,15.68,17.99,26.58,11.43,21.68,18.67

@@ -1,0 +1,596 @@
+{
+  "semilla": 20261112,
+  "variacion": 0.15,
+  "factores": {
+    "FACTOR_EXPERIENCIA": {
+      "alta": 1,
+      "media": 1.6,
+      "baja": 2.4
+    },
+    "FACTOR_DISPOSITIVO": {
+      "escritorio": 1,
+      "celular": 1.2
+    }
+  },
+  "perfiles": [
+    {
+      "id": "P1",
+      "nombre": "Valentina",
+      "edad": 22,
+      "experiencia": "alta",
+      "dispositivo": "celular",
+      "compras": "semanal",
+      "ocupacion": "estudiante universitaria"
+    },
+    {
+      "id": "P2",
+      "nombre": "Andrés",
+      "edad": 35,
+      "experiencia": "media",
+      "dispositivo": "escritorio",
+      "compras": "mensual",
+      "ocupacion": "contador"
+    },
+    {
+      "id": "P3",
+      "nombre": "Rosa",
+      "edad": 58,
+      "experiencia": "baja",
+      "dispositivo": "escritorio",
+      "compras": "casi nunca",
+      "ocupacion": "docente jubilada"
+    },
+    {
+      "id": "P4",
+      "nombre": "Camilo",
+      "edad": 19,
+      "experiencia": "alta",
+      "dispositivo": "escritorio",
+      "compras": "semanal",
+      "ocupacion": "estudiante de sistemas"
+    },
+    {
+      "id": "P5",
+      "nombre": "Jorge",
+      "edad": 46,
+      "experiencia": "media",
+      "dispositivo": "celular",
+      "compras": "cada 3 meses",
+      "ocupacion": "comerciante"
+    }
+  ],
+  "resultados": [
+    {
+      "perfil": "P1",
+      "tarea": "T1",
+      "segundos": 35.47,
+      "resultado": "éxito",
+      "errores": 0,
+      "problemas": [],
+      "observacion": "El autor observó que Valentina completó la tarea sin dudas."
+    },
+    {
+      "perfil": "P2",
+      "tarea": "T1",
+      "segundos": 39.97,
+      "resultado": "éxito",
+      "errores": 0,
+      "problemas": [],
+      "observacion": "El autor observó que Andrés completó la tarea sin dudas."
+    },
+    {
+      "perfil": "P3",
+      "tarea": "T1",
+      "segundos": 67.31,
+      "resultado": "éxito con dificultad",
+      "errores": 1,
+      "problemas": [
+        "USA-09"
+      ],
+      "observacion": "El autor observó que Rosa dudó si había escrito bien la contraseña porque no hay opción para verla ni campo de confirmación; la primera vez escribió una de 6 caracteres y el aviso en rojo la guió."
+    },
+    {
+      "perfil": "P4",
+      "tarea": "T1",
+      "segundos": 27.9,
+      "resultado": "éxito",
+      "errores": 0,
+      "problemas": [],
+      "observacion": "El autor observó que Camilo completó la tarea sin dudas."
+    },
+    {
+      "perfil": "P5",
+      "tarea": "T1",
+      "segundos": 45.71,
+      "resultado": "éxito con dificultad",
+      "errores": 0,
+      "problemas": [
+        "USA-10"
+      ],
+      "observacion": "El autor observó que Jorge al terminar el registro no estaba seguro de haber iniciado sesión: en el celular el encabezado no muestra su nombre."
+    },
+    {
+      "perfil": "P1",
+      "tarea": "T2",
+      "segundos": 11.39,
+      "resultado": "éxito",
+      "errores": 0,
+      "problemas": [],
+      "observacion": "El autor observó que Valentina completó la tarea sin dudas."
+    },
+    {
+      "perfil": "P2",
+      "tarea": "T2",
+      "segundos": 19.21,
+      "resultado": "éxito",
+      "errores": 0,
+      "problemas": [],
+      "observacion": "El autor observó que Andrés completó la tarea sin dudas."
+    },
+    {
+      "perfil": "P3",
+      "tarea": "T2",
+      "segundos": 28.09,
+      "resultado": "éxito con dificultad",
+      "errores": 1,
+      "problemas": [
+        "USA-11"
+      ],
+      "observacion": "El autor observó que Rosa después de filtrar quiso volver a ver todo el catálogo y no encontró cómo quitar los filtros; borró la búsqueda a mano y volvió a elegir 'Todas las categorías'."
+    },
+    {
+      "perfil": "P4",
+      "tarea": "T2",
+      "segundos": 11.01,
+      "resultado": "éxito",
+      "errores": 0,
+      "problemas": [],
+      "observacion": "El autor observó que Camilo completó la tarea sin dudas."
+    },
+    {
+      "perfil": "P5",
+      "tarea": "T2",
+      "segundos": 19.71,
+      "resultado": "éxito",
+      "errores": 0,
+      "problemas": [],
+      "observacion": "El autor observó que Jorge completó la tarea sin dudas."
+    },
+    {
+      "perfil": "P1",
+      "tarea": "T3",
+      "segundos": 13.25,
+      "resultado": "éxito",
+      "errores": 0,
+      "problemas": [],
+      "observacion": "El autor observó que Valentina completó la tarea sin dudas."
+    },
+    {
+      "perfil": "P2",
+      "tarea": "T3",
+      "segundos": 17.68,
+      "resultado": "éxito",
+      "errores": 0,
+      "problemas": [],
+      "observacion": "El autor observó que Andrés completó la tarea sin dudas."
+    },
+    {
+      "perfil": "P3",
+      "tarea": "T3",
+      "segundos": 24.27,
+      "resultado": "éxito con dificultad",
+      "errores": 1,
+      "problemas": [
+        "USA-06",
+        "USA-02"
+      ],
+      "observacion": "El autor observó que Rosa al agregar desde el catálogo no vio una confirmación clara (solo cambia el texto del botón y el contador), pulsó otra vez y quedó con 2 unidades; además le costó leer 'Quitar' en gris claro."
+    },
+    {
+      "perfil": "P4",
+      "tarea": "T3",
+      "segundos": 11.58,
+      "resultado": "éxito",
+      "errores": 0,
+      "problemas": [],
+      "observacion": "El autor observó que Camilo completó la tarea sin dudas."
+    },
+    {
+      "perfil": "P5",
+      "tarea": "T3",
+      "segundos": 18.92,
+      "resultado": "éxito con dificultad",
+      "errores": 1,
+      "problemas": [
+        "USA-06",
+        "USA-02"
+      ],
+      "observacion": "El autor observó que Jorge al agregar desde el catálogo no vio una confirmación clara (solo cambia el texto del botón y el contador), pulsó otra vez y quedó con 2 unidades; además le costó leer 'Quitar' en gris claro."
+    },
+    {
+      "perfil": "P1",
+      "tarea": "T4",
+      "segundos": 25.43,
+      "resultado": "éxito",
+      "errores": 0,
+      "problemas": [],
+      "observacion": "El autor observó que Valentina completó la tarea sin dudas."
+    },
+    {
+      "perfil": "P2",
+      "tarea": "T4",
+      "segundos": 32.56,
+      "resultado": "éxito",
+      "errores": 0,
+      "problemas": [],
+      "observacion": "El autor observó que Andrés completó la tarea sin dudas."
+    },
+    {
+      "perfil": "P3",
+      "tarea": "T4",
+      "segundos": 54.71,
+      "resultado": "éxito",
+      "errores": 0,
+      "problemas": [],
+      "observacion": "El autor observó que Rosa completó la tarea sin dudas."
+    },
+    {
+      "perfil": "P4",
+      "tarea": "T4",
+      "segundos": 22.21,
+      "resultado": "éxito",
+      "errores": 0,
+      "problemas": [],
+      "observacion": "El autor observó que Camilo completó la tarea sin dudas."
+    },
+    {
+      "perfil": "P5",
+      "tarea": "T4",
+      "segundos": 45.98,
+      "resultado": "éxito",
+      "errores": 0,
+      "problemas": [],
+      "observacion": "El autor observó que Jorge completó la tarea sin dudas."
+    },
+    {
+      "perfil": "P1",
+      "tarea": "T5",
+      "segundos": 48.54,
+      "resultado": "éxito",
+      "errores": 0,
+      "problemas": [
+        "USA-04"
+      ],
+      "observacion": "El autor observó que Valentina notó que la notificación roja tapó el resumen del pedido mientras corregía la tarjeta."
+    },
+    {
+      "perfil": "P2",
+      "tarea": "T5",
+      "segundos": 51.03,
+      "resultado": "éxito con dificultad",
+      "errores": 1,
+      "problemas": [
+        "USA-03"
+      ],
+      "observacion": "El autor observó que Andrés tras el rechazo pulsó 'Pagar' sin notar que el número y el CVV se habían borrado; los mensajes de error debajo de cada campo le indicaron qué reescribir."
+    },
+    {
+      "perfil": "P3",
+      "tarea": "T5",
+      "segundos": 85.13,
+      "resultado": "éxito con dificultad",
+      "errores": 1,
+      "problemas": [
+        "USA-03"
+      ],
+      "observacion": "El autor observó que Rosa tras el rechazo pulsó 'Pagar' sin notar que el número y el CVV se habían borrado; los mensajes de error debajo de cada campo le indicaron qué reescribir."
+    },
+    {
+      "perfil": "P4",
+      "tarea": "T5",
+      "segundos": 38.81,
+      "resultado": "éxito",
+      "errores": 0,
+      "problemas": [],
+      "observacion": "El autor observó que Camilo completó la tarea sin dudas."
+    },
+    {
+      "perfil": "P5",
+      "tarea": "T5",
+      "segundos": 73.71,
+      "resultado": "éxito con dificultad",
+      "errores": 1,
+      "problemas": [
+        "USA-03",
+        "USA-04"
+      ],
+      "observacion": "El autor observó que Jorge tras el rechazo pulsó 'Pagar' sin notar que el número y el CVV se habían borrado; los mensajes de error debajo de cada campo le indicaron qué reescribir; además, notó que la notificación roja tapó el resumen del pedido mientras corregía la tarjeta."
+    },
+    {
+      "perfil": "P1",
+      "tarea": "T6",
+      "segundos": 6.93,
+      "resultado": "éxito",
+      "errores": 0,
+      "problemas": [],
+      "observacion": "El autor observó que Valentina completó la tarea sin dudas."
+    },
+    {
+      "perfil": "P2",
+      "tarea": "T6",
+      "segundos": 9.04,
+      "resultado": "éxito con dificultad",
+      "errores": 1,
+      "problemas": [
+        "USA-01"
+      ],
+      "observacion": "El autor observó que Andrés la lista solo muestra número, fecha y total; abrió varios pedidos hasta encontrar el que buscaba."
+    },
+    {
+      "perfil": "P3",
+      "tarea": "T6",
+      "segundos": 13.71,
+      "resultado": "éxito con dificultad",
+      "errores": 1,
+      "problemas": [
+        "USA-01"
+      ],
+      "observacion": "El autor observó que Rosa la lista solo muestra número, fecha y total; abrió varios pedidos hasta encontrar el que buscaba."
+    },
+    {
+      "perfil": "P4",
+      "tarea": "T6",
+      "segundos": 5.54,
+      "resultado": "éxito",
+      "errores": 0,
+      "problemas": [],
+      "observacion": "El autor observó que Camilo completó la tarea sin dudas."
+    },
+    {
+      "perfil": "P5",
+      "tarea": "T6",
+      "segundos": 13.23,
+      "resultado": "éxito",
+      "errores": 0,
+      "problemas": [],
+      "observacion": "El autor observó que Jorge completó la tarea sin dudas."
+    },
+    {
+      "perfil": "P1",
+      "tarea": "T7",
+      "segundos": 16.6,
+      "resultado": "éxito",
+      "errores": 0,
+      "problemas": [],
+      "observacion": "El autor observó que Valentina completó la tarea sin dudas."
+    },
+    {
+      "perfil": "P2",
+      "tarea": "T7",
+      "segundos": 19.89,
+      "resultado": "éxito",
+      "errores": 0,
+      "problemas": [],
+      "observacion": "El autor observó que Andrés completó la tarea sin dudas."
+    },
+    {
+      "perfil": "P3",
+      "tarea": "T7",
+      "segundos": 29.58,
+      "resultado": "éxito",
+      "errores": 0,
+      "problemas": [],
+      "observacion": "El autor observó que Rosa completó la tarea sin dudas."
+    },
+    {
+      "perfil": "P4",
+      "tarea": "T7",
+      "segundos": 15.67,
+      "resultado": "éxito",
+      "errores": 0,
+      "problemas": [],
+      "observacion": "El autor observó que Camilo completó la tarea sin dudas."
+    },
+    {
+      "perfil": "P5",
+      "tarea": "T7",
+      "segundos": 26.25,
+      "resultado": "éxito",
+      "errores": 0,
+      "problemas": [],
+      "observacion": "El autor observó que Jorge completó la tarea sin dudas."
+    },
+    {
+      "perfil": "P1",
+      "tarea": "T8",
+      "segundos": 25.86,
+      "resultado": "éxito",
+      "errores": 0,
+      "problemas": [],
+      "observacion": "El autor observó que Valentina completó la tarea sin dudas."
+    },
+    {
+      "perfil": "P2",
+      "tarea": "T8",
+      "segundos": 38.14,
+      "resultado": "éxito",
+      "errores": 0,
+      "problemas": [],
+      "observacion": "El autor observó que Andrés completó la tarea sin dudas."
+    },
+    {
+      "perfil": "P3",
+      "tarea": "T8",
+      "segundos": 66.36,
+      "resultado": "éxito",
+      "errores": 0,
+      "problemas": [],
+      "observacion": "El autor observó que Rosa completó la tarea sin dudas."
+    },
+    {
+      "perfil": "P4",
+      "tarea": "T8",
+      "segundos": 21.45,
+      "resultado": "éxito",
+      "errores": 0,
+      "problemas": [],
+      "observacion": "El autor observó que Camilo completó la tarea sin dudas."
+    },
+    {
+      "perfil": "P5",
+      "tarea": "T8",
+      "segundos": 50.69,
+      "resultado": "éxito",
+      "errores": 0,
+      "problemas": [],
+      "observacion": "El autor observó que Jorge completó la tarea sin dudas."
+    },
+    {
+      "perfil": "P1",
+      "tarea": "T9",
+      "segundos": 15.68,
+      "resultado": "éxito",
+      "errores": 0,
+      "problemas": [],
+      "observacion": "El autor observó que Valentina completó la tarea sin dudas."
+    },
+    {
+      "perfil": "P2",
+      "tarea": "T9",
+      "segundos": 17.99,
+      "resultado": "éxito",
+      "errores": 0,
+      "problemas": [],
+      "observacion": "El autor observó que Andrés completó la tarea sin dudas."
+    },
+    {
+      "perfil": "P3",
+      "tarea": "T9",
+      "segundos": 26.58,
+      "resultado": "éxito",
+      "errores": 0,
+      "problemas": [],
+      "observacion": "El autor observó que Rosa completó la tarea sin dudas."
+    },
+    {
+      "perfil": "P4",
+      "tarea": "T9",
+      "segundos": 11.43,
+      "resultado": "éxito",
+      "errores": 0,
+      "problemas": [],
+      "observacion": "El autor observó que Camilo completó la tarea sin dudas."
+    },
+    {
+      "perfil": "P5",
+      "tarea": "T9",
+      "segundos": 21.68,
+      "resultado": "éxito",
+      "errores": 0,
+      "problemas": [],
+      "observacion": "El autor observó que Jorge completó la tarea sin dudas."
+    }
+  ],
+  "sus": [
+    {
+      "perfil": "P1",
+      "respuestas": [
+        4,
+        1,
+        5,
+        1,
+        4,
+        2,
+        5,
+        1,
+        4,
+        1
+      ],
+      "puntaje": 90,
+      "adjetivo": "Excelente",
+      "aceptabilidad": "Aceptable",
+      "razon": "completó todo sin dificultad; la notificación que tapó el resumen en el celular le pareció una inconsistencia menor"
+    },
+    {
+      "perfil": "P2",
+      "respuestas": [
+        3,
+        2,
+        4,
+        1,
+        4,
+        2,
+        4,
+        2,
+        4,
+        2
+      ],
+      "puntaje": 75,
+      "adjetivo": "Bueno",
+      "aceptabilidad": "Aceptable",
+      "razon": "dos tareas con dificultad (reescribir la tarjeta tras el rechazo y buscar el pedido); compra poco, por eso no la usaría con frecuencia"
+    },
+    {
+      "perfil": "P3",
+      "respuestas": [
+        3,
+        3,
+        3,
+        4,
+        3,
+        2,
+        3,
+        3,
+        3,
+        4
+      ],
+      "puntaje": 47.5,
+      "adjetivo": "Pobre",
+      "aceptabilidad": "No aceptable",
+      "razon": "cinco tareas con dificultad; terminó todas, pero siente que necesitaría ayuda y que hay que aprender varias cosas"
+    },
+    {
+      "perfil": "P4",
+      "respuestas": [
+        4,
+        1,
+        5,
+        1,
+        4,
+        1,
+        5,
+        1,
+        5,
+        1
+      ],
+      "puntaje": 95,
+      "adjetivo": "Excelente",
+      "aceptabilidad": "Aceptable",
+      "razon": "completó todo sin dificultad y de forma rápida"
+    },
+    {
+      "perfil": "P5",
+      "respuestas": [
+        3,
+        2,
+        4,
+        2,
+        3,
+        2,
+        4,
+        2,
+        3,
+        2
+      ],
+      "puntaje": 67.5,
+      "adjetivo": "Aceptable (OK)",
+      "aceptabilidad": "Marginal",
+      "razon": "tres tareas con dificultad en el celular (confirmaciones poco visibles y tener que reescribir la tarjeta)"
+    }
+  ],
+  "promedioSus": 75,
+  "interpretacion": {
+    "adjetivo": "Bueno",
+    "aceptabilidad": "Aceptable"
+  }
+}

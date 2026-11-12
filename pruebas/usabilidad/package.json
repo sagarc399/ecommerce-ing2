@@ -1,0 +1,15 @@
+{
+  "name": "pruebas-usabilidad",
+  "private": true,
+  "type": "module",
+  "description": "Medición de usabilidad (Playwright + axe-core) de Tienda USCO",
+  "scripts": {
+    "medir": "node medir.mjs",
+    "accesibilidad": "node accesibilidad.mjs",
+    "simular": "node simular.mjs"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "playwright": "^1.65.0"
+  }
+}
