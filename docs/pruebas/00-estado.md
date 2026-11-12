@@ -153,10 +153,25 @@ La mejora de tiempos **no** se debe al límite, que no abarata bcrypt: es variab
 
 Las informativas son esperadas (errores 4xx correctos, el login identificado y respuestas no cacheables). Los escaneos baseline del frontend y de admin no se repitieron: el cambio fue en la API y el escaneo de cliente es el pedido en el plan. SEG-04/05 quedan **cerrados**.
 
+**SEG-09: BD expuesta con contraseña por defecto** (`pruebas/seguridad/manuales/exposicion-bd-antes.txt` y `exposicion-bd-despues.txt`, script `node pruebas/seguridad/exposicion-bd.mjs antes|despues`). El script intenta conectarse como `postgres` por loopback y por cada IP de red local del equipo (como entraría otro equipo de la misma red), con la clave por defecto y con la del `.env` (que no se imprime).
+
+Cambios: `docker-compose.yml` publica `"127.0.0.1:5434:5432"`; `ALTER USER postgres` con una clave aleatoria de 32 caracteres (`crypto.randomBytes(24)` en base64url) sin borrar el volumen (los datos se conservan); `DB_PASSWORD` actualizado en `backend/.env`; `backend/.env.example` ahora trae `cambia_esta_clave` y cómo cambiarla. Los scripts que usan `docker exec ... psql -U postgres` (`verificar.mjs`, `ejecutar.sh` de k6, `manuales.mjs`) siguen funcionando: entran por el socket local del contenedor, que no pide clave.
+
+| Indicador | Antes | Después |
+|---|---|---|
+| Interfaces donde escucha 5434 | `0.0.0.0` y `[::]` (todas) | **solo `127.0.0.1`** |
+| Desde la IP de red local 192.168.194.203 con `postgres/postgres` | **CONECTA** | puerto cerrado |
+| Desde la IP 172.26.208.1 (adaptador de WSL) con `postgres/postgres` | **CONECTA** | puerto cerrado |
+| Desde 127.0.0.1 con `postgres/postgres` | CONECTA | **RECHAZADA** (contraseña incorrecta) |
+| Desde 127.0.0.1 con la clave del `.env` (la app) | CONECTA | CONECTA |
+| Desde un contenedor por `host.docker.internal` con `postgres/postgres` | CONECTA | RECHAZADA (contraseña incorrecta) |
+
+Riesgo residual: otro contenedor del mismo equipo aún llega al puerto por `host.docker.internal` (pasarela interna de Docker Desktop), pero la clave por defecto ya no sirve. Verificación de la app: `/api/health` ok, catálogo y login 200, `npm run verificar` → LISTO PARA LA DEMO, `npm run prueba:concurrencia` → PRUEBA SUPERADA. SEG-09 queda **cerrado**.
+
 ### Falta del plan, sección por sección
 
 1. **Rendimiento:** completo.
-2. **Seguridad:** **SEG-09** completo: puerto `127.0.0.1:5434:5432` en `docker-compose.yml`, `ALTER USER postgres` con contraseña aleatoria sin borrar el volumen, actualizarla en `backend/.env` (valor de ejemplo en `.env.example`), recrear el contenedor y verificar que no escucha en `0.0.0.0` y que la app funciona.
+2. **Seguridad:** completo (SEG-09 cerrado, ver abajo).
 3. **Usabilidad:**
    - **USA-02:** cambiar `text-slate-400` por un tono que cumpla 4,5:1 (probar `slate-500`) en toda la app, incluidos el chat y el admin, y repetir `node pruebas/usabilidad/accesibilidad.mjs`. Antes: 43 graves y 3 moderadas.
    - **USA-03:** en `frontend/src/pages/Checkout.tsx`, tras un 402 conservar el número, el titular y el vencimiento en memoria, borrar solo el CVV, poner el foco en el CVV y mostrar "Por seguridad, vuelve a ingresar el CVV"; con cualquier otro resultado, borrar todo. Verificar con el script de la prueba 11 de la Fase 6 y volver a medir T5 con Playwright y KLM. **Ojo:** T5 pide reintentar con *otra* tarjeta, así que con el número conservado el usuario debe borrarlo antes de escribir el nuevo (selección + Ctrl+A en el KLM). Hay que medirlo y explicar el compromiso en "USA-03: equilibrio entre usabilidad y seguridad". No repetir el SUS.
