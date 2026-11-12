@@ -219,12 +219,30 @@ En la tarea tal como está definida, USA-03 **no** reduce el esfuerzo: lo sube 0
 
 Equilibrio entre usabilidad y seguridad: conservar el número evita reescribir 16 dígitos en el caso más común de reintento, pero el CVV se pide siempre de nuevo (no debe quedar en memoria tras un intento, criterio alineado con PCI DSS) y ningún dato sale del estado del componente. El SUS **no** se repite (decisión H del traspaso); la mejora se expresa con KLM y con la verificación funcional. USA-03 queda **cerrado** y se documenta como **análisis de compromiso usabilidad-seguridad, no como mejora**: en el simulador el rechazo solo ocurre con tarjetas terminadas en 0000 (se reintenta con otra, +0,56 s); en pasarelas reales con rechazos transitorios se reintenta con la misma (11,87 → 4,19 s). La corrección crítica de usabilidad es USA-02.
 
+### Regresión tras las correcciones (12 de noviembre)
+
+Con el backend reiniciado (sin bloqueos de login en memoria), datos de `db:reset` y el chat en `groq`. Evidencias en `pruebas/regresion/resultados/`.
+
+| Prueba | Comando | Resultado |
+|---|---|---|
+| Build del frontend | `cd frontend && npm run build` | Compila (`tsc -b` + Vite) |
+| Chatbot v2: precio real (anónimo) | `node pruebas/regresion/chatbot.mjs` | OK, $1.250.000 (Groq, 1,5 s) |
+| Chatbot v2: pedido sin sesión (anónimo) | ídem | OK, pide iniciar sesión y no muestra datos (1,0 s) |
+| Chatbot v2: pedido propio (cliente) | ídem | OK, muestra Mancuernas 5 kg y $149.900 (1,8 s) |
+| Chatbot v2: IDOR (cliente2 pide el pedido de cliente) | ídem | OK, no revela productos ni total (1,4 s) |
+| Flujo en el navegador: login → carrito → compra aprobada → rechazo con USA-03 y reintento → mis pedidos → salir → admin crea producto | `node pruebas/regresion/flujo.mjs` | 8 de 8 OK, sin errores de JavaScript (solo el 402 esperado) |
+| Verificación de la demo | `npm run verificar` | 🎉 LISTO PARA LA DEMO (Groq 961 ms) |
+
+Las preguntas del chatbot van separadas 25 s por la cuota de Groq; ninguna cayó al respaldo por reglas. En la primera corrida de `flujo.mjs` fallaron 2 pasos por la prueba, no por la app: había dos enlaces "Mis pedidos" (encabezado y confirmación) y el producto nuevo cae en otra página de la tabla del admin. Se ajustaron los selectores (como en T8) y se repitió desde `db:reset`.
+
+Observación (no es regresión: `backend/src/chat` no cambia desde la Fase 9): en el caso IDOR el modelo responde a `cliente2`, que sí tiene sesión, "primero debes iniciar sesión" en lugar de "no encontré ese pedido entre los tuyos", como pide el prompt. La seguridad no depende del modelo: la herramienta filtra por `usuario_id` del token en el SQL y devuelve "Pedido no encontrado". Es una imprecisión de redacción del LLM; queda para la hoja de ruta (ajustar el prompt o devolver un mensaje fijo cuando la herramienta no encuentra el pedido).
+
 ### Falta del plan, sección por sección
 
 1. **Rendimiento:** completo.
 2. **Seguridad:** completo (SEG-04/05 y SEG-09 cerrados, ver arriba).
 3. **Usabilidad:** completo (USA-02 y USA-03, ver arriba).
-4. **Regresión:** `npm run build` del frontend; pruebas del chatbot v2 (precio real, pedido sin sesión, IDOR con cliente2), espaciadas por la cuota de Groq; flujo completo en el navegador. Antes, reiniciar el backend para borrar los bloqueos de login en memoria: la prueba de fuerza bruta bloqueó `cliente@tienda.com` desde localhost por 15 minutos.
+4. **Regresión:** completa (ver arriba).
 5. **Documentación:** `05-correcciones.md` (causa raíz, cambio, ANTES/DESPUÉS y efecto en el negocio de cada hallazgo, más la sección sobre USA-03), `06-matriz-calidad.md` (matriz unificada con diagnóstico de una frase por dimensión), hoja de ruta de lo no corregido con esfuerzo y motivo, y actualizar este archivo.
 6. **Cierre:** `npm run db:reset` (la BD tiene ahora los datos de `db:poblar` y las órdenes de k6), revisar `.env`, keys y tokens (incluidos los JSON de k6, que guardan tokens en `setup_data`), y el commit "Correcciones de rendimiento, seguridad y usabilidad con nueva medición". No unir a master.
 

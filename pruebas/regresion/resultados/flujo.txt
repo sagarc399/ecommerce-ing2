@@ -1,0 +1,12 @@
+Regresión del flujo en el navegador — 2026-11-12T17:03:23.586Z
+
+OK    1. Login como cliente (aparece 'Mis pedidos' en el encabezado)
+OK    2. Agregar al carrito desde el catálogo (Mouse inalámbrico en el carrito)
+OK    3. Compra aprobada (4111…) (pedido #1)
+OK    4. Rechazo (…0000) con USA-03 y reintento (número conservado, CVV vacío con foco, reintento aprobado)
+OK    5. Mis pedidos (3 pedidos; detalle del #1 abre)
+OK    6. Salir
+OK    7. Admin crea un producto ("Producto regresión 2693" creado y visible en el catálogo)
+OK    8. Sin errores de JavaScript en la consola (1 mensajes de red esperados (402))
+
+FLUJO COMPLETO SIN REGRESIONES
