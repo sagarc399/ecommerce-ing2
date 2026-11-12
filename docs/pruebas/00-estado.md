@@ -78,6 +78,76 @@ Para repetir las mediciones después de corregir, usa las mismas condiciones: ba
 | 12 | USA-12 | Landmarks y enlaces duplicados (axe-core A11Y-02) | 1 |
 | 13 | USA-13 | "Respuesta automática" sin explicación | 1 |
 
+## Progreso de correcciones (sesión del 12 de noviembre, interrumpida por contexto)
+
+Todo en la rama `pruebas-no-funcionales`. Las mediciones del "después" usaron los mismos scripts y parámetros que el "antes": k6 con 20 VUs para checkout y 30 para login, datos de `npm run db:poblar` y backend con `npm run dev`.
+
+### Hechas
+
+| ID | Archivos | Cambio y valores |
+|---|---|---|
+| REN-01 / REN-02 / SEG-01 | `backend/src/controllers/ordenes.controller.ts` | La lectura final de la orden usa el mismo `cliente` de la transacción, antes del `release()`, en lugar de `pool.query`. Se revisaron órdenes, `poblar.ts` y las herramientas del chatbot v2: no hay otro lugar que pida una segunda conexión mientras retiene una |
+| REN-01 (defensa) | `backend/src/config/db.ts`, `backend/src/middleware/errorHandler.ts` | Pool con `max: 10` y `connectionTimeoutMillis: 5000`. Si el pool se agota, la petición responde **503** "El servidor está ocupado, intenta de nuevo en unos segundos" en lugar de colgarse. Se comprobó que `pg` devuelve "timeout exceeded when trying to connect" |
+| SEG-02 | `backend/src/routes/auth.routes.ts` | `express-rate-limit` en `POST /auth/login`: **5 intentos fallidos por IP + email cada 15 minutos** → 429 "Demasiados intentos fallidos de inicio de sesión. Espera 15 minutos e intenta de nuevo." Los logins exitosos no cuentan (`skipSuccessfulRequests`) |
+| SEG-04 / SEG-05 | `backend/src/index.ts`, `backend/package.json` (helmet 8.3.0) | `helmet` con CSP `default-src 'none'; frame-ancestors 'none'` (la API solo devuelve JSON) y `app.disable("x-powered-by")`. CORS sigue funcionando: el preflight desde :5173 responde 204 con el origen correcto |
+
+### Mediciones ANTES y DESPUÉS que ya están
+
+**REN-01: checkout con 20 VUs** (`pruebas/rendimiento/resultados/*_despues.*`)
+
+| Escenario | req/s | p50 | p95 | Máx | Errores | ¿Se cuelga? |
+|---|---|---|---|---|---|---|
+| C1 antes | 0,62 | 1,06 s | 60,00 s | 60,00 s | 23,26 % (20 de 86) | Sí |
+| C1 después | **4,61** | 2,12 s | 5,26 s | 6,87 s | **0 %** (0 de 495) | **No** |
+| C2 antes | 0,34 | 3,70 s | 59,99 s | 59,99 s | 44,68 % (21 de 47) | Sí |
+| C2 después | **1,84** | 9,38 s | 9,51 s | 9,53 s | **0 %** (0 de 203) | **No** |
+
+- **Integridad después:** carga A 99655 = 100000 − 345, B 99813 = 100000 − 187 y C 99834 = 100000 − 166 (cuadran las 3). 0 stock negativo, 0 órdenes PAGADA sin pago APROBADO (766 PAGADA).
+- **Órdenes confirmadas sin respuesta:** antes 10 por bloqueo, después **0**. Unidades vendidas = respuestas 201: 495 en C1 y 203 en C2.
+- **Prueba de concurrencia:** 3 de 3 PRUEBA SUPERADA (`resultados/concurrencia-despues.txt`).
+- El p95 sigue por encima de 1500 ms por REN-03 (500 ms de pago con las filas bloqueadas), que no entra en esta fase. En C2 se ve el máximo teórico: unas 2 ventas por segundo de un mismo producto.
+
+**SEG-02: fuerza bruta** (`pruebas/seguridad/manuales/fuerza-bruta-despues.txt`)
+
+- **Antes:** 50 × 401, sin límite.
+- **Después:** 5 × 401 y **45 × 429; se bloquea en el intento 6**. Con el bloqueo activo, incluso la contraseña correcta da 429 para esa IP + email. Otro email desde la misma IP sigue entrando (200), y 10 logins exitosos seguidos dan 10 × 200.
+- Efecto secundario conocido: el dueño real de la cuenta también queda bloqueado 15 minutos desde esa IP. El límite se guarda en memoria y se reinicia al reiniciar el backend.
+
+**Escenario B: login con 30 VUs, para confirmar que no afecta a los legítimos**
+
+| | Peticiones | req/s | p50 | p95 | Máx | Errores |
+|---|---|---|---|---|---|---|
+| Antes | 1055 | 9,98 | 1,59 s | 2,51 s | 5,11 s | 0 % |
+| Después | 1375 | 12,98 | 0,97 s | 1,21 s | 4,01 s | 0 % (ningún 429) |
+
+La mejora de tiempos **no** se debe al límite, que no abarata bcrypt: es variabilidad de la máquina entre sesiones. REN-04 se debe seguir considerando abierto.
+
+**SEG-04/05: cabeceras** (`pruebas/seguridad/manuales/cabeceras-despues.txt`)
+
+| Cabecera | Antes | Después |
+|---|---|---|
+| Content-Security-Policy | ausente | `default-src 'none';frame-ancestors 'none'` |
+| X-Frame-Options | ausente | `SAMEORIGIN` |
+| X-Content-Type-Options | ausente | `nosniff` |
+| Strict-Transport-Security | ausente | `max-age=31536000; includeSubDomains` (sin efecto sin HTTPS) |
+| Referrer-Policy | ausente | `no-referrer` |
+| X-Powered-By | `Express` | ausente |
+
+### Incompleto
+
+- **SEG-04/05:** falta repetir el **escaneo de API de ZAP con token de cliente** (mismo comando, `bash pruebas/seguridad/ejecutar-zap.sh`, con `CHAT_PROVEEDOR=reglas` durante el escaneo y `groq` al final) y armar la tabla ANTES/DESPUÉS por severidad. Antes: Alta 0, Media 0, Baja 3, Informativa 3. El script ejecuta los 3 escaneos; si solo interesa el de cliente, se puede comentar el resto.
+
+### Falta del plan, sección por sección
+
+1. **Rendimiento:** completo.
+2. **Seguridad:** el ZAP de SEG-04/05 (arriba); **SEG-09** completo: puerto `127.0.0.1:5434:5432` en `docker-compose.yml`, `ALTER USER postgres` con contraseña aleatoria sin borrar el volumen, actualizarla en `backend/.env` (valor de ejemplo en `.env.example`), recrear el contenedor y verificar que no escucha en `0.0.0.0` y que la app funciona.
+3. **Usabilidad:**
+   - **USA-02:** cambiar `text-slate-400` por un tono que cumpla 4,5:1 (probar `slate-500`) en toda la app, incluidos el chat y el admin, y repetir `node pruebas/usabilidad/accesibilidad.mjs`. Antes: 43 graves y 3 moderadas.
+   - **USA-03:** en `frontend/src/pages/Checkout.tsx`, tras un 402 conservar el número, el titular y el vencimiento en memoria, borrar solo el CVV, poner el foco en el CVV y mostrar "Por seguridad, vuelve a ingresar el CVV"; con cualquier otro resultado, borrar todo. Verificar con el script de la prueba 11 de la Fase 6 y volver a medir T5 con Playwright y KLM. **Ojo:** T5 pide reintentar con *otra* tarjeta, así que con el número conservado el usuario debe borrarlo antes de escribir el nuevo (selección + Ctrl+A en el KLM). Hay que medirlo y explicar el compromiso en "USA-03: equilibrio entre usabilidad y seguridad". No repetir el SUS.
+4. **Regresión:** `npm run build` del frontend; pruebas del chatbot v2 (precio real, pedido sin sesión, IDOR con cliente2), espaciadas por la cuota de Groq; flujo completo en el navegador. Antes, reiniciar el backend para borrar los bloqueos de login en memoria: la prueba de fuerza bruta bloqueó `cliente@tienda.com` desde localhost por 15 minutos.
+5. **Documentación:** `05-correcciones.md` (causa raíz, cambio, ANTES/DESPUÉS y efecto en el negocio de cada hallazgo, más la sección sobre USA-03), `06-matriz-calidad.md` (matriz unificada con diagnóstico de una frase por dimensión), hoja de ruta de lo no corregido con esfuerzo y motivo, y actualizar este archivo.
+6. **Cierre:** `npm run db:reset` (la BD tiene ahora los datos de `db:poblar` y las órdenes de k6), revisar `.env`, keys y tokens (incluidos los JSON de k6, que guardan tokens en `setup_data`), y el commit "Correcciones de rendimiento, seguridad y usabilidad con nueva medición". No unir a master.
+
 ## Lo que falta
 
 1. **Correcciones** en orden de prioridad: primero REN-01, luego las altas de seguridad y después USA-02 y USA-06 (las más baratas y con más efecto). Después de cada una, repetir la medición correspondiente para documentar el "después".

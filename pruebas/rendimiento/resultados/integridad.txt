@@ -110,3 +110,35 @@
  Producto carga C | 99840 |              160 |        160
 (3 rows)
 
+=== Antes de c1_checkout_distribuido_despues (2026-11-12 09:36:24) ===
+      nombre      | stock  | vendidas_pagadas | descontado 
+------------------+--------+------------------+------------
+ Producto carga A | 100000 |                0 |          0
+ Producto carga B | 100000 |                0 |          0
+ Producto carga C | 100000 |                0 |          0
+(3 rows)
+
+=== Después de c1_checkout_distribuido_despues (2026-11-12 09:38:14) ===
+      nombre      | stock | vendidas_pagadas | descontado 
+------------------+-------+------------------+------------
+ Producto carga A | 99858 |              142 |        142
+ Producto carga B | 99813 |              187 |        187
+ Producto carga C | 99834 |              166 |        166
+(3 rows)
+
+=== Antes de c2_checkout_contencion_despues (2026-11-12 09:38:30) ===
+      nombre      | stock | vendidas_pagadas | descontado 
+------------------+-------+------------------+------------
+ Producto carga A | 99858 |              142 |        142
+ Producto carga B | 99813 |              187 |        187
+ Producto carga C | 99834 |              166 |        166
+(3 rows)
+
+=== Después de c2_checkout_contencion_despues (2026-11-12 09:40:22) ===
+      nombre      | stock | vendidas_pagadas | descontado 
+------------------+-------+------------------+------------
+ Producto carga A | 99655 |              345 |        345
+ Producto carga B | 99813 |              187 |        187
+ Producto carga C | 99834 |              166 |        166
+(3 rows)
+
