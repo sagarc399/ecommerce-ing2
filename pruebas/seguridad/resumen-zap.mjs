@@ -8,6 +8,7 @@ const REPORTES = [
   ["Baseline frontend (:4173)", "baseline-frontend.json"],
   ["API con token de cliente", "api-cliente.json"],
   ["API con token de admin", "api-admin.json"],
+  ["Baseline frontend — ANTES_v2 (build de 255fa7d en :4174, ZAP actual)", "baseline-frontend_antes_v2.json"],
   ["Baseline frontend (:4173) — DESPUÉS", "baseline-frontend_despues.json"],
   ["API con token de cliente — DESPUÉS", "api-cliente_despues.json"],
   ["API con token de admin — DESPUÉS", "api-admin_despues.json"],
@@ -18,7 +19,7 @@ const nivel = (a) => a.riskdesc.split(" ")[0];
 for (const [nombre, archivo] of REPORTES) {
   const ruta = join(DIR, archivo);
   if (!existsSync(ruta)) {
-    if (!archivo.includes("_despues")) console.log(`\n${nombre}: SIN REPORTE`);
+    if (!/_despues|_antes_v2/.test(archivo)) console.log(`\n${nombre}: SIN REPORTE`);
     continue;
   }
   const alertas = JSON.parse(readFileSync(ruta, "utf8")).site.flatMap((s) => s.alerts);

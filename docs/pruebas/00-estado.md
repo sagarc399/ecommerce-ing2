@@ -62,8 +62,8 @@ Para repetir las mediciones después de corregir, usa las mismas condiciones: ba
 | — | SEG-11 | Timestamp Disclosure en una dependencia de desarrollo (paso 2.3.1) | **Descartado** (falso positivo) |
 | — | SEG-12 | Token de recarga en caliente de Vite en la URL (paso 2.3.1) | **Descartado** (solo de desarrollo) |
 | 15 | SEG-13 | El login devuelve el token de sesión en el cuerpo JSON (paso 2.3.1) | Informativa |
-| 16 | SEG-14 | La CSP del frontend admite imágenes de cualquier origen `https:` (medición de SEG-04) | Baja |
-| 17 | SEG-15 | Faltan COOP, COEP, CORP y `Permissions-Policy` en el frontend (medición de SEG-04) | Baja |
+| — | SEG-14 | La CSP del frontend admite imágenes de cualquier origen `https:` (medición de SEG-04) | **Riesgo aceptado** (ZAP: Media; propia: Baja) |
+| 16 | SEG-15 | Faltan COOP, COEP, CORP y `Permissions-Policy` en el frontend (ya existía; COEP `require-corp` es incompatible con imágenes externas) | Baja |
 
 ### Usabilidad (severidad de Nielsen, 0 a 4)
 
@@ -85,7 +85,7 @@ Para repetir las mediciones después de corregir, usa las mismas condiciones: ba
 
 ## Progreso de correcciones (completo)
 
-**Paso 2.3.1 (proxy y spider):** hecho el 12 de noviembre: ZAP como proxy con el flujo de Playwright (cliente y admin) y el AJAX spider; frontend de 6 URL (build) a 15 comparables (desarrollo, sin archivos internos de Vite) y 12 endpoints del API. Agregó SEG-13 (Informativa) y dos descartados (SEG-11 y SEG-12), y mostró que SEG-04 seguía abierto en el frontend. **SEG-04 en el frontend** se corrigió después en `frontend/vite.config.ts` (`507ae43`): el ZAP baseline sobre :4173 pasa de Media 2 / Baja 1 a Media 1 / Baja 4, sin las 3 alertas de SEG-04 y con dos hallazgos nuevos (SEG-14 y SEG-15). Total: **32 hallazgos válidos y 2 descartados** (ver `06-matriz-calidad.md`, "Trazabilidad").
+**Paso 2.3.1 (proxy y spider):** hecho el 12 de noviembre: ZAP como proxy con el flujo de Playwright (cliente y admin) y el AJAX spider; frontend de 6 URL (build) a 15 comparables (desarrollo, sin archivos internos de Vite) y 12 endpoints del API. Agregó SEG-13 (Informativa) y dos descartados (SEG-11 y SEG-12), y mostró que SEG-04 seguía abierto en el frontend. **SEG-04 en el frontend** se corrigió después en `frontend/vite.config.ts` (`507ae43`): con el mismo ZAP (ANTES_v2, build sin cabeceras reconstruido en un worktree temporal, frente a DESPUÉS) el baseline pasa de Media 2 / Baja 5 a Media 1 / Baja 4, sin las 3 alertas de SEG-04; SEG-15 ya existía y SEG-14 es un riesgo aceptado. Total: **32 hallazgos válidos (8 corregidos, 1 implementado, 1 riesgo aceptado, 22 en la hoja de ruta) y 2 descartados** (ver `06-matriz-calidad.md`, "Trazabilidad").
 
 **Entregable:** un informe técnico en PDF, sin enfoque de venta, que el usuario arma fuera del repositorio. No queda ninguna tarea pendiente en el repo.
 

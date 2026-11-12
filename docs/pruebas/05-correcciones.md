@@ -111,14 +111,15 @@ Desaparecen "X-Powered-By" (5 instancias) y "X-Content-Type-Options Header Missi
 
 **SEG-04 en el frontend** (`frontend/vite.config.ts`, commit `507ae43`). El paso 2.3.1 mostró que el frontend seguía sin estas cabeceras, porque las pone el servidor que entrega el HTML. Se agregaron en `preview.headers` (build): CSP `default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https:; connect-src 'self' http://localhost:3000; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'`, `X-Frame-Options: DENY` y `nosniff`; en `server.headers` (desarrollo) solo `X-Frame-Options` y `nosniff`, para no romper la recarga en caliente. `img-src` admite `https:` porque con `'self' data:` el navegador bloqueaba la vista previa de imágenes externas del panel admin.
 
-| ZAP baseline sobre el build (:4173), mismo comando del antes | Antes | Después |
-|---|---|---|
-| CSP Header Not Set (Media) | 3 | **0** |
-| Missing Anti-clickjacking Header (Media) | 1 | **0** |
-| X-Content-Type-Options Header Missing (Baja) | 5 | **0** |
-| Alta / Media / Baja / Informativa | 0 / 2 / 1 / 2 | 0 / 1 / 4 / 3 |
+| ZAP baseline sobre el build, mismo comando | ANTES original (5 nov) | ANTES_v2 (ZAP actual) | DESPUÉS |
+|---|---|---|---|
+| CSP Header Not Set (Media) | 3 | 3 | **0** |
+| Missing Anti-clickjacking Header (Media) | 1 | 2 | **0** |
+| X-Content-Type-Options Header Missing (Baja) | 5 | 5 | **0** |
+| Alta / Media / Baja / Informativa | 0 / 2 / 1 / 2 | 0 / 2 / 5 / 3 | 0 / 1 / 4 / 3 |
+| Reglas evaluadas | 62 | 68 | 68 |
 
-Las 3 alertas de SEG-04 desaparecen. Las nuevas se registraron como hallazgos: SEG-14 (comodín `https:` en `img-src`, el compromiso para permitir imágenes externas) y SEG-15 (faltan COOP, COEP, CORP y `Permissions-Policy`), ambas en la hoja de ruta. Verificación: el flujo completo contra el build pasa 9 de 9 con 0 violaciones de CSP, y en desarrollo también 9 de 9, con la recarga en caliente funcionando.
+La comparación válida es **ANTES_v2 frente a DESPUÉS** (mismo ZAP y mismas 68 reglas; el ANTES_v2 es el build sin cabeceras, reconstruido en un worktree temporal en `255fa7d`): Media 2 → 1 y Baja 5 → 4. Las 3 alertas de SEG-04 desaparecen. Queda SEG-15 (faltan COOP, COEP, CORP y `Permissions-Policy`), que ya existía antes del cambio y va a la hoja de ruta, y aparece SEG-14 (comodín `https:` en `img-src`), registrado como riesgo aceptado por decisión de diseño. Verificación: el flujo completo contra el build pasa 9 de 9 con 0 violaciones de CSP, y en desarrollo también 9 de 9, con la recarga en caliente funcionando.
 
 **Efecto en el negocio.** La API y las páginas de la tienda llevan instrucciones explícitas contra *clickjacking*, *MIME sniffing* y fugas por *referrer*, y el servidor deja de anunciar su tecnología a quien lo escanea.
 

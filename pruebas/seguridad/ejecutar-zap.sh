@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Escaneos de OWASP ZAP. Uso (Git Bash, desde la raíz): bash pruebas/seguridad/ejecutar-zap.sh [baseline] [cliente] [admin]
 # Sin argumentos corre los tres. SUFIJO=_despues agrega el sufijo a los reportes (no pisa los del ANTES).
+# PUERTO_FRONTEND=4174 apunta el baseline a otro vite preview (por defecto 4173).
 # Requiere: backend en :3000, vite preview en :4173 (--host 0.0.0.0) y datos de npm run db:poblar.
 # Durante el escaneo conviene CHAT_PROVEEDOR=reglas para no consumir la cuota de Groq.
 cd "$(dirname "$0")/reportes" || exit 1
@@ -36,7 +37,9 @@ sed 's#http://localhost:3000/api#http://host.docker.internal:3000/api#' ../../..
 
 if quiere baseline; then
   echo ">>> baseline frontend ($(date '+%H:%M:%S'))"
-  zap zap-baseline.py -t http://host.docker.internal:4173 -I -r "baseline-frontend$SUFIJO.html" -J "baseline-frontend$SUFIJO.json" 2>&1 | tail -6
+  # La salida completa (lista de reglas PASS/WARN) queda en baseline-frontend$SUFIJO.log.
+  zap zap-baseline.py -t "http://host.docker.internal:${PUERTO_FRONTEND:-4173}" -I -r "baseline-frontend$SUFIJO.html" -J "baseline-frontend$SUFIJO.json" 2>&1 |
+    tee "baseline-frontend$SUFIJO.log" | tail -6
 fi
 
 if quiere cliente; then

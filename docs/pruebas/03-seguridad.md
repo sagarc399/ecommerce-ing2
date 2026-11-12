@@ -75,23 +75,29 @@ Endpoints alcanzados navegando: `GET /productos`, `/productos/:id`, `/productos/
 
 **Verificación funcional** (build en :4173 con CORS del backend apuntado temporalmente a :4173): `APP_URL=http://localhost:4173 node pruebas/regresion/flujo.mjs` → 9 de 9 pasos, **0 violaciones de CSP** (`pruebas/regresion/resultados/flujo-build-csp.txt`); la vista previa de una imagen externa en el panel admin ya no viola la CSP. En desarrollo (:5173) el flujo también pasa 9 de 9 y la recarga en caliente responde.
 
-**Medición con el mismo método del baseline original** (`SUFIJO=_despues bash pruebas/seguridad/ejecutar-zap.sh baseline`, ZAP 2.17.0 sobre :4173; `reportes/baseline-frontend_despues.*`):
+**Medición con el mismo método del baseline original** (`ejecutar-zap.sh baseline`, ZAP 2.17.0 sobre el build servido con `vite preview`). Hay tres corridas:
 
-| Alerta del frontend | Antes (5 nov) | Después (12 nov) |
-|---|---|---|
-| Content Security Policy (CSP) Header Not Set — Media | 3 instancias | **desaparece** |
-| Missing Anti-clickjacking Header — Media | 1 | **desaparece** |
-| X-Content-Type-Options Header Missing — Baja | 5 | **desaparece** |
-| CSP: Wildcard Directive — Media | — | **nueva**, 3 (por `https:` en `img-src`): **SEG-14** |
-| Cross-Origin-Embedder/Opener/Resource-Policy Missing — Baja | — | **nueva**, 3 + 3 + 5: **SEG-15** |
-| Permissions Policy Header Not Set — Baja | — | **nueva**, 4: **SEG-15** |
-| Suspicious Comments — Informativa | 1 | 1 (código de terceros en el bundle) |
-| Modern Web Application — Informativa | 3 | 3 |
-| Storable but Non-Cacheable Content — Informativa | — | 5 (esperada) |
-| **Total por severidad (Alta / Media / Baja / Informativa)** | **0 / 2 / 1 / 2** | **0 / 1 / 4 / 3** |
-| Reglas que pasaron | 57 | 62 |
+- **ANTES original** (5 de noviembre): `reportes/baseline-frontend.*`.
+- **ANTES_v2** (12 de noviembre): el mismo build **sin** las cabeceras, reconstruido en un `git worktree` temporal en `255fa7d` (antes del cambio de `vite.config.ts`) y servido en :4174; `PUERTO_FRONTEND=4174 SUFIJO=_antes_v2 bash pruebas/seguridad/ejecutar-zap.sh baseline` → `reportes/baseline-frontend_antes_v2.*` (incluye la lista completa de reglas en `.log`). El worktree se borró al terminar.
+- **DESPUÉS** (12 de noviembre): el build con las cabeceras en :4173; `reportes/baseline-frontend_despues.*`.
 
-Las 3 alertas que definían SEG-04 en el frontend desaparecen: **SEG-04 queda corregido en la API y en el frontend**. Aparecen alertas nuevas: la de comodín es consecuencia directa de admitir imágenes `https:` (SEG-14), y las de aislamiento entre orígenes y `Permissions-Policy` (SEG-15) son cabeceras que ZAP no reportó en la corrida del 5 de noviembre. Ambas corridas usaron ZAP 2.17.0 y el mismo comando; en la segunda se evaluaron 62 reglas frente a 57, probablemente porque `zap-baseline.py` actualiza los complementos al arrancar (no se pudo confirmar).
+| Alerta del frontend | ANTES original (5 nov) | ANTES_v2 (ZAP actual) | DESPUÉS |
+|---|---|---|---|
+| Content Security Policy (CSP) Header Not Set — Media | 3 | 3 | **0** |
+| Missing Anti-clickjacking Header — Media | 1 | 2 | **0** |
+| X-Content-Type-Options Header Missing — Baja | 5 | 5 | **0** |
+| CSP: Wildcard Directive — Media | — | — | 3 (**SEG-14**, por `https:` en `img-src`) |
+| Cross-Origin-Embedder/Opener/Resource-Policy Missing — Baja | no se evaluaba | 3 + 3 + 5 | 3 + 3 + 5 (**SEG-15**) |
+| Permissions Policy Header Not Set — Baja | no se evaluaba | 4 | 4 (**SEG-15**) |
+| Storable but Non-Cacheable Content — Informativa | no se evaluaba | 5 | 5 |
+| Suspicious Comments — Informativa | 1 | 1 | 1 |
+| Modern Web Application — Informativa | 3 | 3 | 3 |
+| **Alta / Media / Baja / Informativa (reglas con alerta)** | **0 / 2 / 1 / 2** | **0 / 2 / 5 / 3** | **0 / 1 / 4 / 3** |
+| Reglas evaluadas (PASS + WARN) | 62 (57 + 5) | 68 (60 + 8) | 68 (62 + 6) |
+
+**La comparación válida para el informe es ANTES_v2 frente a DESPUÉS**: mismo ZAP, mismas 68 reglas, mismo comando y mismo tipo de servidor; lo único que cambia es `vite.config.ts`. El ANTES original no es comparable porque evaluó 6 reglas menos: `zap-baseline.py` actualiza sus reglas pasivas al arrancar, y entre el 5 y el 12 de noviembre entraron reglas nuevas. Tres de ellas se identifican porque en el ANTES_v2 alertan sobre el build viejo, que tampoco tenía esas cabeceras: **10049** (Storable but Non-Cacheable), **10063** (Permissions Policy) y **90004** (Cross-Origin Policies). Las otras tres no se pueden identificar: los reportes JSON y HTML de ZAP solo guardan las reglas con alerta, y la lista de reglas que pasaron del 5 de noviembre no se guardó (desde ahora el script la guarda en `baseline-frontend<sufijo>.log`).
+
+Con la comparación válida: **Media 2 → 1, Baja 5 → 4, Informativa 3 → 3**. Desaparecen las 3 alertas de SEG-04 (CSP, anti-clickjacking y `nosniff`), aparece una por el comodín `https:` de `img-src` (SEG-14, riesgo aceptado) y **SEG-15 ya existía antes del cambio**: no lo causó la corrección, solo no se detectaba con las reglas del 5 de noviembre.
 
 ### Análisis pedido por el enunciado (Módulo 3, punto 3)
 
@@ -144,7 +150,7 @@ Pruebas adicionales:
 | SEG-11 | Timestamp Disclosure en una dependencia del servidor de desarrollo | **Descartado** (falso positivo) | No aplica |
 | SEG-12 | Token en la URL del servidor de desarrollo de Vite (recarga en caliente) | **Descartado** (solo de desarrollo) | No aplica |
 | SEG-13 | El login devuelve el token de sesión en el cuerpo JSON | Informativa | A07 Fallas de autenticación |
-| SEG-14 | La CSP del frontend admite imágenes de cualquier origen `https:` | Baja (ZAP: Media) | A02 Configuración de seguridad incorrecta |
+| SEG-14 | La CSP del frontend admite imágenes de cualquier origen `https:` | **Riesgo aceptado** (ZAP: Media; propia: Baja) | A02 Configuración de seguridad incorrecta |
 | SEG-15 | Faltan cabeceras de aislamiento entre orígenes (COOP, COEP, CORP) y `Permissions-Policy` en el frontend | Baja | A02 Configuración de seguridad incorrecta |
 
 ### SEG-01 — Denegación de servicio con 10 checkouts simultáneos (Alta)
@@ -225,17 +231,17 @@ Pruebas adicionales:
 - **Análisis:** es el diseño actual y no es una vulnerabilidad por sí mismo; el riesgo está en que el frontend lo guarda donde JavaScript puede leerlo (SEG-03). Encontrado en el paso 2.3.1.
 - **Destino:** hoja de ruta junto con SEG-03 (cookie `HttpOnly`), esfuerzo Alto.
 
-### SEG-14 — La CSP del frontend admite imágenes de cualquier origen `https:` (Baja)
+### SEG-14 — La CSP del frontend admite imágenes de cualquier origen `https:` (Riesgo aceptado: ZAP Media, propia Baja)
 
 - **Descripción:** ZAP (regla 10055, riesgo Medio) marca `img-src 'self' data: https:` como directiva con comodín.
 - **Análisis:** es el compromiso elegido para que el admin pueda usar imágenes externas. Una imagen no ejecuta código: `script-src`, `style-src`, `connect-src` y `frame-ancestors` siguen cerrados. El riesgo que queda es cargar imágenes de terceros (rastreo o contenido engañoso puesto por un admin). Por eso se clasifica como **Baja** en la escala de este informe, aunque ZAP la reporte como Media. Encontrado en la medición del después de SEG-04.
-- **Destino:** hoja de ruta, esfuerzo Medio: subir las imágenes al propio servidor o permitir solo una lista de dominios.
+- **Destino:** **riesgo aceptado (decisión de diseño)**, fuera de la hoja de ruta: se eligió permitir imágenes externas en el panel admin. Si se quisiera cerrar: subir las imágenes al propio servidor o permitir solo una lista de dominios (esfuerzo Medio).
 
 ### SEG-15 — Faltan cabeceras de aislamiento y `Permissions-Policy` en el frontend (Baja)
 
 - **Descripción:** ZAP (reglas 90004 y 10063, riesgo Bajo) reporta la ausencia de `Cross-Origin-Opener-Policy`, `Cross-Origin-Embedder-Policy`, `Cross-Origin-Resource-Policy` y `Permissions-Policy` en el build.
-- **Análisis:** son defensas adicionales contra ataques de canal lateral entre pestañas y para restringir APIs del navegador (cámara, micrófono…), que la app no usa. Encontrado en la medición del después de SEG-04.
-- **Destino:** hoja de ruta, esfuerzo Bajo: agregar `Cross-Origin-Opener-Policy: same-origin`, `Cross-Origin-Resource-Policy: same-origin` y una `Permissions-Policy` restrictiva en `preview.headers` (COEP `require-corp` bloquearía las imágenes externas de SEG-14).
+- **Análisis:** son defensas adicionales contra ataques de canal lateral entre pestañas y para restringir APIs del navegador (cámara, micrófono…), que la app no usa. **Ya existía antes de la corrección de SEG-04**: aparece igual en el ANTES_v2; el ZAP del 5 de noviembre no tenía esas reglas.
+- **Destino:** hoja de ruta, esfuerzo Bajo: agregar `Cross-Origin-Opener-Policy: same-origin`, `Cross-Origin-Resource-Policy: same-origin` y una `Permissions-Policy` restrictiva en `preview.headers`. **`Cross-Origin-Embedder-Policy: require-corp` es incompatible con las imágenes externas** (SEG-14): el navegador bloquearía toda imagen de otro origen que no envíe `Cross-Origin-Resource-Policy`, así que COEP no se activaría o se usaría `credentialless`.
 
 ## Controles que funcionaron
 
