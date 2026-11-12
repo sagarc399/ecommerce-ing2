@@ -1,0 +1,57 @@
+Paso 2.3.1 — ZAP como proxy + AJAX spider — 2026-11-12T20:18:16.914Z
+Nota: las evidencias de esta lista se restauraron a mano con los valores de la primera extracción, porque una segunda extracción las dañó (una expresión regular mal escrita borró las letras "s") y ZAP ya estaba detenido. Los conteos de URL y de alertas no se afectaron.
+Mensajes HTTP registrados por ZAP: 8879
+
+URL únicas (sin query): frontend 15, recursos de Vite 65, API 32 (12 endpoints distintos sin contar OPTIONS)
+
+Frontend (rutas y archivos de la app):
+  http://localhost:5173/
+  http://localhost:5173/favicon.svg
+  http://localhost:5173/productos
+  http://localhost:5173/productos/audifonos-bluetooth.jpg
+  http://localhost:5173/productos/balon-futbol.jpg
+  http://localhost:5173/productos/cafetera-goteo.jpg
+  http://localhost:5173/productos/camiseta-deportiva.jpg
+  http://localhost:5173/productos/chaqueta-impermeable.jpg
+  http://localhost:5173/productos/juego-sabanas.jpg
+  http://localhost:5173/productos/lampara-escritorio-led.jpg
+  http://localhost:5173/productos/mancuernas-5kg.jpg
+  http://localhost:5173/productos/mat-yoga.jpg
+  http://localhost:5173/productos/monitor-24.jpg
+  http://localhost:5173/productos/mouse-inalambrico.jpg
+  http://localhost:5173/productos/teclado-mecanico.jpg
+
+API (método y ruta, ids como :id):
+  GET /api/admin/productos
+  GET /api/auth/me
+  GET /api/ordenes/:id
+  GET /api/ordenes/mias
+  GET /api/productos
+  GET /api/productos/:id
+  GET /api/productos/categorias
+  OPTIONS /api/admin/productos
+  OPTIONS /api/auth/login
+  OPTIONS /api/auth/me
+  OPTIONS /api/auth/registro
+  OPTIONS /api/chat
+  OPTIONS /api/ordenes
+  OPTIONS /api/ordenes/:id
+  OPTIONS /api/ordenes/mias
+  OPTIONS /api/productos
+  OPTIONS /api/productos/categorias
+  POST /api/auth/login
+  POST /api/auth/registro
+  POST /api/chat
+  POST /api/ordenes
+  POST /api/productos
+
+Alertas pasivas: 80 instancias en 9 reglas
+  [Medium] Content Security Policy (CSP) Header Not Set (plugin 10038, CWE 693) — frontend 1, vite 0, api 0 — ej.: GET /
+  [Medium] Missing Anti-clickjacking Header (plugin 10020, CWE 1021) — frontend 1, vite 0, api 0 — ej.: GET /
+  [Low] Timestamp Disclosure - Unix (plugin 10096, CWE 497) — frontend 0, vite 1, api 0 — ej.: GET /node_modules/.vite/deps/react-dom_client.js — evidencia: 2080374784
+  [Low] X-Content-Type-Options Header Missing (plugin 10021, CWE 693) — frontend 14, vite 50, api 0 — ej.: GET /
+  [Informational] Authentication Request Identified (plugin 10111, CWE -1) — frontend 0, vite 0, api 3 — ej.: POST /api/auth/registro — evidencia: password
+  [Informational] Information Disclosure - Sensitive Information in URL (plugin 10024, CWE 598) — frontend 1, vite 0, api 0 — ej.: GET / — evidencia: token
+  [Informational] Information Disclosure - Suspicious Comments (plugin 10027, CWE 615) — frontend 0, vite 7, api 0 — ej.: GET /@react-refresh — evidencia: er's tag is derived from the kind of its typ
+  [Informational] Modern Web Application (plugin 10109, CWE -1) — frontend 1, vite 0, api 0 — ej.: GET / — evidencia: <script type="module">import { injectIntoGlobalHook } from "/@react-refresh"; injectIntoGlobalHook(window); window.$Refr
+  [Informational] Session Management Response Identified (plugin 10112, CWE -1) — frontend 0, vite 0, api 1 — ej.: POST /api/auth/login — evidencia: token

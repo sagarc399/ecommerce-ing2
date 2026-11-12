@@ -24,9 +24,11 @@ Umbrales de referencia: lecturas p95 < 500 ms; escrituras p95 < 1500 ms; errores
 | | ¿El servidor se bloquea? / órdenes sin respuesta | Sí / 10 | **No / 0** | | |
 | | Login con 30 VUs: p95 y errores | 2,51 s, 0 % | 1,21 s, 0 % (por variación del equipo, no por un cambio) | | |
 | | Integridad del stock y concurrencia | Cuadra | Cuadra; 3 de 3 superadas | | |
-| **Seguridad** (OWASP ZAP + pruebas manuales) | ZAP API con token de cliente: Alta / Media / Baja / Informativa | 0 / 0 / 3 / 3 | 0 / 0 / **1** / 3 | SEG-03 (Media): token en `localStorage` y sin revocación | Requiere mejora → **Aceptable** |
+| **Seguridad** (OWASP ZAP + pruebas manuales) | ZAP API con token de cliente: Alta / Media / Baja / Informativa | 0 / 0 / 3 / 3 | 0 / 0 / **1** / 3 | SEG-03 (Media): token en `localStorage` y sin revocación; SEG-04 en el frontend (Media) | Requiere mejora → **Aceptable** |
 | | Fuerza bruta: 50 intentos fallidos | 50 aceptados | **5** aceptados, 45 bloqueados (429) | SEG-06, SEG-07, SEG-08, SEG-10 (Bajas) | |
 | | Cabeceras de seguridad en la API | 0 de 5, `X-Powered-By: Express` | **5 de 5**, sin `X-Powered-By` | | |
+| | Cabeceras de seguridad en el frontend (ZAP por proxy) | CSP, X-Frame-Options y nosniff ausentes | **Sin cambios** (no se corrigió: dependen del servidor web que entrega el HTML) | SEG-11, SEG-12, SEG-13 (Informativas) | |
+| | Rutas mapeadas por ZAP (paso 2.3.1) | 6 URL del frontend (spider tradicional) | 15 URL del frontend y 12 endpoints del API (proxy + AJAX spider) | | |
 | | Base de datos desde la red local con `postgres/postgres` | Conecta | **Puerto cerrado**; por loopback, clave rechazada | | |
 | | Autobloqueo con 10 compras (SEG-01, disponibilidad) | Sí | **No** | | |
 | | Inyección SQL (14 cargas), XSS almacenado, IDOR, asignación masiva, errores que revelan el servidor | No explotables; ningún error filtra stack ni detalles de PostgreSQL | Igual; IDOR del chatbot sin fuga en la regresión | | |
@@ -41,14 +43,14 @@ Umbrales de referencia: lecturas p95 < 500 ms; escrituras p95 < 1500 ms; errores
 ## Diagnóstico por dimensión
 
 - **Rendimiento:** nuestra app resiste bien la carga de lectura (catálogo de 50 usuarios con 8 ms de p95) y ya no se cae con compras simultáneas, pero el checkout sigue lento bajo contención porque el pago simulado retiene el bloqueo del producto 500 ms.
-- **Seguridad:** nuestra app no tiene vulnerabilidades altas ni medias según ZAP, protege el login contra fuerza bruta y ya no expone la base de datos, pero el token de sesión vive en `localStorage` y no se puede revocar.
+- **Seguridad:** nuestra API no tiene alertas altas ni medias según ZAP, protege el login contra fuerza bruta y ya no expone la base de datos, pero el token de sesión vive en `localStorage` y no se puede revocar, y el frontend todavía no envía cabeceras de seguridad (CSP, X-Frame-Options).
 - **Usabilidad:** nuestra app se usa con éxito (SUS 75, "Bueno") y ahora cumple el contraste de WCAG 2.1 AA en todas las pantallas, pero falla a los usuarios con menos experiencia en puntos como la recuperación de contraseña y la confirmación de acciones.
 
 **En una frase:** Tienda USCO pasó de "Requiere mejora" a "Aceptable" en las tres dimensiones, con los tres problemas críticos corregidos y medidos, y con una hoja de ruta concreta para lo que falta.
 
 ## Trazabilidad de todos los hallazgos (paso 3.2 de la metodología)
 
-Cada hallazgo de `02`, `03` y `04` (y la observación de la regresión) tiene destino: **9 corregidos** con su commit y **20 en la hoja de ruta** con su esfuerzo. **Ningún hallazgo queda sin destino.** Las severidades de usabilidad son de Nielsen (0 a 4).
+Los **32 hallazgos** de `02`, `03` y `04` (incluidos los 3 del paso 2.3.1 y la observación de la regresión) tienen destino: **8 corregidos** con su commit, **1 implementado** como compromiso (USA-03) y **23 en la hoja de ruta** con su esfuerzo. **Ningún hallazgo queda sin destino.** Las severidades de usabilidad son de Nielsen (0 a 4).
 
 | ID | Hallazgo | Severidad | Destino |
 |---|---|---|---|
@@ -57,19 +59,22 @@ Cada hallazgo de `02`, `03` y `04` (y la observación de la regresión) tiene de
 | REN-03 | Pago simulado de 500 ms con el bloqueo de filas | Media | Hoja de ruta, esfuerzo Alto |
 | REN-04 | Login lento con 30 VUs (`bcryptjs`) | Media | Hoja de ruta, esfuerzo Bajo |
 | REN-05 | Medición en modo desarrollo en un portátil | Informativa | Hoja de ruta, esfuerzo Medio |
-| SEG-01 | Denegación de servicio con 10 checkouts (mismo defecto que REN-01) | Alta en `03`; Crítica junto con REN-01 en `00` | **Corregido**, `a76c206` (mismo cambio que REN-01) |
+| SEG-01 | Denegación de servicio con 10 checkouts (mismo defecto que REN-01) | Alta | **Corregido**, `a76c206` (mismo cambio que REN-01) |
 | SEG-02 | Login sin límite de intentos | Alta | **Corregido**, `a76c206` (código y prueba de fuerza bruta) |
 | SEG-03 | Token en `localStorage` y sin revocación | Media | Hoja de ruta, esfuerzo Alto |
-| SEG-04 | Faltan cabeceras de seguridad | Media | **Corregido**, `a76c206` (código; ZAP del después en `fff72eb`) |
+| SEG-04 | Faltan cabeceras de seguridad | Media | **Corregido en la API**, `a76c206` (ZAP del después en `fff72eb`); **en el frontend sigue abierto** (paso 2.3.1): hoja de ruta, esfuerzo Bajo |
 | SEG-05 | `X-Powered-By: Express` | Baja | **Corregido**, `a76c206` (código; ZAP del después en `fff72eb`) |
 | SEG-06 | Enumeración de usuarios por tiempo | Baja | Hoja de ruta, esfuerzo Bajo |
 | SEG-07 | 500 con byte nulo o cuerpo grande | Baja | Hoja de ruta, esfuerzo Bajo |
 | SEG-08 | Política de contraseñas débil | Baja | Hoja de ruta, esfuerzo Bajo |
 | SEG-09 | BD en `0.0.0.0:5434` con contraseña `postgres` | Media | **Corregido**, `8391d27` |
 | SEG-10 | Sin registro de eventos de seguridad | Baja | Hoja de ruta, esfuerzo Medio |
+| SEG-11 | Timestamp Disclosure en una dependencia de desarrollo (falso positivo) | Informativa | Hoja de ruta, esfuerzo Bajo |
+| SEG-12 | Token de recarga en caliente de Vite en la URL (solo desarrollo) | Informativa | Hoja de ruta, esfuerzo Bajo |
+| SEG-13 | El login devuelve el token de sesión en el cuerpo JSON | Informativa | Hoja de ruta con SEG-03, esfuerzo Alto |
 | USA-01 | "Mis pedidos" sin productos ni paginación | 2 | Hoja de ruta, esfuerzo Medio |
 | USA-02 | Contraste insuficiente (43 elementos) | 3 | **Corregido**, `60e7393` (axe 43 → 0 graves) |
-| USA-03 | Tras un rechazo hay que reescribir la tarjeta | 2 | **Corregido**, `df10b04` (aplicado como compromiso usabilidad-seguridad, no como mejora) |
+| USA-03 | Tras un rechazo hay que reescribir la tarjeta | 2 | **Implementado (compromiso usabilidad-seguridad)**, `df10b04` |
 | USA-04 | En el celular la notificación de rechazo tapa el resumen | 1 | Hoja de ruta, esfuerzo Bajo |
 | USA-05 | Vaciar carrito y Quitar sin confirmación | 2 | Hoja de ruta, esfuerzo Bajo |
 | USA-06 | Agregar al carrito casi sin confirmación | 2 | Hoja de ruta, esfuerzo Bajo |
@@ -82,7 +87,6 @@ Cada hallazgo de `02`, `03` y `04` (y la observación de la regresión) tiene de
 | USA-13 | "Respuesta automática" sin explicación | 1 | Hoja de ruta, esfuerzo Bajo |
 | OBS-01 | En el IDOR del chatbot, el modelo pide "iniciar sesión" a un usuario con sesión | Informativa | Hoja de ruta, esfuerzo Bajo |
 
-Nota sobre SEG-01: `03-seguridad.md` lo clasifica como Alta desde el punto de vista de seguridad (denegación de servicio), mientras que `00-estado.md` lo agrupa con REN-01 como Crítica. Es el mismo defecto y la misma corrección.
 
 ## Brechas frente al enunciado
 
@@ -90,7 +94,6 @@ Lo que la auditoría de cobertura encontró sin cubrir del todo y que **requiere
 
 | Paso | Brecha | Qué haría falta |
 |---|---|---|
-| 2.3.1 | No hubo una sesión de navegación manual con el navegador configurado contra el proxy de ZAP, y el spider tradicional solo mapeó 6 URL de la SPA | Navegar la app (cliente y admin) con el navegador a través del proxy de ZAP, o correr el *AJAX spider*, y guardar el árbol de sitios |
 | 2.2.1–2.2.3 y Módulo 2 | La prueba cruzada con otro equipo se reemplazó por perfiles simulados (desviación declarada y autorizada) | Solo si el docente lo pide: una sesión con un evaluador externo real y su SUS |
 
 ## Hoja de ruta (lo que no se corrigió)
@@ -115,3 +118,7 @@ Esfuerzo estimado para un desarrollador que ya conoce el proyecto: **Bajo** (men
 | 14 | OBS-01 | En el IDOR del chatbot, el modelo le pide "iniciar sesión" a un usuario que sí la tiene | Informativa | Bajo | No hay fuga: el filtro está en el SQL | Respuesta fija cuando la herramienta devuelve "Pedido no encontrado" |
 | 15 | USA-04, 10, 11, 12, 13 | Detalles del celular, filtros, landmarks y el aviso "Respuesta automática" | 1 | Bajo | Severidad cosmética | Ajustes de interfaz (ver `04-usabilidad.md`) |
 | 16 | REN-05 | Medición en modo desarrollo en un portátil | Informativa | Medio | Limitación del entorno de la práctica | Repetir k6 con el build de producción en un servidor dedicado |
+| 17 | SEG-04 (frontend) | El frontend no envía CSP, X-Frame-Options ni `nosniff` | Media | Bajo | La corrección de esta entrega cubrió la API; en el frontend dependen del servidor web | Definir las cabeceras en el servidor que sirva el build (o en `preview.headers` de Vite) y repetir el baseline |
+| 18 | SEG-13 | Token de sesión en el cuerpo JSON del login | Informativa | Alto | Es el diseño actual; se resuelve con SEG-03 | Cookie `HttpOnly` (ver SEG-03) |
+| 19 | SEG-12 | Token de recarga en caliente en la URL (solo desarrollo) | Informativa | Bajo | No existe en producción | Entregar y evaluar el build de producción (con REN-05) |
+| 20 | SEG-11 | Timestamp Disclosure en una dependencia de desarrollo | Informativa | Bajo | Falso positivo | Confirmarlo con un baseline del build y marcarlo en ZAP |

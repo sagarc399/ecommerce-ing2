@@ -32,9 +32,40 @@ Notas del escaneo:
 
 ### Mapeo de rutas: spider y proxy (paso 2.3.1)
 
-- **Spider de ZAP:** sí se usó. El escaneo baseline ejecuta el spider tradicional de ZAP sobre el frontend (`zap-baseline.py`, 1 minuto) y mapeó 6 URL: `/`, `/robots.txt`, `/sitemap.xml`, `/favicon.svg` y los dos *assets* (JS y CSS) (`pruebas/seguridad/reportes/baseline-frontend.json`). Encuentra tan pocas porque la app es una SPA: las rutas (`/carrito`, `/checkout`, `/admin`…) las dibuja React en el navegador y el spider tradicional no ejecuta JavaScript.
-- **Rutas del backend:** se mapearon importando la especificación OpenAPI (`docs/openapi.yaml`, 17 endpoints) en `zap-api-scan.py`, con el token de cliente y de admin inyectado por una regla *replacer*. Es el equivalente al mapeo por proxy para una API REST.
-- **Pendiente (requiere ejecutar una prueba nueva):** el enunciado pide "interceptar el tráfico de su propia aplicación web mientras navegan por ella". No se hizo una sesión de navegación manual con el navegador configurado contra el proxy de ZAP, ni se usó el *AJAX spider*, que sí ejecuta JavaScript. Ver `06-matriz-calidad.md`, "Brechas frente al enunciado".
+**Primer mapeo (estado inicial).** El escaneo baseline ejecutó el spider tradicional de ZAP sobre el build de producción servido con `vite preview` (:4173) y mapeó solo 6 URL: `/`, `/robots.txt`, `/sitemap.xml`, `/favicon.svg` y los dos *assets* (JS y CSS). La app es una SPA: las rutas (`/carrito`, `/checkout`, `/admin`…) las dibuja React en el navegador y el spider tradicional no ejecuta JavaScript. Las rutas del backend se mapearon importando `docs/openapi.yaml` (17 endpoints) en `zap-api-scan.py`.
+
+**Proxy de intercepción y AJAX spider (12 de noviembre de 2026).** Para cumplir lo que pide el enunciado ("interceptar el tráfico de su propia aplicación web mientras navegan por ella"):
+
+1. ZAP 2.17.0 en modo daemon como proxy en `127.0.0.1:8090` (contenedor `zaproxy/zap-stable`), con `CHAT_PROVEEDOR=reglas` durante la prueba y `groq` al final. Como ZAP corre en Docker y la app en el `localhost` del equipo, un contenedor auxiliar con la misma imagen y la misma red de ZAP reenvía su `localhost:5173` y `localhost:3000` al equipo, y en Windows un reenvío local pasa de `127.0.0.1:5174` a `[::1]:5173` (el servidor de Vite solo escucha en IPv6).
+2. **Navegación interceptada como cliente y como admin:** `PROXY=http://127.0.0.1:8090 node pruebas/regresion/flujo.mjs` (Chromium de Playwright con `--proxy-bypass-list=<-loopback>`, porque Chromium no usa el proxy para `localhost` por defecto): registro → carrito → compra aprobada → rechazo y reintento → mis pedidos → salir → admin crea producto. 8 de 8 pasos (`pruebas/regresion/resultados/flujo-proxy.txt`).
+3. **AJAX spider** de ZAP (Firefox headless, 3 minutos) sobre `http://localhost:5173/`.
+4. Extracción del árbol de sitios y de las alertas pasivas: `node pruebas/seguridad/extraer-zap-proxy.mjs` → `pruebas/seguridad/proxy/arbol-sitios.json`, `alertas-pasivas.json` y `resumen.txt`.
+
+| URL mapeadas | Antes (spider tradicional del baseline) | Después (proxy + AJAX spider) |
+|---|---|---|
+| Objetivo | Build de producción en `vite preview` :4173 | Servidor de desarrollo :5173 y API :3000 |
+| Mensajes HTTP registrados | No aplica | 8879 |
+| URL únicas del frontend (sin query) | 6 | 15 (`/`, `/favicon.svg` y las imágenes de `/productos/`) |
+| Recursos del servidor de desarrollo de Vite (`/src`, `/node_modules`, `/@vite`…) | No aplica | 65 (no existen en el build de producción) |
+| URL únicas del API | 0 (se mapeó por OpenAPI) | 32 URL; **12 endpoints distintos** (sin contar `OPTIONS`) de los 17 del inventario |
+
+Endpoints alcanzados navegando: `GET /productos`, `/productos/:id`, `/productos/categorias`, `/auth/me`, `/ordenes/mias`, `/ordenes/:id`, `/admin/productos`; `POST /auth/registro`, `/auth/login`, `/ordenes`, `/productos` y `/chat` (este último lo disparó el AJAX spider al abrir el chat). No se alcanzaron `PUT`, `DELETE` y `PATCH` de productos, `GET /admin/ordenes` ni `GET /health`, porque el flujo no edita ni desactiva productos ni abre las órdenes del admin; esos endpoints sí estaban en el escaneo por OpenAPI. Las rutas de la SPA (`/carrito`, `/checkout`, `/pedidos`, `/admin`…) no aparecen como URL porque React cambia de pantalla sin pedir nada al servidor.
+
+**Alertas pasivas** (80 instancias en 9 reglas, ninguna alta):
+
+| Regla de ZAP | Riesgo ZAP | Frontend / Vite / API | ¿Nueva? | Clasificación |
+|---|---|---|---|---|
+| Content Security Policy (CSP) Header Not Set (10038) | Media | 1 / 0 / 0 | No (estaba en el baseline) | **SEG-04 sigue abierto en el frontend** |
+| Missing Anti-clickjacking Header (10020) | Media | 1 / 0 / 0 | No | SEG-04 en el frontend |
+| X-Content-Type-Options Header Missing (10021) | Baja | 14 / 50 / 0 | No | SEG-04 en el frontend |
+| Timestamp Disclosure - Unix (10096) | Baja | 0 / 1 / 0 | **Sí** | **SEG-11** (falso positivo) |
+| Information Disclosure - Sensitive Information in URL (10024) | Informativa | 1 / 0 / 0 | **Sí** | **SEG-12** |
+| Session Management Response Identified (10112) | Informativa | 0 / 0 / 1 | **Sí** | **SEG-13** |
+| Authentication Request Identified (10111) | Informativa | 0 / 0 / 3 | No | Esperada |
+| Information Disclosure - Suspicious Comments (10027) | Informativa | 0 / 7 / 0 | No (en el baseline salía en el bundle) | Código de terceros (React) |
+| Modern Web Application (10109) | Informativa | 1 / 0 / 0 | No | Esperada |
+
+**Lo que confirma y lo que revela.** El API no tiene alertas de cabeceras: la corrección de SEG-04 y SEG-05 con `helmet` funciona. Pero el **frontend sigue sin CSP, X-Frame-Options ni `nosniff`**: esas cabeceras las pone el servidor que entrega el HTML (Vite en desarrollo; en producción, el servidor web que sirva el build), no Express. La corrección de SEG-04 solo cubrió la API; la parte del frontend queda en la hoja de ruta. Las evidencias del resumen se restauraron a mano tras un error de extracción, sin afectar los conteos (ver la nota en `proxy/resumen.txt`).
 
 ### Análisis pedido por el enunciado (Módulo 3, punto 3)
 
@@ -84,6 +115,9 @@ Pruebas adicionales:
 | SEG-07 | Errores 500 ante entradas inválidas (byte nulo, cuerpo grande) | Baja | A10 Manejo incorrecto de condiciones excepcionales |
 | SEG-08 | Política de contraseñas débil (solo 8 caracteres) | Baja | A07 Fallas de autenticación |
 | SEG-10 | Sin registro de eventos de seguridad (logins fallidos, 403) | Baja | A09 Fallas de registro y alertas |
+| SEG-11 | Timestamp Disclosure en una dependencia del servidor de desarrollo (falso positivo) | Informativa | No aplica |
+| SEG-12 | Token en la URL del servidor de desarrollo de Vite (recarga en caliente) | Informativa | A02 Configuración de seguridad incorrecta |
+| SEG-13 | El login devuelve el token de sesión en el cuerpo JSON | Informativa | A07 Fallas de autenticación |
 
 ### SEG-01 — Denegación de servicio con 10 checkouts simultáneos (Alta)
 
@@ -144,6 +178,24 @@ Pruebas adicionales:
 - **Descripción:** el backend no registra logins fallidos, 401 ni 403; el único log es `console.error` de los errores 500. Un ataque como el de SEG-02 pasaría inadvertido.
 - **Evidencia:** revisión del código (`errorHandler.ts` es el único `console.*` de los middlewares y de auth).
 - **Corrección:** registro estructurado de eventos de autenticación y autorización, sin contraseñas ni tokens, con alertas ante ráfagas.
+
+### SEG-11 — Timestamp Disclosure en una dependencia de desarrollo (Informativa)
+
+- **Descripción:** ZAP (regla 10096, riesgo Bajo) marca el número `2080374784` en `/node_modules/.vite/deps/react-dom_client.js` como una marca de tiempo Unix.
+- **Análisis:** es `0x7C000000`, una máscara de bits interna de React, no una fecha; además el archivo solo existe en el servidor de desarrollo de Vite. Se clasifica como **falso positivo** (Informativa). Encontrado en el paso 2.3.1 (proxy + AJAX spider).
+- **Destino:** hoja de ruta, esfuerzo Bajo: confirmar con un baseline sobre el build de producción y marcarlo como falso positivo en la configuración de ZAP.
+
+### SEG-12 — Token en la URL del servidor de desarrollo (Informativa)
+
+- **Descripción:** ZAP (regla 10024) encuentra un parámetro `token` en `GET http://localhost:5173/?token=…`.
+- **Análisis:** es el `wsToken` de 12 caracteres que Vite 8.3.5 usa para el WebSocket de recarga en caliente, no el JWT de la app (no empieza por `eyJ`). Solo existe en modo desarrollo. Encontrado en el paso 2.3.1.
+- **Destino:** hoja de ruta, esfuerzo Bajo: entregar y evaluar la app con el build de producción (ligado a REN-05).
+
+### SEG-13 — El login devuelve el token de sesión en el cuerpo JSON (Informativa)
+
+- **Descripción:** ZAP (regla 10112) identifica `POST /api/auth/login` como respuesta de gestión de sesión: el JWT viaja en el campo `token` del JSON.
+- **Análisis:** es el diseño actual y no es una vulnerabilidad por sí mismo; el riesgo está en que el frontend lo guarda donde JavaScript puede leerlo (SEG-03). Encontrado en el paso 2.3.1.
+- **Destino:** hoja de ruta junto con SEG-03 (cookie `HttpOnly`), esfuerzo Alto.
 
 ## Controles que funcionaron
 

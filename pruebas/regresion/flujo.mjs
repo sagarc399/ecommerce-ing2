@@ -2,6 +2,8 @@
 // registro → carrito → compra aprobada → rechazo (USA-03) y reintento → mis pedidos → salir → admin crea producto.
 // Uso (desde la raíz, con npm run dev y datos de db:reset): node pruebas/regresion/flujo.mjs
 // Escribe pruebas/regresion/resultados/flujo.txt.
+// PROXY=http://127.0.0.1:8090 hace pasar el navegador por un proxy (ZAP, paso 2.3.1) y escribe flujo-proxy.txt.
+// Chromium no usa el proxy para localhost salvo con la regla "<-loopback>".
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -22,7 +24,10 @@ const paso = async (nombre, fn) => {
   console.log(lineas.at(-1));
 };
 
-const navegador = await chromium.launch();
+const PROXY = process.env.PROXY;
+const navegador = await chromium.launch(
+  PROXY ? { proxy: { server: PROXY, bypass: "<-loopback>" }, args: ["--proxy-bypass-list=<-loopback>"] } : {}
+);
 const ctx = await navegador.newContext({ viewport: { width: 1366, height: 768 }, locale: "es-CO" });
 const page = await ctx.newPage();
 const erroresConsola = [];
@@ -136,6 +141,6 @@ await paso("8. Sin errores de JavaScript en la consola", async () => {
 await navegador.close();
 lineas.push("", fallos === 0 ? "FLUJO COMPLETO SIN REGRESIONES" : `FLUJO CON ${fallos} FALLAS`);
 mkdirSync(join(AQUI, "resultados"), { recursive: true });
-writeFileSync(join(AQUI, "resultados", "flujo.txt"), `Regresión del flujo en el navegador — ${new Date().toISOString()}\n\n${lineas.join("\n")}\n`);
+writeFileSync(join(AQUI, "resultados", PROXY ? "flujo-proxy.txt" : "flujo.txt"), `Regresión del flujo en el navegador — ${new Date().toISOString()}\n\n${lineas.join("\n")}\n`);
 console.log(lineas.at(-1));
 process.exit(fallos ? 1 : 0);

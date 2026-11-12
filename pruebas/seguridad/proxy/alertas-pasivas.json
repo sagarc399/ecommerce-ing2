@@ -1,0 +1,156 @@
+{
+  "generado": "2026-11-12T20:18:16.914Z",
+  "total": 80,
+  "reglas": [
+    {
+      "regla": "Content Security Policy (CSP) Header Not Set",
+      "pluginId": "10038",
+      "riesgo": "Medium",
+      "confianza": "High",
+      "cwe": "693",
+      "instancias": {
+        "frontend": 1,
+        "vite": 0,
+        "api": 0
+      },
+      "ejemplos": [
+        "GET /"
+      ],
+      "evidencia": ""
+    },
+    {
+      "regla": "Missing Anti-clickjacking Header",
+      "pluginId": "10020",
+      "riesgo": "Medium",
+      "confianza": "Medium",
+      "cwe": "1021",
+      "instancias": {
+        "frontend": 1,
+        "vite": 0,
+        "api": 0
+      },
+      "ejemplos": [
+        "GET /"
+      ],
+      "evidencia": ""
+    },
+    {
+      "regla": "Timestamp Disclosure - Unix",
+      "pluginId": "10096",
+      "riesgo": "Low",
+      "confianza": "Low",
+      "cwe": "497",
+      "instancias": {
+        "frontend": 0,
+        "vite": 1,
+        "api": 0
+      },
+      "ejemplos": [
+        "GET /node_modules/.vite/deps/react-dom_client.js"
+      ],
+      "evidencia": "2080374784"
+    },
+    {
+      "regla": "X-Content-Type-Options Header Missing",
+      "pluginId": "10021",
+      "riesgo": "Low",
+      "confianza": "Medium",
+      "cwe": "693",
+      "instancias": {
+        "frontend": 14,
+        "vite": 50,
+        "api": 0
+      },
+      "ejemplos": [
+        "GET /",
+        "GET /src/main.tsx",
+        "GET /node_modules/.vite/deps/react.js"
+      ],
+      "evidencia": ""
+    },
+    {
+      "regla": "Authentication Request Identified",
+      "pluginId": "10111",
+      "riesgo": "Informational",
+      "confianza": "Low",
+      "cwe": "-1",
+      "instancias": {
+        "frontend": 0,
+        "vite": 0,
+        "api": 3
+      },
+      "ejemplos": [
+        "POST /api/auth/registro",
+        "POST /api/auth/login",
+        "POST /api/auth/login"
+      ],
+      "evidencia": "password"
+    },
+    {
+      "regla": "Information Disclosure - Sensitive Information in URL",
+      "pluginId": "10024",
+      "riesgo": "Informational",
+      "confianza": "Medium",
+      "cwe": "598",
+      "instancias": {
+        "frontend": 1,
+        "vite": 0,
+        "api": 0
+      },
+      "ejemplos": [
+        "GET /"
+      ],
+      "evidencia": "token"
+    },
+    {
+      "regla": "Information Disclosure - Suspicious Comments",
+      "pluginId": "10027",
+      "riesgo": "Informational",
+      "confianza": "Medium",
+      "cwe": "615",
+      "instancias": {
+        "frontend": 0,
+        "vite": 7,
+        "api": 0
+      },
+      "ejemplos": [
+        "GET /@react-refresh",
+        "GET /@react-refresh",
+        "GET /@vite/client"
+      ],
+      "evidencia": "er's tag is derived from the kind of its typ"
+    },
+    {
+      "regla": "Modern Web Application",
+      "pluginId": "10109",
+      "riesgo": "Informational",
+      "confianza": "Medium",
+      "cwe": "-1",
+      "instancias": {
+        "frontend": 1,
+        "vite": 0,
+        "api": 0
+      },
+      "ejemplos": [
+        "GET /"
+      ],
+      "evidencia": "<script type=\"module\">import { injectIntoGlobalHook } from \"/@react-refresh\"; injectIntoGlobalHook(window); window.$Refr"
+    },
+    {
+      "regla": "Session Management Response Identified",
+      "pluginId": "10112",
+      "riesgo": "Informational",
+      "confianza": "Medium",
+      "cwe": "-1",
+      "instancias": {
+        "frontend": 0,
+        "vite": 0,
+        "api": 1
+      },
+      "ejemplos": [
+        "POST /api/auth/login"
+      ],
+      "evidencia": "token"
+    }
+  ]
+}

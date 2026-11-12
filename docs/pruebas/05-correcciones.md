@@ -6,11 +6,11 @@ La práctica pide corregir **al menos un problema crítico en cada una de las tr
 
 | Dimensión | Corrección crítica | Indicador principal | Antes | Después |
 |---|---|---|---|---|
-| Rendimiento | **REN-01 / SEG-01** autobloqueo del backend con 10 compras simultáneas, y REN-02 | Errores en el checkout con contención (C2, 20 VUs) | 44,68 % y el servidor colgado | **0 %**, sin bloqueo |
+| Rendimiento | **REN-01** (Crítica; en seguridad, SEG-01, Alta) autobloqueo del backend con 10 compras simultáneas, y REN-02 | Errores en el checkout con contención (C2, 20 VUs) | 44,68 % y el servidor colgado | **0 %**, sin bloqueo |
 | Seguridad | **SEG-02** login sin límite de intentos | Intentos de fuerza bruta aceptados (50 seguidos) | 50 de 50 | **5** (bloqueo en el intento 6) |
 | Usabilidad | **USA-02** contraste insuficiente (severidad 3) | Violaciones graves de accesibilidad (axe-core, 8 pantallas) | 43 | **0** |
 
-Además se corrigieron SEG-04 y SEG-05 (cabeceras de seguridad) y SEG-09 (base de datos expuesta), y se aplicó USA-03 (conservar la tarjeta tras un rechazo), que se documenta como **análisis de compromiso entre usabilidad y seguridad**, no como mejora.
+Además se corrigieron SEG-04 en la API y SEG-05 (cabeceras de seguridad) y SEG-09 (base de datos expuesta), y se aplicó USA-03 (conservar la tarjeta tras un rechazo), que se documenta como **análisis de compromiso entre usabilidad y seguridad**, no como mejora.
 
 ## Método
 
@@ -32,7 +32,7 @@ Además se corrigieron SEG-04 y SEG-05 (cabeceras de seguridad) y SEG-09 (base d
 
 ## Rendimiento
 
-### REN-01 / SEG-01 — El backend se bloqueaba con 10 compras simultáneas (Crítica) y REN-02 — Órdenes confirmadas sin respuesta (Alta)
+### REN-01 (Crítica) / SEG-01 (Alta) — El backend se bloqueaba con 10 compras simultáneas y REN-02 — Órdenes confirmadas sin respuesta (Alta)
 
 **Causa raíz.** Al final del checkout, `ordenes.controller.ts` leía la orden recién creada con `pool.query` **mientras todavía retenía la conexión de la transacción**. Con 10 compras en curso (el tamaño del pool) las 10 conexiones quedaban ocupadas y cada petición esperaba una conexión libre que nunca llegaba: el servidor dejaba de responder a todo, incluido el catálogo. Las 10 órdenes ya estaban confirmadas en la BD, pero el cliente no recibía respuesta (REN-02: riesgo de que vuelva a pagar).
 
@@ -109,7 +109,9 @@ El límite no afecta a los usuarios legítimos. La mejora de tiempos del escenar
 
 Desaparecen "X-Powered-By" (5 instancias) y "X-Content-Type-Options Header Missing" (5). Queda el 500 con `buscar=%00` (SEG-07, hoja de ruta). Las informativas son esperadas (errores 4xx correctos, el login identificado y respuestas no cacheables).
 
-**Efecto en el negocio.** El navegador del cliente recibe instrucciones explícitas contra *clickjacking*, *MIME sniffing* y fugas por *referrer*, y el servidor deja de anunciar su tecnología a quien lo escanea.
+**Alcance.** La corrección cubre las respuestas de la API. El paso 2.3.1 (ZAP como proxy, ver `03-seguridad.md`) confirmó que el **frontend** sigue sin CSP, X-Frame-Options ni `nosniff`, porque esas cabeceras las pone el servidor que entrega el HTML; esa parte de SEG-04 queda en la hoja de ruta.
+
+**Efecto en el negocio.** Las respuestas de la API llevan instrucciones explícitas contra *clickjacking*, *MIME sniffing* y fugas por *referrer*, y el servidor deja de anunciar su tecnología a quien lo escanea.
 
 ### SEG-09 — Base de datos expuesta a la red con la contraseña por defecto (Media)
 

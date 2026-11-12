@@ -45,7 +45,7 @@ Para repetir las mediciones después de corregir, usa las mismas condiciones: ba
 
 | Prioridad | ID | Hallazgo | Severidad |
 |---|---|---|---|
-| 1 | **REN-01 / SEG-01** | El backend se bloquea por completo con 10 checkouts simultáneos (autobloqueo del pool: `pool.query` en la línea 127 de `ordenes.controller.ts` mientras se retiene la conexión de la transacción) | **Crítica** |
+| 1 | **REN-01** (SEG-01 en seguridad, Alta) | El backend se bloquea por completo con 10 checkouts simultáneos (autobloqueo del pool: `pool.query` en la línea 127 de `ordenes.controller.ts` mientras se retiene la conexión de la transacción) | **Crítica** |
 | 2 | REN-02 | 10 órdenes confirmadas sin respuesta al cliente en cada bloqueo (riesgo de compra doble) | Alta |
 | 3 | SEG-02 | Login sin límite de intentos ni bloqueo | Alta |
 | 4 | SEG-09 | PostgreSQL publicado en `0.0.0.0:5434` con usuario y contraseña `postgres` | Media |
@@ -59,6 +59,9 @@ Para repetir las mediciones después de corregir, usa las mismas condiciones: ba
 | 12 | SEG-10 | Sin registro de eventos de seguridad | Baja |
 | 13 | SEG-05 | Cabecera `X-Powered-By: Express` | Baja |
 | 14 | REN-05 | Mediciones en modo desarrollo, en un portátil compartido con k6 y ZAP | Informativa |
+| 15 | SEG-11 | Timestamp Disclosure en una dependencia de desarrollo (falso positivo; paso 2.3.1) | Informativa |
+| 16 | SEG-12 | Token de recarga en caliente de Vite en la URL (solo desarrollo; paso 2.3.1) | Informativa |
+| 17 | SEG-13 | El login devuelve el token de sesión en el cuerpo JSON (paso 2.3.1) | Informativa |
 
 ### Usabilidad (severidad de Nielsen, 0 a 4)
 
@@ -79,6 +82,8 @@ Para repetir las mediciones después de corregir, usa las mismas condiciones: ba
 | 13 | USA-13 | "Respuesta automática" sin explicación | 1 |
 
 ## Progreso de correcciones (completo)
+
+**Paso 2.3.1 (proxy y spider):** hecho el 12 de noviembre: ZAP como proxy con el flujo de Playwright (cliente y admin) y el AJAX spider; de 6 a 15 URL del frontend y 12 endpoints del API. Agregó SEG-11, SEG-12 y SEG-13 (Informativas) y mostró que SEG-04 sigue abierto en el frontend. Total: 32 hallazgos (ver `06-matriz-calidad.md`, "Trazabilidad").
 
 **Entregable:** un informe técnico en PDF, sin enfoque de venta, que el usuario arma fuera del repositorio. No queda ninguna tarea pendiente en el repo.
 
@@ -155,7 +160,7 @@ La mejora de tiempos **no** se debe al límite, que no abarata bcrypt: es variab
 | Authentication Request Identified (Informativa) | 2 | 2 |
 | Non-Storable Content (Informativa) | 5 | 5 |
 
-Las informativas son esperadas (errores 4xx correctos, el login identificado y respuestas no cacheables). Los escaneos baseline del frontend y de admin no se repitieron: el cambio fue en la API y el escaneo de cliente es el pedido en el plan. SEG-04/05 quedan **cerrados**.
+Las informativas son esperadas (errores 4xx correctos, el login identificado y respuestas no cacheables). Los escaneos baseline del frontend y de admin no se repitieron: el cambio fue en la API y el escaneo de cliente es el pedido en el plan. SEG-04 (en la API) y SEG-05 quedan **cerrados**; el paso 2.3.1 mostró después que el frontend sigue sin esas cabeceras (SEG-04 en el frontend, hoja de ruta).
 
 **SEG-09: BD expuesta con contraseña por defecto** (`pruebas/seguridad/manuales/exposicion-bd-antes.txt` y `exposicion-bd-despues.txt`, script `node pruebas/seguridad/exposicion-bd.mjs antes|despues`). El script intenta conectarse como `postgres` por loopback y por cada IP de red local del equipo (como entraría otro equipo de la misma red), con la clave por defecto y con la del `.env` (que no se imprime).
 
@@ -245,7 +250,7 @@ Observación (no es regresión: `backend/src/chat` no cambia desde la Fase 9): e
 ### Falta del plan, sección por sección
 
 1. **Rendimiento:** completo.
-2. **Seguridad:** completo (SEG-04/05 y SEG-09 cerrados, ver arriba).
+2. **Seguridad:** completo (SEG-04 en la API, SEG-05 y SEG-09 cerrados, ver arriba; SEG-04 sigue abierto en el frontend, según el paso 2.3.1).
 3. **Usabilidad:** completo (USA-02 y USA-03, ver arriba).
 4. **Regresión:** completa (ver arriba).
 5. **Documentación:** completa. `05-correcciones.md` (causa raíz, cambio, ANTES/DESPUÉS y efecto en el negocio; USA-03 como análisis de compromiso) y `06-matriz-calidad.md` (matriz unificada, calificación Requiere mejora → Aceptable en las tres dimensiones, diagnóstico por dimensión y hoja de ruta con esfuerzo y motivo).
