@@ -4,7 +4,7 @@ dist/
 .claude/
 
 # Insumos para el informe (se arman fuera del repositorio)
-entrega/
+/entrega/
 
 # Variables del despliegue con Docker Compose (solo se versiona .env.compose.example)
 .env.compose
