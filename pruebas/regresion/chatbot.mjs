@@ -7,7 +7,8 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const API = "http://localhost:3000/api";
+// API_URL (con /api) permite correrla contra otro despliegue (por ejemplo, Docker Compose).
+const API = process.env.API_URL || "http://localhost:3000/api";
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const PAUSA_MS = 25000;
 const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -67,5 +68,6 @@ for (const [i, c] of casos.entries()) {
 }
 lineas.push("", fallos === 0 ? "CHATBOT v2 SIN REGRESIONES" : `CHATBOT v2 CON ${fallos} FALLAS`);
 mkdirSync(join(AQUI, "resultados"), { recursive: true });
-writeFileSync(join(AQUI, "resultados", "chatbot.txt"), `${lineas.join("\n")}\n`);
+writeFileSync(join(AQUI, "resultados", process.env.CHATBOT_SALIDA || "chatbot.txt"), `${lineas.join("\n")}\n`);
 console.log(lineas.slice(-1)[0]);
+process.exit(fallos ? 1 : 0);

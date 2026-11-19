@@ -55,8 +55,9 @@ cd ecommerce-ing2
 
 1. **Base de datos.** Con Docker Desktop abierto:
    ```bash
-   docker compose up -d
+   npm run db:levantar
    ```
+   Equivale a `docker compose -f docker-compose.dev.yml up -d` (contenedor `ecommerce_db` en `127.0.0.1:5434`).
    La primera vez, PostgreSQL ejecuta `database/schema.sql` y crea las 5 tablas. El contenedor se reinicia solo cuando se abre Docker Desktop.
 
 2. **Variables de entorno.** Copia los ejemplos y complétalos:
@@ -92,6 +93,21 @@ cd ecommerce-ing2
    ```
    Abre http://localhost:5173 (la API queda en http://localhost:3000/api).
 
+## Despliegue con Docker Compose
+
+La solución completa (PostgreSQL, API y frontend con nginx) corre en contenedores con `docker-compose.yml` (proyecto `tienda-usco`, que no choca con la BD de desarrollo):
+
+```bash
+cp .env.compose.example .env.compose   # completar contraseña de la BD, JWT_SECRET y la key de Groq
+npm run deploy                         # docker compose --env-file .env.compose up -d --build
+npm run deploy:demo                    # datos de demostración dentro del contenedor de la API
+docker compose ps                      # db, api y web en estado healthy
+```
+
+Web en http://localhost:8080 y API en http://localhost:3000/api. Para detenerlo: `npm run deploy:down`. `.env.compose` no se versiona.
+
+**Manual técnico:** [docs/manual-tecnico.md](docs/manual-tecnico.md) (arquitectura, variables, despliegue paso a paso, pruebas y solución de problemas).
+
 ## Credenciales de prueba
 
 | Rol | Email | Contraseña |
@@ -121,6 +137,10 @@ Vencimiento: cualquier fecha futura en formato MM/AA (ej. 12/28). CVV: cualquier
 | `npm run db:demo` | Igual que `db:reset` y además carga datos de demostración coherentes: 48 productos más, 12 clientes y 40 órdenes con su historial (240 registros) |
 | `npm run verificar` | Chequeo previo: Docker, contenedor, tablas, `.env`, puertos e internet/Groq |
 | `npm run prueba:concurrencia` | Dos clientes compran a la vez la última unidad del monitor: debe dar 201 + 409 y stock final 0 |
+| `npm run db:levantar` | Levanta la BD de desarrollo (`docker-compose.dev.yml`) |
+| `npm run deploy` / `deploy:demo` / `deploy:down` | Despliegue completo con Docker Compose: construir y levantar, cargar la demo, detener |
+| `npm run deploy:concurrencia` | Prueba de concurrencia dentro del despliegue con Compose |
+| `npm run test:e2e` / `test:e2e:compose` | Suite E2E de aceptación contra desarrollo o contra Compose |
 
 En `backend/` también están `npm run seed`, `npm run build` y `npm start`; en `frontend/`, `npm run build` y `npm run lint`.
 

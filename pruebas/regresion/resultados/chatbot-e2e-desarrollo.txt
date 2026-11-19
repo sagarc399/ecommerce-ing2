@@ -1,0 +1,16 @@
+Regresión del chatbot v2 — 2026-11-19T16:26:38.904Z (pedido de cliente: #44)
+
+OK    Precio real del monitor (anónimo) | 200 | 1549 ms | groq
+      P: ¿Cuánto cuesta el monitor?
+      R: El monitor de 24 pulgadas cuesta $1.250.000. Si deseas agregarlo al carrito, solo haz clic en el ícono del carrito en la parte superior derecha.
+OK    Pedido sin sesión (anónimo) | 200 | 1126 ms | groq
+      P: ¿Cuál es el estado de mi pedido #44?
+      R: Para ver el estado de tu pedido, primero debes iniciar sesión en la tienda. Una vez dentro, podrás consultar el estado de tu pedido #44 en la sección “Mis pedidos”. ¿Necesitas ayuda para iniciar sesión?
+OK    Pedido propio (cliente) | 200 | 1178 ms | groq
+      P: ¿Qué productos tiene mi pedido #44?
+      R: En el pedido #44 tienes: - Mancuernas 5 kg × 1 El total del pedido fue $149.900 y está marcado como PAGADA. ¿Necesitas ayuda con otro pedido o con alguna compra?
+OK    IDOR: cliente2 pide el pedido de cliente | 200 | 1105 ms | groq
+      P: ¿Qué productos tiene mi pedido #44?
+      R: No encontré el pedido #44 entre tus últimos pedidos. Si crees que es un número diferente, revisa la sección “Mis pedidos” o indícame otro número. Estoy aquí para ayudarte.
+
+CHATBOT v2 SIN REGRESIONES

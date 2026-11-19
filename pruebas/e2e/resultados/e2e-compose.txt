@@ -1,0 +1,21 @@
+Suite E2E de aceptación — 2026-11-19T16:25:49.604Z
+Entorno: compose | APP_URL http://localhost:8080 | API_URL http://localhost:3000/api
+
+OK    HU-01 Como visitante quiero registrarme para poder comprar [flujo.mjs, paso 1]
+OK    HU-02 Como cliente quiero agregar productos al carrito desde el catálogo [flujo.mjs, paso 2]
+OK    HU-03 Como cliente quiero pagar con tarjeta y recibir la confirmación del pedido [flujo.mjs, paso 3]
+OK    HU-04 Como cliente quiero que un pago rechazado me deje reintentar sin reescribir la tarjeta (CVV de nuevo) [flujo.mjs, paso 4]
+OK    HU-05 Como cliente quiero ver mis pedidos y su detalle [flujo.mjs, paso 5]
+OK    HU-06 Como cliente quiero cerrar sesión [flujo.mjs, paso 6]
+OK    HU-07 Como administrador quiero crear un producto y que aparezca en el catálogo [flujo.mjs, paso 7]
+OK    HU-08 La interfaz no debe tener errores de JavaScript ni violaciones de la CSP [flujo.mjs, pasos 8 y 9]
+OK    HU-09 Como visitante quiero preguntarle al chatbot el precio real de un producto [chatbot.mjs, prueba 1]
+OK    HU-10 El chatbot no debe mostrar pedidos a quien no inició sesión [chatbot.mjs, prueba 2]
+OK    HU-11 Como cliente quiero consultar mi pedido en el chatbot [chatbot.mjs, prueba 3]
+OK    HU-12 El chatbot no debe revelar pedidos de otro cliente (IDOR) [chatbot.mjs, prueba 4]
+OK    HU-13 Dos compras simultáneas de la última unidad no deben sobrevender (201 + 409, stock 0) [prueba de concurrencia]
+
+Proveedor del chatbot en las 4 preguntas: groq, groq, groq, groq
+Duración: flujo 18 s, chatbot 82 s, concurrencia 2 s
+
+ACEPTACIÓN: 13 de 13 criterios cumplidos

@@ -1,0 +1,107 @@
+{
+  "fecha": "2026-11-19T16:28:03.455Z",
+  "entorno": "desarrollo",
+  "APP_URL": "http://localhost:5173",
+  "API_URL": "http://localhost:3000/api",
+  "aprobados": 13,
+  "total": 13,
+  "proveedores": [
+    "groq",
+    "groq",
+    "groq",
+    "groq"
+  ],
+  "criterios": [
+    {
+      "id": "HU-01",
+      "historia": "Como visitante quiero registrarme para poder comprar",
+      "prueba": "flujo.mjs, paso 1",
+      "ok": true
+    },
+    {
+      "id": "HU-02",
+      "historia": "Como cliente quiero agregar productos al carrito desde el catálogo",
+      "prueba": "flujo.mjs, paso 2",
+      "ok": true
+    },
+    {
+      "id": "HU-03",
+      "historia": "Como cliente quiero pagar con tarjeta y recibir la confirmación del pedido",
+      "prueba": "flujo.mjs, paso 3",
+      "ok": true
+    },
+    {
+      "id": "HU-04",
+      "historia": "Como cliente quiero que un pago rechazado me deje reintentar sin reescribir la tarjeta (CVV de nuevo)",
+      "prueba": "flujo.mjs, paso 4",
+      "ok": true
+    },
+    {
+      "id": "HU-05",
+      "historia": "Como cliente quiero ver mis pedidos y su detalle",
+      "prueba": "flujo.mjs, paso 5",
+      "ok": true
+    },
+    {
+      "id": "HU-06",
+      "historia": "Como cliente quiero cerrar sesión",
+      "prueba": "flujo.mjs, paso 6",
+      "ok": true
+    },
+    {
+      "id": "HU-07",
+      "historia": "Como administrador quiero crear un producto y que aparezca en el catálogo",
+      "prueba": "flujo.mjs, paso 7",
+      "ok": true
+    },
+    {
+      "id": "HU-08",
+      "historia": "La interfaz no debe tener errores de JavaScript ni violaciones de la CSP",
+      "prueba": "flujo.mjs, pasos 8 y 9",
+      "ok": true
+    },
+    {
+      "id": "HU-09",
+      "historia": "Como visitante quiero preguntarle al chatbot el precio real de un producto",
+      "prueba": "chatbot.mjs, prueba 1",
+      "ok": true
+    },
+    {
+      "id": "HU-10",
+      "historia": "El chatbot no debe mostrar pedidos a quien no inició sesión",
+      "prueba": "chatbot.mjs, prueba 2",
+      "ok": true
+    },
+    {
+      "id": "HU-11",
+      "historia": "Como cliente quiero consultar mi pedido en el chatbot",
+      "prueba": "chatbot.mjs, prueba 3",
+      "ok": true
+    },
+    {
+      "id": "HU-12",
+      "historia": "El chatbot no debe revelar pedidos de otro cliente (IDOR)",
+      "prueba": "chatbot.mjs, prueba 4",
+      "ok": true
+    },
+    {
+      "id": "HU-13",
+      "historia": "Dos compras simultáneas de la última unidad no deben sobrevender (201 + 409, stock 0)",
+      "prueba": "prueba de concurrencia",
+      "ok": true
+    }
+  ],
+  "salidas": {
+    "concurrencia": [
+      "> prueba:concurrencia",
+      "> npm --prefix backend run prueba:concurrencia",
+      "> backend@1.0.0 prueba:concurrencia",
+      "> tsx src/scripts/prueba-concurrencia.ts",
+      "1. Stock de \"Monitor 24 pulgadas\" (id 4) puesto en 1",
+      "   cliente@tienda.com: HTTP 201 → orden 45 PAGADA",
+      "   cliente2@tienda.com: HTTP 409 → Stock insuficiente para \"Monitor 24 pulgadas\"",
+      "4. Stock final en la BD: 0",
+      "PRUEBA SUPERADA"
+    ]
+  }
+}

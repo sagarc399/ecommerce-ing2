@@ -39,11 +39,11 @@ Datos que se usan: **cliente@tienda.com / Cliente123**, **admin@tienda.com / Adm
 |---|---|
 | **Sin internet** | En `backend/.env` poner `CHAT_PROVEEDOR=reglas` y reiniciar `npm run dev`. El catálogo no se afecta porque las imágenes son locales. El chat responde con reglas (aviso "Respuesta automática"). |
 | **Groq falla o se agota la cuota** | El chat ya cae solo a reglas. Para usar otro proveedor: `CHAT_PROVEEDOR=gemini` (lento en el plan gratuito) o `CHAT_PROVEEDOR=reglas`, y reiniciar `npm run dev`. |
-| **Docker no arranca** | Reiniciar Docker Desktop. Si sigue fallando: `wsl --shutdown` en PowerShell y abrir Docker de nuevo. Luego `docker compose up -d` y `npm run verificar`. |
+| **Docker no arranca** | Reiniciar Docker Desktop. Si sigue fallando: `wsl --shutdown` en PowerShell y abrir Docker de nuevo. Luego `npm run db:levantar` y `npm run verificar`. |
 | **Puerto 3000 o 5173 ocupado** | `npm run verificar` lo detecta. Buscar el proceso con `netstat -ano \| findstr :3000` y cerrarlo con `taskkill /PID <pid> /F`. Suele ser una terminal vieja de `npm run dev`. |
 | **Puerto 5434 ocupado** | Revisar con `netstat -ano \| findstr :5434`. Si es otro PostgreSQL, cambiar el puerto en `docker-compose.yml` y `DB_PORT` en `backend/.env`. |
 | **La BD tiene datos sucios** | `npm run db:reset` (vacía todo, reinicia ids y recarga los datos de prueba). Cerrar sesión en el navegador después, porque los ids cambian. |
-| **Se perdió el esquema (tablas)** | `docker compose down -v` y `docker compose up -d` (recrea el volumen y vuelve a ejecutar `schema.sql`), luego `npm run db:reset`. |
+| **Se perdió el esquema (tablas)** | `docker compose -f docker-compose.dev.yml down -v` y `npm run db:levantar` (recrea el volumen y vuelve a ejecutar `schema.sql`), luego `npm run db:reset`. |
 | **Sesión rara en el navegador** | Cerrar sesión, o en la consola del navegador `localStorage.clear()` y recargar. |
 
 ## d) Preguntas probables del profesor
