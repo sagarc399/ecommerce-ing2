@@ -93,14 +93,14 @@ function revisarDocker() {
     ok(`El contenedor ecommerce_db está arriba (${estado})`);
     return true;
   }
-  falla("El contenedor ecommerce_db no está corriendo", "En la raíz del proyecto ejecuta: docker compose up -d");
+  falla("El contenedor ecommerce_db no está corriendo", "En la raíz del proyecto ejecuta: npm run db:levantar");
   return false;
 }
 
 // --- 2. PostgreSQL y tablas ---
 async function revisarBaseDeDatos(contenedorArriba) {
   if (!(await puertoAbierto(5434))) {
-    falla("PostgreSQL no responde en el puerto 5434", "Ejecuta docker compose up -d y revisa que nada más use el puerto 5434");
+    falla("PostgreSQL no responde en el puerto 5434", "Ejecuta npm run db:levantar y revisa que nada más use el puerto 5434");
     return;
   }
   if (!contenedorArriba) {
@@ -115,7 +115,7 @@ async function revisarBaseDeDatos(contenedorArriba) {
     const existentes = new Set(salida.split(/\r?\n/).map((t) => t.trim()));
     const faltan = TABLAS.filter((t) => !existentes.has(t));
     if (faltan.length === 0) ok(`PostgreSQL responde en el puerto 5434 y existen las ${TABLAS.length} tablas`);
-    else falla(`Faltan tablas en la BD: ${faltan.join(", ")}`, "Recrea la BD: docker compose down -v && docker compose up -d && npm run db:reset");
+    else falla(`Faltan tablas en la BD: ${faltan.join(", ")}`, "Recrea la BD: docker compose -f docker-compose.dev.yml down -v && npm run db:levantar && npm run db:reset");
   } catch {
     falla("No se pudo consultar la BD dentro del contenedor", "Espera unos segundos a que PostgreSQL termine de arrancar y vuelve a intentar");
   }

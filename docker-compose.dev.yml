@@ -1,0 +1,22 @@
+# BD de DESARROLLO (contenedor ecommerce_db en 127.0.0.1:5434), para npm run dev.
+# Uso: npm run db:levantar   (equivale a: docker compose -f docker-compose.dev.yml up -d)
+# La solución completa en contenedores está en docker-compose.yml (proyecto tienda-usco).
+services:
+  db:
+    image: postgres:16
+    container_name: ecommerce_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      # Solo se usa al crear el volumen por primera vez. Después cámbiala con
+      # ALTER USER postgres WITH PASSWORD '...'; y ponla en DB_PASSWORD de backend/.env (SEG-09).
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ecommerce
+    ports:
+      # Solo en loopback: la BD no queda expuesta a la red local (SEG-09).
+      - "127.0.0.1:5434:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql
+volumes:
+  pgdata:

@@ -9,7 +9,14 @@
     "verificar": "node scripts/verificar.mjs",
     "prueba:concurrencia": "npm --prefix backend run prueba:concurrencia",
     "db:poblar": "npm --prefix backend run db:poblar",
-    "db:demo": "npm --prefix backend run db:demo"
+    "db:demo": "npm --prefix backend run db:demo",
+    "db:levantar": "docker compose -f docker-compose.dev.yml up -d",
+    "deploy": "node scripts/preparar-certs.mjs && docker compose --env-file .env.compose up -d --build",
+    "deploy:demo": "docker compose --env-file .env.compose exec api node dist/scripts/demo.js",
+    "deploy:concurrencia": "docker compose --env-file .env.compose exec api node dist/scripts/prueba-concurrencia.js",
+    "deploy:down": "docker compose --env-file .env.compose down",
+    "test:e2e": "node pruebas/e2e/ejecutar.mjs",
+    "test:e2e:compose": "node pruebas/e2e/ejecutar.mjs --compose"
   },
   "devDependencies": {
     "concurrently": "^10.0.6"

@@ -1,19 +1,84 @@
+# Solución completa de Tienda USCO en contenedores: base de datos, API y frontend.
+# Proyecto "tienda-usco": no choca con la BD de desarrollo (docker-compose.dev.yml, contenedor ecommerce_db).
+#
+# Uso (desde la raíz):
+#   cp .env.compose.example .env.compose   y completar los valores (no se versiona)
+#   npm run deploy        → docker compose --env-file .env.compose up -d --build
+#   npm run deploy:demo   → carga los datos de demostración (db:demo) dentro del contenedor de la API
+#   npm run deploy:down   → detiene y borra los contenedores (el volumen con los datos se conserva)
+# Web: http://localhost:8080   API: http://localhost:3000/api
+name: tienda-usco
+
 services:
   db:
     image: postgres:16
-    container_name: ecommerce_db
-    restart: unless-stopped
     environment:
-      POSTGRES_USER: postgres
-      # Solo se usa al crear el volumen por primera vez. Después cámbiala con
-      # ALTER USER postgres WITH PASSWORD '...'; y ponla en DB_PASSWORD de backend/.env (SEG-09).
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: ecommerce
-    ports:
-      # Solo en loopback: la BD no queda expuesta a la red local (SEG-09).
-      - "127.0.0.1:5434:5432"
+      POSTGRES_USER: ${POSTGRES_USER:?Falta POSTGRES_USER en .env.compose}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Falta POSTGRES_PASSWORD en .env.compose}
+      POSTGRES_DB: ${POSTGRES_DB:?Falta POSTGRES_DB en .env.compose}
+    # Sin puertos publicados: solo la API llega a la base de datos, por la red interna de Compose.
     volumes:
-      - pgdata:/var/lib/postgresql/data
-      - ./database/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql
+      - datos:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ./backend
+      secrets: [ca_extra]
+    environment:
+      PORT: 3000
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: ${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET:?Falta JWT_SECRET en .env.compose}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-2h}
+      ADMIN_EMAIL: ${SEED_ADMIN_EMAIL:?Falta SEED_ADMIN_EMAIL en .env.compose}
+      ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:?Falta SEED_ADMIN_PASSWORD en .env.compose}
+      # El navegador carga la app desde el contenedor web.
+      CORS_ORIGIN: ${WEB_URL:-http://localhost:8080}
+      CHAT_PROVEEDOR: ${CHAT_PROVEEDOR:-reglas}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      GROQ_MODEL: ${GROQ_MODEL:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-}
+      # Certificado raíz adicional (opcional, ver scripts/preparar-certs.mjs) para las llamadas HTTPS al chatbot.
+      NODE_EXTRA_CA_CERTS: /certs/ca-extra.pem
+    volumes:
+      - ./certs:/certs:ro
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./frontend
+      secrets: [ca_extra]
+      args:
+        # Origen de la API tal como lo ve el navegador, sin /api (el bundle usa API_URL/api; la CSP, el origen).
+        API_URL: ${API_URL:-http://localhost:3000}
+    ports:
+      - "8080:8080"
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
 volumes:
-  pgdata:
+  datos:
+
+# Certificado raíz adicional, propio de cada máquina (certs/ no se versiona). npm run deploy lo crea vacío
+# si no existe. En el equipo de pruebas es el de Avast Web/Mail Shield, que inspecciona el HTTPS.
+secrets:
+  ca_extra:
+    file: ./certs/ca-extra.pem

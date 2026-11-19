@@ -11,6 +11,8 @@ import { chromium } from "../usabilidad/node_modules/playwright/index.mjs";
 
 // APP_URL=http://localhost:4173 corre el flujo contra el build de producción (vite preview, con CSP).
 const APP = process.env.APP_URL || "http://localhost:5173";
+// API_URL (con /api) para la comprobación del paso 7; por defecto la API de desarrollo.
+const API = process.env.API_URL || "http://localhost:3000/api";
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const lineas = [];
 let fallos = 0;
@@ -133,7 +135,7 @@ await paso("7. Admin crea un producto", async () => {
   await page.getByRole("dialog").waitFor({ state: "detached" });
   // Como en T8: la tabla pagina, así que vale la fila o el aviso de creación.
   await page.locator("tbody").getByText(nombreProducto).or(page.getByText(`"${nombreProducto}" creado`)).first().waitFor({ timeout: 10000 });
-  const r = await (await fetch(`http://localhost:3000/api/productos?buscar=${encodeURIComponent(nombreProducto)}`)).json();
+  const r = await (await fetch(`${API}/productos?buscar=${encodeURIComponent(nombreProducto)}`)).json();
   if (!r.datos.some((p) => p.nombre === nombreProducto)) throw new Error("no aparece en el catálogo público");
   return `"${nombreProducto}" creado y visible en el catálogo`;
 });
@@ -155,6 +157,6 @@ await paso("9. Sin violaciones de Content-Security-Policy", async () => {
 await navegador.close();
 lineas.push("", fallos === 0 ? "FLUJO COMPLETO SIN REGRESIONES" : `FLUJO CON ${fallos} FALLAS`);
 mkdirSync(join(AQUI, "resultados"), { recursive: true });
-writeFileSync(join(AQUI, "resultados", PROXY ? "flujo-proxy.txt" : process.env.APP_URL ? "flujo-build-csp.txt" : "flujo.txt"), `Regresión del flujo en el navegador — ${new Date().toISOString()}\n\n${lineas.join("\n")}\n`);
+writeFileSync(join(AQUI, "resultados", process.env.FLUJO_SALIDA ? process.env.FLUJO_SALIDA : PROXY ? "flujo-proxy.txt" : process.env.APP_URL ? "flujo-build-csp.txt" : "flujo.txt"), `Regresión del flujo en el navegador — ${new Date().toISOString()}\n\n${lineas.join("\n")}\n`);
 console.log(lineas.at(-1));
 process.exit(fallos ? 1 : 0);
